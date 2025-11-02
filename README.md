@@ -33,6 +33,6 @@
 <div>
   <p>프로젝트를 다운받으면 node_modules를 설치해야 합니다.</p>
 
-  <p>각 파트 폴더로 이동해서 node init을 하면 설치됩니다.</p>
-  <p>packege.json에 dependencies가 있기 때문에 node init을 하면 다운받을 수 있습니다.</p>
+  <p>각 파트 폴더로 이동해서 node install을 하면 설치됩니다.</p>
+  <p>packege.json에 dependencies가 있기 때문에 node install을 하면 다운받을 수 있습니다.</p>
 </div>
