@@ -1,0 +1,237 @@
+.search-page {
+  width: 100%;
+  padding: 40px 60px;
+  box-sizing: border-box;
+}
+
+/* 상단 작은 타이틀 */
+.search-top-row {
+  margin-bottom: 28px;
+}
+
+.search-main-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #444;
+}
+
+/* 메인 레이아웃 */
+.ingredient-area {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 40px;
+  align-items: flex-start;
+  margin-bottom: 60px;
+}
+
+/* 왼쪽: 재료 클라우드 */
+.ingredient-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 18px;
+  padding: 28px 32px;
+  border-radius: 40px;
+  background: #f5f1e9; 
+}
+
+.ingredient-pill {
+  padding: 16px 26px;
+  border-radius: 40px;
+  border: none;
+  background: #fdfbf7;
+  box-shadow: 0 0 0 1px #e2ddd3 inset;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.15s;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05); 
+
+}
+
+.ingredient-pill:hover {
+  box-shadow: 0 0 0 1px #ee6049 inset;
+}
+
+.ingredient-pill.active {
+  background: #ffcfb8;
+  box-shadow: 0 0 0 1px #ee6049 inset;
+  color: #ee6049;
+  font-weight: 600;
+}
+
+/* 오른쪽: 검색/정렬/레시피찾기/태그 영역 */
+.search-side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* 정렬 탭 */
+.side-sort-row {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.side-sort-tab {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 50px;
+  border: none;
+  background: #f2eee7;
+  color: #777;
+  cursor: pointer;
+}
+
+.side-sort-tab.active {
+  background: #ffffff;
+  box-shadow: 0 0 0 1px #e2ddd3 inset;
+  color: #444;
+  font-weight: 500;
+}
+
+/* SEARCH 입력 */
+.side-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.side-search-input {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 40px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  background: #fff;
+}
+
+.side-search-input:disabled {
+  color: #aaa;
+  background: #faf7f2;
+}
+
+.side-search-icon {
+  font-size: 20px;
+}
+
+/* 레시피 찾기 버튼 */
+.side-search-button button {
+  font-size: 20px;
+  padding: 16px 0;
+  border-radius: 12px;
+
+}
+
+/* 오른쪽 tag 리스트 */
+.side-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.side-tag-chip {
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: none;
+  background: #333;
+  color: #fff;
+  font-size: 17px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.side-tag-placeholder {
+  font-size: 15px;
+  color: #999;
+}
+
+/* ========== 추천 레시피 영역 ========== */
+.recommend-section {
+  margin-top: 8px;
+}
+
+.recommend-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.recommend-helper,
+.recommend-empty {
+  font-size: 18px;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+/* 카드들을 가로로 배치 */
+.recommend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+}
+
+/* 레시피 카드 (작은 베이지 카드 + 동그란 이미지) */
+.recommend-card {
+  width: 240px;
+  padding: 20px 18px 18px;
+  background: #ffe9d9;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.recommend-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* 동그란 이미지 */
+.recommend-img-wrap {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #fff;
+}
+
+.recommend-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 텍스트 */
+.recommend-info {
+  text-align: center;
+}
+
+.recommend-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.recommend-meta {
+  font-size: 15px;
+  color: #666;
+}
+
+/* 반응형 */
+@media (max-width: 960px) {
+  .ingredient-area {
+    grid-template-columns: 1fr;
+  }
+
+  .search-side-panel {
+    align-items: flex-start;
+  }
+
+  .recommend-row {
+    justify-content: flex-start;
+  }
+}
