@@ -1,3 +1,62 @@
+// 식재료 더미 목록
+
+const dummyIngredients = [
+  {
+    id: 1,
+    name: "계란",
+    createdAt: "2025-11-01",
+    expireAt: "2025-11-05",
+  },
+  {
+    id: 2,
+    name: "빵",
+    createdAt: "2025-11-02",
+    expireAt: "2025-11-04",
+  },
+  {
+    id: 3,
+    name: "토마토",
+    createdAt: "2025-11-03",
+    expireAt: "2025-11-08",
+  },
+  {
+    id: 4,
+    name: "양파",
+    createdAt: "2025-11-01",
+    expireAt: "2025-11-06",
+  },
+  {
+    id: 5,
+    name: "감자",
+    createdAt: "2025-11-02",
+    expireAt: "2025-11-03",
+  },
+  {
+    id: 6,
+    name: "치즈",
+    createdAt: "2025-11-04",
+    expireAt: "2025-11-10",
+  },
+  {
+    id: 7,
+    name: "쌀",
+    createdAt: "2025-11-01",
+    expireAt: "2025-12-01",
+  },
+  
+];
+
+//  식재료 목록 가져오기 (나중에 DB API로 교체)
+export async function fetchIngredients() {
+  // TODO: 실제 백엔드 연결 시
+  // const res = await fetch("/api/ingredients");
+  // return res.json();
+
+  await new Promise((r) => setTimeout(r, 200)); // 시연용 딜레이
+  return dummyIngredients;
+}
+
+
 // 시연용 더미 데이터 
 const dummySavedRecipes = [
   {
@@ -25,26 +84,9 @@ const dummySavedRecipes = [
     createdAt: "2025-01-30",
     ingredients: ["양상추", "토마토", "양파", "올리브유"]
   },
+
   {
     id: 4,
-    name: "Egg Scramble",
-    category: "양식",
-    imageUrl: "/images/egg.png",
-    createdAt: "2025-02-01",
-    ingredients: ["계란", "우유", "소금"]
-
-  },
-  {
-    id: 5,
-    name: "Egg Scramble",
-    category: "양식",
-    imageUrl: "/images/egg.png",
-    createdAt: "2025-02-01",
-    ingredients: ["계란", "우유", "소금"],
-
-  },
-  {
-    id: 6,
     name: "Hamburger",
     category: "양식",
     imageUrl: "/images/burger.png",
@@ -78,7 +120,7 @@ export async function fetchRecipeDetail(id) {
 
 
 
-// 검색에 쓸 재료 기반 레시피 더미 데이터
+//  레시피 더미 데이터
 const dummySearchRecipes = [
   {
     id: 101,

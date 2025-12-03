@@ -1,32 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { searchRecipesByIngredients } from "../utils/api";
+import {   fetchIngredients, searchRecipesByIngredients } from "../utils/api";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
 import "./RecipeSearch.css";
 
-const INGREDIENT_OPTIONS = [
-  "계란",
-  "빵",
-  "토마토",
-  "양파",
-  "감자",
-  "치즈",
-  "파스타",
-  "쌀",
-  "소고기",
-  "닭고기",
-  "김치",
-];
 
 export default function RecipeSearch() {
   const navigate = useNavigate();
+
+  const [ingredients, setIngredients] = useState([]);
 
   const [selected, setSelected] = useState([]);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [sortMode, setSortMode] = useState("created"); 
+
+  // DB(지금은 더미)에서 식재료 목록 가져오기
+  useEffect(() => {
+    const load = async () => {
+      const data = await fetchIngredients();
+      setIngredients(data);
+    };
+    load();
+  }, []);
+
+  // sortMode에 따라 정렬된 식재료 목록 만들기
+  const sortedIngredients = [...ingredients].sort((a, b) => {
+    if (sortMode === "name") {
+      return a.name.localeCompare(b.name, "ko-KR");
+    }
+    if (sortMode === "expire") {
+      // 유통기한 임박순 (가장 빠른 날짜 먼저)
+      return new Date(a.expireAt) - new Date(b.expireAt);
+    }
+    // 등록순: id 기준 오름차순 (food_id)
+    return a.id - b.id;
+  });
+
+  const filteredIngredients = sortedIngredients.filter((item) =>
+      item.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+
 
   // 재료 선택 토글
   const toggleIngredient = (item) => {
@@ -52,10 +69,6 @@ export default function RecipeSearch() {
     
   };
 
-  const filteredIngredients = INGREDIENT_OPTIONS.filter((item) =>
-      item.toLowerCase().includes(searchText.toLowerCase())
-    );
-    
   return (
     <div className="search-page">
       {/* 상단 텍스트 */}
@@ -65,21 +78,22 @@ export default function RecipeSearch() {
 
       {/* 재료 클라우드 + 오른쪽 패널 */}
       <div className="ingredient-area">
-        {/* 왼쪽: 구름 형태 재료 버튼들 */}
+        {/* 왼쪽:재료 버튼들 */}
         <div className="ingredient-cloud">
           {filteredIngredients.map((item) => {
-            const isActive = selected.includes(item);
+            const isActive = selected.includes(item.name);
             return (
               <button
-                key={item}
+                key={item.id ?? item.name}
                 type="button"
                 className={`ingredient-pill ${isActive ? "active" : ""}`}
-                onClick={() => toggleIngredient(item)}
+                onClick={() => toggleIngredient(item.name)}
               >
-                {item}
+                {item.name}
               </button>
             );
           })}
+
           {filteredIngredients.length === 0 && (
             <div className="no-ingredient">
               해당 이름의 식재료가 없습니다.
@@ -91,12 +105,29 @@ export default function RecipeSearch() {
         <aside className="search-side-panel">
           {/* 정렬 탭 */}
           <div className="side-sort-row">
-            <button className="side-sort-tab active">입력순</button>
-            <button className="side-sort-tab">이름순</button>
-            <button className="side-sort-tab">등록순</button>
+            <button
+              className={`side-sort-tab ${sortMode === "name" ? "active" : ""}`}
+              onClick={() => setSortMode("name")}
+            >
+              이름순
+            </button>
+
+            <button
+              className={`side-sort-tab ${sortMode === "created" ? "active" : ""}`}
+              onClick={() => setSortMode("created")}
+            >
+              등록순
+            </button>
+
+            <button
+              className={`side-sort-tab ${sortMode === "expire" ? "active" : ""}`}
+            onClick={() => setSortMode("expire")}
+            >
+              임박순
+            </button>
           </div>
 
-          {/* SEARCH 입력 (지금은 기능 없음, 디자인용) */}
+          {/* SEARCH 입력 */}
           <div className="side-search-row">
             <input
               className="side-search-input"
@@ -105,11 +136,11 @@ export default function RecipeSearch() {
               onChange={(e) => setSearchText(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  const exact = INGREDIENT_OPTIONS.find(
-                    (item) => item === searchText
+                  const exact = ingredients.find(
+                    (item) => item.name === searchText
                   );
                   if (exact) {
-                  toggleIngredient(exact);
+                  toggleIngredient(exact.name);
                   }
                 }
               }}
@@ -136,14 +167,14 @@ export default function RecipeSearch() {
               </span>
             )}
 
-            {selected.map((item) => (
+            {selected.map((name) => (
               <button
-                key={item}
+                key={name}
                 type="button"
                 className="side-tag-chip"
-                onClick={() => removeSelected(item)}
+                onClick={() => removeSelected(name)}
               >
-                {item} ✕
+                {name}  ✕
               </button>
             ))}
           </div>
