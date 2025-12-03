@@ -26,6 +26,7 @@ export default function RecipeSearch() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   // 재료 선택 토글
   const toggleIngredient = (item) => {
@@ -48,8 +49,13 @@ export default function RecipeSearch() {
     const data = await searchRecipesByIngredients(selected);
     setResults(data);
     setLoading(false);
+    
   };
 
+  const filteredIngredients = INGREDIENT_OPTIONS.filter((item) =>
+      item.toLowerCase().includes(searchText.toLowerCase())
+    );
+    
   return (
     <div className="search-page">
       {/* 상단 텍스트 */}
@@ -61,7 +67,7 @@ export default function RecipeSearch() {
       <div className="ingredient-area">
         {/* 왼쪽: 구름 형태 재료 버튼들 */}
         <div className="ingredient-cloud">
-          {INGREDIENT_OPTIONS.map((item) => {
+          {filteredIngredients.map((item) => {
             const isActive = selected.includes(item);
             return (
               <button
@@ -74,6 +80,11 @@ export default function RecipeSearch() {
               </button>
             );
           })}
+          {filteredIngredients.length === 0 && (
+            <div className="no-ingredient">
+              해당 이름의 식재료가 없습니다.
+            </div>
+          )}
         </div>
 
         {/* 오른쪽: 정렬/검색/레시피찾기/태그 */}
@@ -89,8 +100,19 @@ export default function RecipeSearch() {
           <div className="side-search-row">
             <input
               className="side-search-input"
-              placeholder="SEARCH"
-              disabled
+              placeholder="식재료 검색"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const exact = INGREDIENT_OPTIONS.find(
+                    (item) => item === searchText
+                  );
+                  if (exact) {
+                  toggleIngredient(exact);
+                  }
+                }
+              }}
             />
             <span className="side-search-icon">🔍</span>
           </div>
