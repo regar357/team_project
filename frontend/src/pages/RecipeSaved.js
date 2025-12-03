@@ -15,7 +15,8 @@ const RecipeSaved = () => {
   const [selectedCategories, setSelectedCategories] = useState([...CATEGORIES]);
   const [loading, setLoading] = useState(true);
   const [deleteMode, setDeleteMode] = useState(false);
-
+  // const raw = localStorage.getItem("savedRecipes");
+  // const ids = raw ? JSON.parse(raw) : [];
   useEffect(() => {
     fetchSavedRecipes()
       .then((data) => {

@@ -1,5 +1,4 @@
 // 식재료 더미 목록
-
 const dummyIngredients = [
   {
     id: 1,
@@ -48,7 +47,7 @@ const dummyIngredients = [
 
 //  식재료 목록 가져오기 (나중에 DB API로 교체)
 export async function fetchIngredients() {
-  // TODO: 실제 백엔드 연결 시
+  // 실제 백엔드 연결 시
   // const res = await fetch("/api/ingredients");
   // return res.json();
 
@@ -57,7 +56,7 @@ export async function fetchIngredients() {
 }
 
 
-// 시연용 더미 데이터 
+// 저장 레시피 더미 데이터 
 const dummySavedRecipes = [
   {
     id: 1,
@@ -65,8 +64,15 @@ const dummySavedRecipes = [
     category: "양식",
     imageUrl: "/images/egg.png",
     createdAt: "2025-02-01",
-    ingredients: ["계란", "우유", "소금"]
-
+    servings: "1인분",
+    time: "10분",
+    ingredients: ["계란 2개", "우유 50ml", "소금", "후추", "버터"],
+    steps: [
+      "볼에 계란과 우유를 넣고 잘 풀어준다.",
+      "중약불로 달군 팬에 버터를 녹인다.",
+      "계란물을 넣고 주걱으로 천천히 저어가며 익힌다.",
+      "반숙 정도에서 불을 끄고 잔열로 마무리한다.",
+    ],
   },
   {
     id: 2,
@@ -104,7 +110,7 @@ export async function fetchSavedRecipes() {
 // 레시피 삭제하기
 export async function deleteRecipe(id) {
   await new Promise((r) => setTimeout(r, 150));
-  return true; // 성공했다고 가정
+  return true; 
 }
 // 레시피 상세 조회 (id로 찾기)
 export async function fetchRecipeDetail(id) {
@@ -130,6 +136,12 @@ const dummySearchRecipes = [
     servings: "2인분",
     imageUrl: "/images/pasta.png",
     ingredients: ["파스타", "토마토", "마늘", "올리브유"],
+    steps: [
+      "파스타 면을 삶는다.",
+      "팬에 올리브유와 마늘을 볶는다.",
+      "토마토 소스를 넣고 끓인다.",
+      "삶은 면을 넣고 잘 섞어준다.",
+    ],
   },
   {
     id: 102,
@@ -178,4 +190,32 @@ export async function searchRecipesByIngredients(selectedIngredients) {
 
   // "메뉴 3개 정도" → 상위 3개만 리턴
   return filtered.slice(0, 3);
+}
+
+
+const dummyRecipeDetail = {
+  id: 1,
+  imageUrl: "/images/egg.png",
+  title: "토마토 파스타",
+  description: "상큼한 토마토 향이 가득한 간단 파스타입니다.",
+  priority_used_ingredients: ["토마토", "파스타면", "올리브유"],
+  other_ingredients: ["마늘", "소금", "후추"],
+  servings: 2,
+  steps: [
+    "파스타 면을 삶습니다.123456789123456789123456789",
+    "올리브유에 마늘을 볶습니다.",
+    "토마토 소스를 넣고 끓입니다.",
+    "면을 넣고 잘 섞어 마무리합니다."
+  ],
+  tips: [
+    "토마토 대신 로제로 변형해도 맛있어요.",
+    "면은 80% 정도만 삶아 소스에서 마저 익히세요."
+  ]
+};
+
+
+// 레시피 상세 조회 API
+export async function fetchRecipeById(id) {
+  await new Promise((r) => setTimeout(r, 150));
+  return dummyRecipeDetail; // 실제로는 id
 }
