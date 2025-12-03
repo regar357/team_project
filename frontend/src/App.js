@@ -1,5 +1,6 @@
+// src/App.js
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 
 import Home from "./pages/Home";
@@ -12,20 +13,18 @@ import ExpireAlert from "./pages/ExpireAlert";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <Routes>
         
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} /> 
-          <Route path="/recipes/saved" element={<RecipeSaved />} />
-          <Route path="/recipes/search" element={<RecipeSearch />} />
-          <Route path="/recipes/:id" element={<RecipeDetail />} />
-          <Route path="/weekly-plan" element={<WeeklyPlan />} />
-          <Route path="/alerts" element={<ExpireAlert />} />
-        </Route>
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Home />} /> 
+        <Route path="/recipes/saved" element={<RecipeSaved />} />
+        <Route path="/recipes/search" element={<RecipeSearch />} />
+        <Route path="/recipes/:id" element={<RecipeDetail />} />
+        <Route path="/weekly-plan" element={<WeeklyPlan />} />
+        <Route path="/alerts" element={<ExpireAlert />} />
+      </Route>
 
-      </Routes>
-    </BrowserRouter>
+    </Routes>
   );
 }
 
