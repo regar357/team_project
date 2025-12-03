@@ -1,0 +1,20 @@
+.badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.badge.normal {
+  background: #777;
+}
+.badge.warning {
+  background: #ffb545;
+}
+.badge.danger {
+  background: #EE6049;
+}
+.badge.safe {
+  background: #4caf50;
+}

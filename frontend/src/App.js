@@ -1,30 +1,30 @@
 // src/App.js
 import React from "react";
-import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import MainLayout from "./layouts/MainLayout";
+
+import Home from "./pages/Home";
+import RecipeSaved from "./pages/RecipeSaved";
+import RecipeSearch from "./pages/RecipeSearch";
+import RecipeDetail from "./pages/RecipeDetail";
+import WeeklyPlan from "./pages/WeeklyPlan";
+import ExpireAlert from "./pages/ExpireAlert";
+
 
 function App() {
   return (
-    <div className="app">
-      <header className="header">
-        <div className="logo">FreshLens</div>
+    <Routes>
+        
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Home />} /> 
+        <Route path="/recipes/saved" element={<RecipeSaved />} />
+        <Route path="/recipes/search" element={<RecipeSearch />} />
+        <Route path="/recipes/:id" element={<RecipeDetail />} />
+        <Route path="/weekly-plan" element={<WeeklyPlan />} />
+        <Route path="/alerts" element={<ExpireAlert />} />
+      </Route>
 
-        <nav className="nav">
-          <a href="#ingredients">식재료</a>
-          <a href="#recipe">레시피</a>
-          <a href="#weekly">주간식단</a>
-          <a href="#waste">폐기량</a>
-        </nav>
-
-        <div className="header-icons">
-          <button className="icon-btn" aria-label="검색">
-            🔍
-          </button>
-          <button className="icon-btn" aria-label="알림">
-            🔔
-          </button>
-        </div>
-      </header>
-    </div>
+    </Routes>
   );
 }
 
