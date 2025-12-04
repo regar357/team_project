@@ -87,13 +87,13 @@
 }
 
 .list-count {
-  font-size: 15px;
+  font-size: 20px;
   color: #444;
 }
 
 .list-count span {
   color: #EE6049;
-  font-weight: 600;
+  font-weight: 620;
 }
 
 /* 오른쪽 아이콘 영역 */

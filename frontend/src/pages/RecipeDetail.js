@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchRecipeById } from "../utils/api";
+import { fetchRecipeById } from "../utils/api/recipe";
 import "./RecipeDetail.css";
 
 export default function RecipeDetail() {
@@ -82,7 +82,7 @@ export default function RecipeDetail() {
 
           {/* 이미지 */}
           <div className="detail-image-wrap">
-            <img src={recipe.imageUrl} alt={recipe.title} className="detail-image" />
+            <img src={recipe.image_url} alt={recipe.title} className="detail-image" />
           </div>
 
           {/* 제목 + 하트 */}

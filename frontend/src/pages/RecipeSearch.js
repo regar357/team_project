@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {   fetchIngredients, searchRecipesByIngredients } from "../utils/api";
+import {   searchRecipesByIngredients } from "../utils/api/recipe";
+import {   fetchIngredients } from "../utils/api/ingredients";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
 import "./RecipeSearch.css";
@@ -208,13 +209,13 @@ export default function RecipeSearch() {
               >
                 <div className="recommend-img-wrap">
                   <img
-                    src={recipe.imageUrl}
-                    alt={recipe.name}
+                    src={recipe.image_url}
+                    alt={recipe.title}
                     className="recommend-img"
                   />
                 </div>
                 <div className="recommend-info">
-                  <div className="recommend-name">{recipe.name}</div>
+                  <div className="recommend-name">{recipe.title}</div>
                   <div className="recommend-meta">
                     {recipe.time} · {recipe.servings}
                   </div>
