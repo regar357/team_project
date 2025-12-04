@@ -118,18 +118,9 @@ export default function RecipeDetail() {
         <div className="right-column">
 
           <div className="detail-box">
-            <h2 className="detail-section-title">냉장고 속 식재료</h2>
+            <h2 className="detail-section-title">식재료</h2>
             <ul className="detail-list">
-              {recipe.priority_used_ingredients?.map((ing, idx) => (
-                <li key={idx}>{ing}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="detail-box">
-            <h2 className="detail-section-title">추가 필요한 재료</h2>
-            <ul className="detail-list">
-              {recipe.other_ingredients?.map((ing, idx) => (
+              {recipe.ingredients?.map((ing, idx) => (
                 <li key={idx}>{ing}</li>
               ))}
             </ul>

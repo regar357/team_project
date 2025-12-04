@@ -19,7 +19,7 @@ export default function RecipeSearch() {
   const [searchText, setSearchText] = useState("");
   const [sortMode, setSortMode] = useState("created"); 
 
-  // DB(지금은 더미)에서 식재료 목록 가져오기
+  // DB에서 식재료 목록 가져오기
   useEffect(() => {
     const load = async () => {
       const data = await fetchIngredients();
@@ -217,7 +217,9 @@ export default function RecipeSearch() {
                 <div className="recommend-info">
                   <div className="recommend-name">{recipe.title}</div>
                   <div className="recommend-meta">
-                    {recipe.time} · {recipe.servings}
+                    {recipe.tags && recipe.tags.map((tag) => (
+                      <span key={tag} className="tag-badge">{tag}</span>
+                    ))}
                   </div>
                 </div>
               </div>

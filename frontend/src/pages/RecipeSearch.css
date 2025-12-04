@@ -217,8 +217,21 @@
 }
 
 .recommend-meta {
-  font-size: 15px;
-  color: #666;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.tag-badge {
+  background: #ee6049;         
+  color:#fff;                 
+  padding: 3px 12px;          
+  border-radius: 999px;      
+  font-size: 12px;          
+  font-weight: 700;        
+  display: inline-block;
 }
 
 /* 반응형 */

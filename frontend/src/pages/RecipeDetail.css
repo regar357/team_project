@@ -128,9 +128,15 @@
 }
 
 .detail-list {
-  font-size: 20px;
+  font-size: 18px;
   color: #333;
   padding-left: 22px;
+}
+.detail-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  margin-bottom: 14px;
 }
 
 /* 조리 순서 */
@@ -142,8 +148,8 @@
 .detail-steps li {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 30px;
+  margin-bottom: 30px;
 }
 
 .step-number {
