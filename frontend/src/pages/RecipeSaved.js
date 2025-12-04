@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchSavedRecipes, deleteRecipe } from "../utils/api";
+import { fetchSavedRecipes, deleteRecipe } from "../utils/api/recipe";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
 import "./RecipeSaved.css";
@@ -15,6 +15,8 @@ const RecipeSaved = () => {
   const [selectedCategories, setSelectedCategories] = useState([...CATEGORIES]);
   const [loading, setLoading] = useState(true);
   const [deleteMode, setDeleteMode] = useState(false);
+  const [sortOrder, setSortOrder] = useState('등록순');
+
   // const raw = localStorage.getItem("savedRecipes");
   // const ids = raw ? JSON.parse(raw) : [];
   useEffect(() => {
@@ -40,10 +42,18 @@ const RecipeSaved = () => {
   const handleCardClick = (id) => {
     navigate(`/recipes/${id}`);
   };
-
+  const handleSortChange = (e) => {
+    setSortOrder(e.target.value);
+  };
   const filteredRecipes = recipes.filter((r) =>
     selectedCategories.includes(r.category)
   );
+  const sortedRecipes = filteredRecipes.slice().sort((a, b) => {
+    if (sortOrder === '이름순') {
+      return a.title.localeCompare(b.title); 
+    }
+    return 0; 
+  });
 
   if (loading) {
     return <div className="saved-page">불러오는 중...</div>;
@@ -82,7 +92,7 @@ const RecipeSaved = () => {
         <section className="saved-content">
           <div className="saved-toolbar">
             <div className="list-count">
-              list <span>{filteredRecipes.length}</span>
+              list <span>{sortedRecipes.length}</span>
             </div>
 
           <div className="toolbar-right">
@@ -91,16 +101,19 @@ const RecipeSaved = () => {
               onClick={() => setDeleteMode(prev => !prev)}
             > 🗑 </button>
           
-            <select className="sort-select">
-              <option>등록순</option>
-              <option>이름순</option>
-            </select>
+            <select 
+              className="sort-select"
+              value={sortOrder}
+              onChange={handleSortChange}
+            >
+              <option value="등록순">등록순</option>
+              <option value="이름순">이름순</option>
+              </select>
           </div>
-
           </div>
 
           <div className="recipe-grid">
-            {filteredRecipes.map((recipe) => (
+            {sortedRecipes.map((recipe) => (
               <Card key={recipe.id}>
                 <div
                   className="recipe-card"
@@ -108,12 +121,12 @@ const RecipeSaved = () => {
                 >
                   <div className="recipe-img-wrap">
                     <img
-                      src={recipe.imageUrl}
-                      alt={recipe.name}
+                      src={recipe.image_url}
+                      alt={recipe.title}
                       className="recipe-img"
                     />
                   </div>
-                  <div className="recipe-name">{recipe.name}</div>
+                  <div className="recipe-name">{recipe.title}</div>
                 </div>
 
                 {deleteMode && (
