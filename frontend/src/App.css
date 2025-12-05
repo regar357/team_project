@@ -10,11 +10,69 @@ body {
     "Noto Sans KR", sans-serif;
 }
 
-/* 여기 배경 사진 설정 – 경로를 네 파일로 바꾸면 됨 */
+
 .app {
   min-height: 100vh;
   background: center/cover no-repeat;
-  background-image: url("./images/background.png"); /* <- 네가 넣을 사진 경로 */
+  background-image: url("./images/background.png");
+  position: relative; /* 아이콘 절대 위치 기준 */
+}
+
+
+.deco {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none; /* 클릭 방해 안 하도록 */
+}
+
+/* 각각 다른 이미지 + 위치 + 기울기 */
+.deco1 {
+  background-image: url("./images/deco1.png"); /* 사과 */
+  top: 22%;
+  left: 18%;
+  transform: rotate(-12deg);
+  width: 450px; 
+  height: 450px;
+}
+
+.deco2 {
+  background-image: url("./images/deco2.png"); /* 브로콜리 */
+  bottom: 14%;
+  left: 10%;
+  transform: rotate(8deg);
+  width: 450px; 
+  height: 450px;
+}
+
+.deco3 {
+  background-image: url("./images/deco3.png"); /* 바나나 */
+  bottom: 36%;
+  left: 42%;
+  transform: rotate(15deg);
+  width: 450px; 
+  height: 450px;
+}
+
+.deco4 {
+  background-image: url("./images/deco4.png"); /* 토마토 */
+  top: 40%;
+  right: 24%;
+  transform: rotate(-10deg);
+  width: 450px; 
+  height: 450px;
+}
+
+.deco5 {
+  background-image: url("./images/deco5.png"); /* 파프리카 */
+  top: 22%;
+  right: 8%;
+  transform: rotate(6deg);
+  width: 450px; 
+  height: 450px;
 }
 
 /* 상단 메뉴바 */
@@ -63,6 +121,14 @@ body {
   font-size: 20px;
   cursor: pointer;
 }
+
+.logo-link {
+  color: rgba(238, 96, 73, 0.9);        /* 원래 로고 색 유지 */
+  text-decoration: none;   /* 밑줄 제거 */
+  font-size: 50px;
+  cursor: pointer;         /* 마우스 올리면 손가락 모양 */
+}
+
 
 /* 화면이 좁을 때 메뉴 간단하게 */
 @media (max-width: 768px) {

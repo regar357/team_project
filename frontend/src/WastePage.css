@@ -1,0 +1,264 @@
+/* 기본 폰트 / 배경 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+    "Noto Sans KR", sans-serif;
+  background: #f3f3f3;
+}
+
+/* 페이지 전체 */
+.page {
+  min-height: 100vh;
+  padding: 0;
+  background: #f3f3f3;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 왼쪽 위 회색 텍스트 */
+.page-label {
+  font-size: 18px;
+  color: #c4c4c4;
+  padding: 20px 24px 8px;
+}
+
+/* 가운데 흰색 카드 */
+.frame {
+  flex: 1;
+  width: 100%;
+  margin: 0;
+  background: #ffffff;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+/* ===== 상단 헤더 ===== */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 30px;
+  background: #ffffff;
+  color: #f26d57;
+}
+
+/* 햄버거 메뉴 버튼 */
+.menu-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.menu-btn span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #f26d57;
+  border-radius: 999px;
+}
+
+/* 중앙 FreshLens 텍스트 */
+.topbar-logo {
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  font-size: 20px;
+}
+
+/* 오른쪽 아이콘 자리 */
+.topbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.icon-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* WASTE */
+.waste-hero {
+  background: #f26d57;
+  text-align: center;
+  padding: 28px 16px 36px;
+  color: #ffffff;
+}
+
+.waste-title {
+  font-size: 30px;
+  letter-spacing: 0.45em;
+  text-indent: 0.45em; /* 첫 글자 밀림 보정 */
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.waste-subtitle {
+  font-size: 14px;
+  letter-spacing: 0.2em;
+}
+
+/* 아래 내용 영역 */
+.waste-content {
+  background: #ffffff;
+  min-height: 320px;
+  padding: 24px 32px 32px;
+}
+
+/* 필터 영역 */
+.waste-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.filter-group label {
+  color: #666666;
+}
+
+.filter-group select {
+  min-width: 140px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid #dddddd;
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+.waste-reset-btn {
+  border: none;
+  background: #f5f5f5;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #777777;
+  cursor: pointer;
+}
+
+.waste-reset-btn:hover {
+  background: #ececec;
+}
+
+/* 요약 카드 영역 */
+.waste-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: #fff8f5;
+  border-radius: 8px;
+  padding: 14px 16px;
+  border: 1px solid #ffe1d2;
+}
+
+.summary-label {
+  font-size: 13px;
+  color: #999999;
+  margin-bottom: 6px;
+}
+
+.summary-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f26d57;
+}
+
+/* 테이블 영역 */
+.waste-table-wrapper {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 16px;
+}
+
+.waste-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.waste-table thead {
+  background: #fafafa;
+}
+
+.waste-table th,
+.waste-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.waste-table th {
+  font-weight: 600;
+  color: #666666;
+}
+
+.waste-table tbody tr:hover {
+  background: #fff8f5;
+}
+
+.waste-empty {
+  text-align: center;
+  color: #999999;
+  padding: 16px 0;
+}
+
+/* 반응형 */
+@media (max-width: 900px) {
+  .waste-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .frame {
+    max-width: 100%;
+  }
+
+  .topbar {
+    padding: 14px 18px;
+  }
+
+  .topbar-logo {
+    font-size: 18px;
+    letter-spacing: 0.15em;
+  }
+
+  .waste-hero {
+    padding: 24px 12px 30px;
+  }
+
+  .waste-title {
+    font-size: 24px;
+    letter-spacing: 0.35em;
+  }
+
+  .waste-content {
+    padding: 20px 16px 28px;
+  }
+}
