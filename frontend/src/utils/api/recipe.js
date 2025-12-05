@@ -120,7 +120,7 @@ export async function fetchSavedRecipes() {
     /* 테스트 용 */
     const allRecipes = RECIPES; 
     console.log(`[MOCK] 전체 레시피 ${allRecipes.length}개 반환.`);
-
+    return  allRecipes;
 
 
 
