@@ -1,0 +1,27 @@
+:root {
+  /* 브랜드 컬러 */
+  --primary: #EE6049;
+  --primary-hover: #d8533f;
+
+  /* 배경 */
+  --bg: #fefaf4;
+  --white: #ffffff;
+
+  /* 회색 계열 */
+  --gray-100: #f3f3f3;
+  --gray-200: #ddd;
+  --gray-300: #bbb;
+  --gray-500: #777;
+  --gray-700: #444;
+
+  /* radius + shadow */
+  --radius: 12px;
+  --shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+
+  /* 사이즈 */
+  --container-width: 1280px;
+
+  /* 반응형 */
+  --mobile: 768px;
+  --tablet: 1024px;
+}

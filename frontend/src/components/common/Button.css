@@ -1,0 +1,44 @@
+.btn {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+/* 색상 */
+.btn.primary {
+  background: #EE6049;
+  color: white;
+}
+.btn.primary:hover {
+  background: #e65845;
+}
+
+.btn.gray {
+  background: #ddd;
+  color: #333;
+}
+.btn.gray:hover {
+  background: #ccc;
+}
+
+/* 크기 */
+.btn.sm {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+.btn.md {
+  padding: 10px 16px;
+}
+.btn.lg {
+  padding: 14px 20px;
+  font-size: 16px;
+}
+
+/* full width */
+.btn.full {
+  width: 100%;
+}

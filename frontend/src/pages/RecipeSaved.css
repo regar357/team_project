@@ -1,0 +1,205 @@
+/* 전체 페이지 패딩 */
+.saved-page {
+  width: 100%;
+  padding: 20px 32px;
+  box-sizing: border-box;
+}
+
+/* 상단 HERO (“RECIPE / 레시피 보관함”) */
+.saved-hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.saved-hero h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.saved-hero p {
+  font-size: 14px;
+  color: #777;
+}
+
+/* 메인 2컬럼 레이아웃 (좌: 필터, 우: 리스트) */
+.saved-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 40px;
+}
+
+/* ========== 왼쪽 필터 영역 ========== */
+
+.filter-panel {
+  padding-top: 8px;
+}
+
+.filter-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.filter-subtitle {
+  font-size: 16px;
+  color: #777;
+  margin-bottom: 12px;
+}
+
+.filter-list {
+  list-style: none;
+  padding: 0;
+}
+
+.filter-list li {
+  margin-bottom: 10px;
+}
+
+.filter-list label {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.filter-list input[type="checkbox"] {
+  width: 22px;
+  height: 16px;
+  accent-color: #EE6049; 
+}
+
+/* ========== 오른쪽 리스트 영역 ========== */
+
+.saved-content {
+  width: 100%;
+}
+
+/* 상단 리스트 정보 (list 개수, 정렬, 아이콘) */
+.saved-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.list-count {
+  font-size: 20px;
+  color: #444;
+}
+
+.list-count span {
+  color: #EE6049;
+  font-weight: 620;
+}
+
+/* 오른쪽 아이콘 영역 */
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-btn {
+  padding: 10px 14px;
+  font-size: 20px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  border-color: #EE6049;
+}
+
+/* 정렬 select */
+.sort-select {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+/* ========== 카드 그리드 ========== */
+
+.recipe-grid {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.recipe-card {
+  text-align: center;
+  cursor: pointer;
+  padding: 20px 10px;
+}
+
+.recipe-img-wrap {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 14px auto;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  overflow: hidden;
+  transition: 0.25s;
+}
+
+.recipe-card:hover .recipe-img-wrap {
+  border-color: #EE6049;
+}
+
+.recipe-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recipe-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 6px;
+
+}
+
+button.full-width {
+  font-size: 20px !important; 
+  padding: 10px 0 !important;
+}
+
+/* 빈 상태 */
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px 0;
+  color: #777;
+  font-size: 14px;
+}
+
+/* ========== 반응형 ========== */
+
+@media (max-width: 1024px) {
+  .saved-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .recipe-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .recipe-grid {
+    grid-template-columns: 1fr;
+  }
+}

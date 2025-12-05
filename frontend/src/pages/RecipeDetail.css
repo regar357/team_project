@@ -1,0 +1,177 @@
+.detail-page {
+  width: 100%;
+  padding: 40px 36px 80px;
+  box-sizing: border-box;
+}
+
+.back-link {
+  border: none;
+  background: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  margin-bottom: 28px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(580px, 1.7fr) minmax(500px, 1.2fr); 
+  column-gap: 80px; 
+  align-items: flex-start;
+}
+
+/* =======================
+      LEFT COLUMN
+======================= */
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.detail-image-wrap {
+  width: 100%;
+  height: 380px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: #faf7f2;
+}
+
+.detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.detail-title {
+  font-size: 40px;
+  font-weight: 800;
+  color: #222;
+}
+
+.heart-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.heart-btn.saved {
+  background: #ffe1d9;
+  border-color: #ee6049;
+  color: #ee6049;
+}
+
+.detail-description {
+  font-size: 22px;
+  color: #444;
+}
+
+.detail-meta {
+  font-size: 20px;
+  color: #666;
+}
+
+.tip-section {
+  margin-top: 18px;
+}
+
+.tip-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ee6049;       
+  margin-bottom: 8px;
+}
+
+.tip-list {
+  list-style: disc;
+  padding-left: 22px;
+  margin: 0;
+  font-size: 18px;
+  color: #444;
+}
+
+/* =======================
+      RIGHT COLUMN
+======================= */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  
+}
+
+/* 공통 박스 */
+.detail-box {
+  padding: 26px 30px;
+  background: #fefcf8;
+  border-radius: 18px;
+  min-width: 600px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08),
+              0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+
+.detail-section-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.detail-list {
+  font-size: 18px;
+  color: #333;
+  padding-left: 22px;
+}
+.detail-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  margin-bottom: 14px;
+}
+
+/* 조리 순서 */
+.detail-steps {
+  list-style: none;
+  padding: 0;
+}
+
+.detail-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.step-number {
+  width: 30px;
+  height: 30px;
+  background: #ee6049;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-text {
+  font-size: 20px;
+  color: #333;
+}
+
+/* 반응형 */
+@media (max-width: 960px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

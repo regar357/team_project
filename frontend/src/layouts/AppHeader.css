@@ -1,0 +1,119 @@
+.app-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.header-logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ee6049;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* 햄버거 아이콘 */
+.icon-menu,
+.sidebar-menu-icon {
+  display: inline-block;
+  width: 20px;
+  height: 14px;
+  position: relative;
+}
+
+.icon-menu::before,
+.icon-menu::after,
+.icon-menu::marker,
+.sidebar-menu-icon::before,
+.sidebar-menu-icon::after,
+.sidebar-menu-icon::marker {
+  content: "";
+}
+
+/* 진짜 선 3줄 */
+.icon-menu::before,
+.icon-menu::after,
+.sidebar-menu-icon::before,
+.sidebar-menu-icon::after {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ee6049;
+}
+
+.icon-menu::before,
+.sidebar-menu-icon::before {
+  top: 0;
+}
+.icon-menu::after,
+.sidebar-menu-icon::after {
+  bottom: 0;
+}
+.icon-menu::marker,
+.sidebar-menu-icon::marker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 6px;
+  height: 2px;
+  background: #ee6049;
+}
+
+/* 돋보기 아이콘 */
+.icon-search {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ee6049;
+  border-radius: 50%;
+  position: relative;
+}
+.icon-search::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 2px;
+  background: #ee6049;
+  right: -4px;
+  bottom: -1px;
+  transform: rotate(45deg);
+}
+
+/* 종 아이콘 */
+.icon-bell {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50% 50% 40% 40%;
+  border: 2px solid #ee6049;
+  position: relative;
+}
+.icon-bell::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 2px;
+  border-radius: 999px;
+  background: #ee6049;
+  left: 50%;
+  bottom: -4px;
+  transform: translateX(-50%);
+}

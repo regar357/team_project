@@ -1,0 +1,16 @@
+.tag {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px solid #ddd;
+  font-size: 14px;
+  margin-right: 8px;
+  cursor: pointer;
+  background: white;
+  transition: 0.2s;
+}
+
+.tag.active {
+  border-color: #EE6049;
+  background: #ffe6e1;
+  color: #EE6049;
+}

@@ -1,0 +1,12 @@
+/* 메인 레이아웃 전체 배경 */
+.layout {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* 페이지 내부 컨텐츠 래퍼 */
+.layout-content {
+  padding: 32px 24px;
+  max-width: var(--container-width);
+  margin: 0 auto;
+}

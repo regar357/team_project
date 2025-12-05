@@ -7,6 +7,15 @@ import notiIcon from "./images/noti.png";
 import IngredientsPage from "./IngredientsPage";
 import RecipePage from "./RecipePage";
 import WastePage from "./WastePage";
+import MainLayout from "./layouts/MainLayout";
+
+import Home from "./pages/Home";
+import RecipeSaved from "./pages/RecipeSaved";
+import RecipeSearch from "./pages/RecipeSearch";
+import RecipeDetail from "./pages/RecipeDetail";
+import WeeklyPlan from "./pages/WeeklyPlan";
+import ExpireAlert from "./pages/ExpireAlert";
+
 
 // 메인(홈) 화면 컴포넌트
 function Home() {
@@ -72,6 +81,16 @@ function App() {
 
       {/* 주간식단 페이지는 나중에 추가할 예정이면
           <Route path="/weekly" element={<WeeklyPage />} /> 이런 식으로 추가 */}
+
+
+      <Route element={<MainLayout />}>
+      <Route path="/" element={<Home />} /> 
+      <Route path="/recipes/saved" element={<RecipeSaved />} />
+      <Route path="/recipes/search" element={<RecipeSearch />} />
+      <Route path="/recipes/:id" element={<RecipeDetail />} />
+      <Route path="/weekly-plan" element={<WeeklyPlan />} />
+      <Route path="/alerts" element={<ExpireAlert />} />
+      </Route>
     </Routes>
   );
 }
