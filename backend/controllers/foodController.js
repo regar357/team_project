@@ -19,7 +19,7 @@ exports.uploadFood = async (req, res) => {
 
     pythonProcess.on("close", async () => {
       const result = JSON.parse(output);
-      const { name, category } = result;
+      const { name, category, count } = result;
 
       //유통기한 매핑
       const [expirationRows] = await pool.query(
@@ -38,8 +38,8 @@ exports.uploadFood = async (req, res) => {
 
       //식품 테이블로 저장
       await pool.query(
-        "INSERT INTO food (food_name, food_category, food_Ex) VALUES (?, ?, ?)",
-        [name, category, expirationDate]
+        "INSERT INTO food (food_name, food_category, food_Ex, food_count) VALUES (?, ?, ?, ?)",
+        [name, category, expirationDate, count]
       );
 
       //JSON 프론트로 전달
@@ -48,6 +48,7 @@ exports.uploadFood = async (req, res) => {
         name,
         category,
         expirationDate,
+        count,
       });
     });
   } catch (err) {
