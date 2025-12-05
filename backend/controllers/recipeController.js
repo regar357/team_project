@@ -83,6 +83,31 @@ exports.getRecipeList = async (req, res) => {
   // }
 };
 
+exports.getRecipeListByid = async (req, res) => {
+  const { id } = req.params;
+  console.log("레시피id확인: " + id);
+
+  res.json({
+    message: "레시피 상세보기 확인",
+  });
+  // try {
+  //   const [row] = await pool.query(`
+  //     SELECT recipe_id, recipe_title, recipe_description, priority_used_ingredients,
+  //            other_ingredients, servings, recipe_steps, recipe_tips, created_at
+  //     FROM recipe
+  //     WHERE recipe_id = ?
+  //   `, [id]);
+
+  //   res.json({
+  //     message: "레시피 목록 조회 성공",
+  //     recipes: row,
+  //   });
+  // } catch (err) {
+  //   console.error(err);
+  //   res.status(500).json({ error: "레시피 조회 실패" });
+  // }
+};
+
 exports.deleteRecipe = async (req, res) => {
   const { id } = req.params;
   console.log("레시피id확인: " + id);

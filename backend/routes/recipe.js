@@ -5,7 +5,9 @@ const recipeController = require("../controllers/recipeController");
 router.post("/generate", recipeController.generateRecipe);
 // /recipe/list
 router.get("/list", recipeController.getRecipeList);
-// DELETE /recipe/delete/:id
+// /recipe/list/:id
+router.get("/list/:id", recipeController.getRecipeListByid);
+// /recipe/delete/:id
 router.delete("/delete/:id", recipeController.deleteRecipe);
 
 module.exports = router;
