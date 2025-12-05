@@ -126,7 +126,7 @@ const RecipeSaved = () => {
                       className="recipe-img"
                     />
                   </div>
-                  <div className="recipe-name">{recipe.title}</div>
+                  <div className="recipe-title">{recipe.title}</div>
                 </div>
 
                 {deleteMode && (

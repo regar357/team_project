@@ -1,7 +1,6 @@
 // src/pages/WeeklyPlan.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Card from "../components/common/Card";
 import Button from "../components/common/Button";
 import { fetchWeeklyRecipes } from "../utils/api/weekly";
 import { fetchIngredients } from "../utils/api/ingredients";
@@ -213,7 +212,7 @@ export default function WeeklyPlan() {
             )}
 
             {recipes.map((r) => (
-              <Card key={r.id}> 
+              <div key={r.id}> 
                 <div
                   className={`weekly-recipe-card ${selectedRecipeId === r.id ? "selected" : ""}`}
                   onClick={() => handleSelectRecipe(r.id)}
@@ -231,44 +230,10 @@ export default function WeeklyPlan() {
                     ))}
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </section>
-
-        {/* ========== 오른쪽: Ingredients ========== */}
-        {/* <aside className="weekly-ingredients">
-          <div className="ingredients-note-paper">
-            <div className="ingredients-inner">
-              <h2 className="ingredients-title">Ingredients</h2>
-              <p className="ingredients-subtitle">
-                {selectedRecipeId ? "메뉴의 식재료 목록" : "메뉴를 선택해주세요"}
-              </p>
-
-              <ul className="ingredients-list">
-                {displayIngredients.map((item) => (
-                  <li key={item.id}>
-                    <span className="ingredients-name">{item.name}</span>
-                    <span className="ingredients-dot-line">····</span>
-                    <span className="ingredients-dday">
-                      {item.dday || ""}
-
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                type="button"
-                className="ingredients-footer-btn"
-                onClick={handleGoDetail}
-              >
-                RECIPE
-              </button>
-
-            </div>
-          </div>
-        </aside> */}
       </div>
     </div>
   );
