@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {   searchRecipesByIngredients } from "../utils/api/recipe";
+// import {   searchRecipesByIngredients } from "../utils/api/recipe";
 import {   fetchIngredients } from "../utils/api/ingredients";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
@@ -61,14 +61,24 @@ export default function RecipeSearch() {
   };
 
   // 레시피 찾기 버튼 클릭
-  const handleSearch = async () => {
-    setLoading(true);
-    setHasSearched(true);
-    const data = await searchRecipesByIngredients(selected);
-    setResults(data);
-    setLoading(false);
+  // const handleSearch = async () => {
+  //   setLoading(true);
+  //   setHasSearched(true);
+  //   const data = await searchRecipesByIngredients(selected);
+  //   setResults(data);
+  //   setLoading(false);
     
-  };
+  // };
+  const handleSearch = async () => {
+    try {
+        const data = await searchRecipesByIngredients(selected);
+        setResults(data); // 받은 결과를 화면에 표시하기 위해 상태에 저장
+    } catch (error) {
+        //  에러 처리
+    } finally {
+        
+    }
+};
   return (
   <div className="search-page">
     <section className="saved-hero">
