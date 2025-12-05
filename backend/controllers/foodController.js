@@ -6,49 +6,57 @@ exports.uploadFood = async (req, res) => {
   const imagePath = req.file.path; //  uploads/이미지파일
 
   try {
-    //model 폴더의 YOLO모델 실행
     const pythonProcess = spawn("python", [
-      path.join(__dirname, "YOLO모델 경로"), //상대경로
-      path.join(__dirname, "../" + imagePath), //파일 경로 전달
+      path.join(__dirname, "../../model/yolo/yolo_model.py"),
+      imagePath,
     ]);
 
     let output = "";
     pythonProcess.stdout.on("data", (data) => {
-      output += data.tostring();
+      output += data.toString();
     });
 
     pythonProcess.on("close", async () => {
-      const result = JSON.parse(output);
-      const { name, category, count } = result;
+      const result = JSON.parse(output); // { items: [{name, category}, ...] }
+      const items = result.items;
 
-      //유통기한 매핑
-      const [expirationRows] = await pool.query(
-        "SELECT default_Ex FROM expiration_mapping WHERE food_name = ?",
-        [name]
-      );
+      const finalResults = [];
 
-      if (expirationRows.length === 0) {
-        return res.status(404).json({ message: "유통기한 데이터 없음" });
+      for (const item of items) {
+        const { name, category, count } = item;
+
+        const [expRows] = await pool.query(
+          "SELECT expiration_days FROM expiration_mapping WHERE food_name = ?",
+          [name]
+        );
+
+        const expirationDays = expRows.length
+          ? expRows[0].expiration_days
+          : null;
+
+        let expirationDate = null;
+        if (expirationDays) {
+          expirationDate = new Date();
+          expirationDate.setDate(expirationDate.getDate() + expirationDays);
+
+          await pool.query(
+            "INSERT INTO food (food_name, category, expiration_date, food_count) VALUES (?, ?, ?, ?)",
+            [name, category, expirationDate, count]
+          );
+        }
+
+        finalResults.push({
+          name,
+          category,
+          expirationDays,
+          expirationDate,
+          count,
+        });
       }
 
-      const expirationDays = expirationRows[0].default_Ex;
-
-      const expirationDate = new Date();
-      expirationDate.setDate(expirationDate.getDate() + expirationDays);
-
-      //식품 테이블로 저장
-      await pool.query(
-        "INSERT INTO food (food_name, food_category, food_Ex, food_count) VALUES (?, ?, ?, ?)",
-        [name, category, expirationDate, count]
-      );
-
-      //JSON 프론트로 전달
       res.json({
-        message: "저장 완료",
-        name,
-        category,
-        expirationDate,
-        count,
+        message: "등록 완료",
+        results: finalResults,
       });
     });
   } catch (err) {
