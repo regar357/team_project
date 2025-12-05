@@ -67,8 +67,15 @@ export async function searchRecipesByIngredients(selectedIngredients) {
             const errorData = await response.json().catch(() => ({ message: '알 수 없는 서버 오류' }));
             throw new Error(errorData.message || `API 호출 실패: ${response.status} 상태`);
         }
-        const data = await response.json();
         
+        const data = await response.json();
+        console.log("=== API 레시피 응답 데이터 (JSON) ===");
+        console.log(data);
+
+        if (data && Array.isArray(data.recipes)) {
+            return data.recipes;
+        }
+
         if (!Array.isArray(data)) {
             console.warn("API 응답 형식이 배열이 아닙니다. 응답:", data);
             return [];
