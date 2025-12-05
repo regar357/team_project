@@ -1,0 +1,51 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table th {
+  text-align: left;
+  padding: 12px;
+  background: #f3f3f3;
+  font-size: 14px;
+}
+
+.table td {
+  padding: 12px;
+  font-size: 14px;
+  border-top: 1px solid #eee;
+}
+
+/* 모바일에서 카드형으로 보이게 */
+@media (max-width: 768px) {
+  .table,
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    display: block;
+    background: white;
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  }
+
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border: none;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #555;
+    margin-right: 10px;
+  }
+}

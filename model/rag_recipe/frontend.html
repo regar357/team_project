@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI 레시피 추천 데모</title>
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+
+  h1 {
+    margin-bottom: 12px;
+  }
+
+  .input-box {
+    margin-bottom: 12px;
+  }
+
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px 16px;     /* 🔻 패딩 줄임 */
+    margin-top: 12px;       /* 🔻 카드 위 여백 줄임 */
+    max-width: 700px;
+  }
+
+  #status {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    color: green;
+  }
+
+  #recipeCard h3 {
+    margin: 0 0 6px 0;      /* 🔻 제목 아래 여백 줄임 */
+  }
+
+  #recipeCard p {
+    margin: 0 0 10px 0;     /* 설명 아래 여백 줄임 */
+  }
+
+  #recipeCard h4 {
+    margin: 6px 0 4px 0;    /* 🔻 섹션 제목 위/아래 여백 줄임 */
+    font-size: 15px;
+  }
+
+  #recipeCard ul,
+  #recipeCard ol {
+    margin: 0 0 6px 18px;   /* 🔻 리스트 전체 여백 줄임 */
+    padding: 0;
+  }
+
+  #recipeCard li {
+    margin: 0 0 2px 0;      /* 🔻 li 사이 간격 줄임 */
+    line-height: 1.3;
+  }
+
+  #recipeCard img {
+    margin-bottom: 8px;     /* 이미지 아래 여백 */
+  }
+</style>
+</head>
+<body>
+  <h1>AI 레시피 추천</h1>
+  <p>임박한 재료를 쉼표(,)로 구분해서 입력하세요:</p>
+
+  <div class="input-box">
+    <input
+      id="ingredientsInput"
+      size="60"
+      placeholder="예: 닭가슴살 300g, 양파 2개, 간장, 마늘"
+    />
+    <button id="sendBtn">레시피 추천 받기</button>
+  </div>
+
+<!-- 🖼 이미지로 레시피 추천 -->
+  <p style="margin-top:24px;">또는 음식 사진으로 재료를 인식해 레시피를 추천받을 수도 있어요:</p>
+  <div class="input-box">
+    <input type="file" id="imageInput" accept="image/*" />
+    <button id="sendImageBtn">이미지로 레시피 추천</button>
+  </div>
+
+  <div id="status"></div>
+
+  <h2>최종 레시피</h2>
+  <div id="recipeCard" class="card" style="display:none;"></div>
+
+
+<h2 style="margin-top:32px;">최근 추천 기록</h2>
+  <div id="history" class="card" style="display:none;"></div>
+
+<h2>최종 레시피</h2>
+  <div id="recipeCard" class="card" style="display:none;"></div>
+
+  <h2 style="margin-top:32px;">최근 추천 기록</h2>
+  <div id="history" class="card" style="display:none;"></div>
+
+ <script>
+  // 텍스트 재료로 레시피 요청
+  async function callRecipeAPI(ingredients) {
+    const response = await fetch("http://127.0.0.1:8000/recommend", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ingredients: ingredients,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("API 오류: " + response.status);
+    }
+
+    const data = await response.json();
+    renderRecipe(data, ingredients);   // 👉 최종 렌더링
+    return data;
+  }
+
+  // === 공통 렌더링 함수 (텍스트 + 이미지 공통 사용) ===
+  // === 공통 렌더링 함수 (텍스트 + 이미지 공통 사용) ===
+function renderRecipe(data, ingredients) {
+  const recipeCard = document.getElementById("recipeCard");
+
+  const finalRecipe = data.final_recipe || {};
+  const title = finalRecipe.title || "제목 없음";
+  const desc = finalRecipe.description || "";
+
+  // 🔹 여기서 여러 가지 키 이름을 모두 지원 (백엔드 키가 달라도 대응)
+  const priority =
+    finalRecipe["priority used ingredients"] ||
+    finalRecipe["priority_used_ingredients"] ||
+    [];
+
+  const others =
+    finalRecipe["other ingredients"] ||
+    finalRecipe["other_ingredients"] ||
+    [];
+
+  // 원본 단계들
+  const rawSteps = finalRecipe.steps || [];
+
+  // 앞에 붙은 "1. ", "2. " 같은 번호/점/공백 제거
+  const steps = rawSteps.map(s =>
+    s.replace(/^\s*\d+\.?\s*/, "")
+  );
+
+  const tips = finalRecipe.tips || [];
+
+  const imageUrl = data.image_url || "";
+
+  recipeCard.style.display = "block";
+
+  recipeCard.innerHTML = `
+    <div style="max-width: 700px;">
+
+      <h3 style="margin: 0 0 8px 0;">${title}</h3>
+      <p style="margin: 0 0 16px 0;"><b>설명:</b> ${desc}</p>
+
+      ${
+        imageUrl
+          ? `
+        <div style="margin-bottom:16px;">
+          <img src="${imageUrl}"
+               width="320"
+               style="border-radius:10px; border:1px solid #ddd; display:block;" />
+        </div>
+      `
+          : ""
+      }
+
+      ${
+        ingredients && ingredients.length
+          ? `
+        <h4 style="margin: 8px 0 4px 0;">인식된 재료</h4>
+        <ul style="margin:0 0 8px 18px; padding:0;">
+          ${ingredients.map(i => `<li>${i}</li>`).join("")}
+        </ul>
+      `
+          : ""
+      }
+
+      ${
+        priority.length
+          ? `
+        <h4 style="margin: 8px 0 4px 0;">우선 사용 재료</h4>
+        <ul style="margin:0 0 8px 18px; padding:0;">
+          ${priority.map(i => `<li>${i}</li>`).join("")}
+        </ul>
+      `
+          : ""
+      }
+
+      ${
+        others.length
+          ? `
+        <h4 style="margin: 8px 0 4px 0;">다른 재료</h4>
+        <ul style="margin:0 0 8px 18px; padding:0;">
+          ${others.map(i => `<li>${i}</li>`).join("")}
+        </ul>
+      `
+          : ""
+      }
+
+      ${
+        steps.length
+          ? `
+        <h4 style="margin: 12px 0 4px 0;">조리 순서</h4>
+        <ol style="margin:0 0 8px 18px; padding:0;">
+          ${steps.map(s => `<li>${s}</li>`).join("")}
+        </ol>
+      `
+          : ""
+      }
+
+      ${
+        tips.length
+          ? `
+        <h4 style="margin: 12px 0 4px 0;">팁</h4>
+        <ul style="margin:0 0 8px 18px; padding:0;">
+          ${tips.map(t => `<li>${t}</li>`).join("")}
+        </ul>
+      `
+          : ""
+      }
+
+    </div>
+  `;
+}
+  // === 텍스트 버튼 클릭 ===
+  document.getElementById("sendBtn").addEventListener("click", async () => {
+    const inputValue = document.getElementById("ingredientsInput").value;
+    const statusDiv = document.getElementById("status");
+
+    // " , " 기준으로 재료 나누기
+    const ingredients = inputValue
+      .split(",")
+      .map(item => item.trim())
+      .filter(item => item.length > 0);
+
+    if (ingredients.length === 0) {
+      alert("재료를 한 개 이상 입력해주세요.");
+      return;
+    }
+
+    try {
+      statusDiv.textContent = "레시피 생성 중...";
+      await callRecipeAPI(ingredients);
+      statusDiv.textContent = "✅ 레시피 생성 완료!";
+    } catch (err) {
+      console.error(err);
+      statusDiv.textContent = "에러 발생: " + err.message;
+    }
+  });
+
+  // === 이미지로 레시피 추천 요청 ===
+  async function callImageAPI(formData) {
+      const response = await fetch("http://127.0.0.1:8000/recommend_from_image", {
+          method: "POST",
+          body: formData,  // ⚠️ 헤더(Content-Type)는 직접 지정하지 않기
+      });
+
+      if (!response.ok) {
+          throw new Error("이미지 API 오류: " + response.status);
+      }
+
+      const data = await response.json();
+
+      // YOLO에서 인식한 재료 목록은 백엔드에서 안 보내고 있어서
+      // 여기서는 그냥 레시피만 렌더링
+      renderRecipe(data, []);
+
+      return data;
+  }
+
+  // === 이미지 버튼 클릭 ===
+  document.getElementById("sendImageBtn").addEventListener("click", async () => {
+    const fileInput = document.getElementById("imageInput");
+    const statusDiv = document.getElementById("status");
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+      alert("이미지 파일을 선택해주세요.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    try {
+      statusDiv.textContent = "이미지에서 재료 인식 중... 잠시만 기다려주세요.";
+      await callImageAPI(formData);
+      statusDiv.textContent = "✅ 이미지 인식 및 레시피 생성 완료!";
+    } catch (err) {
+      console.error(err);
+      statusDiv.textContent = "에러 발생: " + err.message;
+    }
+  });
+
+  // 페이지 로드시 카드 숨기기 (선택사항)
+  window.addEventListener("load", () => {
+    const recipeCard = document.getElementById("recipeCard");
+    if (recipeCard) recipeCard.style.display = "none";
+  });
+</script>
+
+  
+</body>
+</html>
