@@ -109,12 +109,20 @@ export async function fetchSavedRecipes() {
     console.log("=== API 레시피 응답 데이터 (GET /recipe/list) ===");
     console.log(data);
 
-    const allRecipes = (data && Array.isArray(data.recipes)) ? data.recipes : [];
+    // const allRecipes = (data && Array.isArray(data.recipes)) ? data.recipes : [];
 
-    const savedIds = getSavedRecipeIds();
-    const savedRecipes = allRecipes.filter(recipe => savedIds.includes(recipe.id));
+    // const savedIds = getSavedRecipeIds();
+    // const savedRecipes = allRecipes.filter(recipe => savedIds.includes(recipe.id));
 
-    return savedRecipes;
+    // return savedRecipes;
+
+
+    /* 테스트 용 */
+    const allRecipes = RECIPES; 
+    console.log(`[MOCK] 전체 레시피 ${allRecipes.length}개 반환.`);
+
+
+
 
   } catch (error) {
       console.error("저장된 레시피 목록 조회 오류:", error);
