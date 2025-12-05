@@ -67,7 +67,7 @@ export async function searchRecipesByIngredients(selectedIngredients) {
             const errorData = await response.json().catch(() => ({ message: '알 수 없는 서버 오류' }));
             throw new Error(errorData.message || `API 호출 실패: ${response.status} 상태`);
         }
-        
+
         const data = await response.json();
         console.log("=== API 레시피 응답 데이터 (JSON) ===");
         console.log(data);
@@ -90,8 +90,43 @@ export async function searchRecipesByIngredients(selectedIngredients) {
 }
 
 
+/* 레시피 저장 */
+export async function fetchSavedRecipes() {
+  const API_ENDPOINT = '/recipe/list'; 
+  
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      method: 'GET', 
+      headers: { 'Content-Type': 'application/json' },
+    });
 
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: '알 수 없는 서버 오류' }));
+        throw new Error(errorData.message || `전체 레시피 목록 조회 실패: ${response.status} 상태`);
+    }
 
+    const data = await response.json();
+    console.log("=== API 레시피 응답 데이터 (GET /recipe/list) ===");
+    console.log(data);
+
+    const allRecipes = (data && Array.isArray(data.recipes)) ? data.recipes : [];
+
+    const savedIds = getSavedRecipeIds();
+    const savedRecipes = allRecipes.filter(recipe => savedIds.includes(recipe.id));
+
+    return savedRecipes;
+
+  } catch (error) {
+      console.error("저장된 레시피 목록 조회 오류:", error);
+      return [];
+  }
+}
+
+export async function deleteRecipe(id) {
+  toggleSaveRecipe(id);
+  await new Promise((r) => setTimeout(r, 150));
+  return true; 
+}
 
 
 
@@ -166,14 +201,14 @@ export function toggleSaveRecipe(id) {
 //   const list = RECIPES.filter((r) => ids.includes(r.id));
 //   return Promise.resolve(list);
 // }
-export async function fetchSavedRecipes() {
-  await new Promise((r) => setTimeout(r, 200));
-  return RECIPES;
-}
+// export async function fetchSavedRecipes() {
+//   await new Promise((r) => setTimeout(r, 200));
+//   return RECIPES;
+// }
 
 
 /* 레시피 삭제 */
-export async function deleteRecipe(id) {
-  await new Promise((r) => setTimeout(r, 150));
-  return true; 
-}
+// export async function deleteRecipe(id) {
+//   await new Promise((r) => setTimeout(r, 150));
+//   return true; 
+// }
