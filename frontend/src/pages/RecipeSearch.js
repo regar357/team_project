@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {   searchRecipesByIngredients } from "../utils/api/recipe";
-import {   fetchIngredients } from "../utils/api/ingredients";
+import { searchRecipesByIngredients } from "../utils/api/recipe";
+import { fetchIngredients } from "../utils/api/ingredients";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
 import "./RecipeSearch.css";
-
 
 export default function RecipeSearch() {
   const navigate = useNavigate();
@@ -17,7 +16,7 @@ export default function RecipeSearch() {
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [sortMode, setSortMode] = useState("created"); 
+  const [sortMode, setSortMode] = useState("created");
 
   // DB에서 식재료 목록 가져오기
   useEffect(() => {
@@ -42,16 +41,13 @@ export default function RecipeSearch() {
   });
 
   const filteredIngredients = sortedIngredients.filter((item) =>
-      item.name.toLowerCase().includes(searchText.toLowerCase())
-    );
-
+    item.name.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   // 재료 선택 토글
   const toggleIngredient = (item) => {
     setSelected((prev) =>
-      prev.includes(item)
-        ? prev.filter((i) => i !== item)
-        : [...prev, item]
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
     );
   };
 
@@ -61,53 +57,113 @@ export default function RecipeSearch() {
   };
 
   // 레시피 찾기 버튼 클릭
-  const handleSearch = async () => {
-    setLoading(true);
-    setHasSearched(true);
-    const data = await searchRecipesByIngredients(selected);
-    setResults(data);
-    setLoading(false);
-    
-  };
+  // const handleSearch = async () => {
+  //   setLoading(true);
+  //   setHasSearched(true);
+  //   const data = await searchRecipesByIngredients(selected);
+  //   setResults(data);
+  //   setLoading(false);
 
+  // };
+  const handleSearch = async () => {
+    try {
+      const data = await searchRecipesByIngredients(selected);
+      setResults(data); // 받은 결과를 화면에 표시하기 위해 상태에 저장
+    } catch (error) {
+      //  에러 처리
+    } finally {
+    }
+  };
   return (
     <div className="search-page">
       <section className="saved-hero">
         <h1>RECIPE</h1>
-        <p>레시피 / 보관함</p>
+        <p>레시피 / 찾기</p>
       </section>
 
-      {/* 상단 텍스트 */}
-      <div className="search-top-row">
-        <h2 className="search-main-title">식재료를 선택하세요</h2>
-      </div>
+      {/*전체 2컬럼 레이아웃 */}
+      <div className="search-layout">
+        {/* === 왼쪽 : 식재료 + 추천 레시피 === */}
+        <div className="search-left">
+          {/* 상단 텍스트 */}
+          <div className="search-top-row">
+            <h2 className="search-main-title">식재료를 선택하세요</h2>
+          </div>
 
-      {/* 재료 클라우드 + 오른쪽 패널 */}
-      <div className="ingredient-area">
-        {/* 왼쪽:재료 버튼들 */}
-        <div className="ingredient-cloud">
-          {filteredIngredients.map((item) => {
-            const isActive = selected.includes(item.name);
-            return (
-              <button
-                key={item.id ?? item.name}
-                type="button"
-                className={`ingredient-pill ${isActive ? "active" : ""}`}
-                onClick={() => toggleIngredient(item.name)}
-              >
-                {item.name}
-              </button>
-            );
-          })}
+          {/* 재료 클라우드 */}
+          <div className="ingredient-cloud">
+            {filteredIngredients.map((item) => {
+              const isActive = selected.includes(item.name);
+              return (
+                <button
+                  key={item.id ?? item.name}
+                  type="button"
+                  className={`ingredient-pill ${isActive ? "active" : ""}`}
+                  onClick={() => toggleIngredient(item.name)}
+                >
+                  {item.name}
+                </button>
+              );
+            })}
 
-          {filteredIngredients.length === 0 && (
-            <div className="no-ingredient">
-              해당 이름의 식재료가 없습니다.
+            {filteredIngredients.length === 0 && (
+              <div className="no-ingredient">
+                해당 이름의 식재료가 없습니다.
+              </div>
+            )}
+          </div>
+
+          {/* 추천 레시피 영역 */}
+          <section className="recommend-section">
+            <h3 className="recommend-title">추천 레시피</h3>
+
+            {!hasSearched && (
+              <p className="recommend-helper">
+                왼쪽에서 식재료를 선택한 뒤
+                <br />
+                <b>“레시피 찾기”</b> 버튼을 눌러보세요.
+              </p>
+            )}
+
+            {hasSearched && results.length === 0 && !loading && (
+              <p className="recommend-empty">
+                선택한 재료로 추천할 수 있는 레시피가 없어요.
+              </p>
+            )}
+
+            <div className="recommend-row">
+              {results.map((recipe) => (
+                <Card key={recipe.id}>
+                  <div
+                    className="recommend-card"
+                    onClick={() => navigate(`/recipes/${recipe.id}`)}
+                  >
+                    <div className="recommend-img-wrap">
+                      <img
+                        src={recipe.image_url}
+                        alt={recipe.title}
+                        className="recommend-img"
+                      />
+                    </div>
+                    <div className="recommend-info">
+                      <div className="recommend-name">{recipe.title}</div>
+                      <div className="recommend-meta">
+                        {recipe.tags &&
+                          recipe.tags.map((tag) => (
+                            <span key={tag} className="tag-badge">
+                              {tag}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
-          )}
+          </section>
         </div>
 
-        {/* 오른쪽: 정렬/검색/레시피찾기/태그 */}
+        {/* === 오른쪽 : 정렬 / 검색 / 레시피 찾기 / 선택된 재료 === */}
         <aside className="search-side-panel">
           {/* 정렬 탭 */}
           <div className="side-sort-row">
@@ -119,15 +175,19 @@ export default function RecipeSearch() {
             </button>
 
             <button
-              className={`side-sort-tab ${sortMode === "created" ? "active" : ""}`}
+              className={`side-sort-tab ${
+                sortMode === "created" ? "active" : ""
+              }`}
               onClick={() => setSortMode("created")}
             >
               등록순
             </button>
 
             <button
-              className={`side-sort-tab ${sortMode === "expire" ? "active" : ""}`}
-            onClick={() => setSortMode("expire")}
+              className={`side-sort-tab ${
+                sortMode === "expire" ? "active" : ""
+              }`}
+              onClick={() => setSortMode("expire")}
             >
               임박순
             </button>
@@ -146,7 +206,7 @@ export default function RecipeSearch() {
                     (item) => item.name === searchText
                   );
                   if (exact) {
-                  toggleIngredient(exact.name);
+                    toggleIngredient(exact.name);
                   }
                 }
               }}
@@ -180,58 +240,12 @@ export default function RecipeSearch() {
                 className="side-tag-chip"
                 onClick={() => removeSelected(name)}
               >
-                {name}  ✕
+                {name} ✕
               </button>
             ))}
           </div>
         </aside>
       </div>
-
-      {/* 추천 레시피 영역 */}
-      <section className="recommend-section">
-        <h3 className="recommend-title">추천 레시피</h3>
-
-        {!hasSearched && (
-          <p className="recommend-helper">
-            왼쪽에서 식재료를 선택한 뒤
-            <br />
-            <b>“레시피 찾기”</b> 버튼을 눌러보세요.
-          </p>
-        )}
-
-        {hasSearched && results.length === 0 && !loading && (
-          <p className="recommend-empty">
-            선택한 재료로 추천할 수 있는 레시피가 없어요.
-          </p>
-        )}
-
-        <div className="recommend-row">
-          {results.map((recipe) => (
-            <Card key={recipe.id}>
-              <div
-                className="recommend-card"
-                onClick={() => navigate(`/recipes/${recipe.id}`)}
-              >
-                <div className="recommend-img-wrap">
-                  <img
-                    src={recipe.image_url}
-                    alt={recipe.title}
-                    className="recommend-img"
-                  />
-                </div>
-                <div className="recommend-info">
-                  <div className="recommend-name">{recipe.title}</div>
-                  <div className="recommend-meta">
-                    {recipe.tags && recipe.tags.map((tag) => (
-                      <span key={tag} className="tag-badge">{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }

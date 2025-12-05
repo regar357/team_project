@@ -251,97 +251,83 @@
 }
 
 /* 개별 레시피 카드 */
-.weekly-recipes-grid .card {
+.weekly-recipe-card{
+  width: 260px;
+  min-height: 320px;
+  padding: 24px 20px 22px;
   background: #ffffff;
-  border-radius: 15px;
-  padding: 18px 16px;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
-  width: 260px;  
-  height: 330px;
-  margin: 0 auto;     
-  display: flex; 
-}
-
-.weekly-recipe-card {
-  width: 100%;
-  padding: 24px 20px 20px;
-  background: #ffe9d9;
-  border-radius: 15px;
+  border-radius: 28px;
+  border: 1px solid #ddd;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-sizing: border-box;
-  display: flex; 
-
-}
-.weekly-recipe-card.selected {
-  /* background: #ffd3bf; */
-  border: 2px solid #ee6049;
-  box-shadow: 0 14px 30px rgba(238, 96, 73, 0.35);
-  transform: translateY(-4px);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.weekly-recipe-card.active {
-  border: 2px solid #EE6049;
-  transform: scale(1.02);
-  background: #ffece7;
+/* 호버 & 선택 상태 */
+.weekly-recipe-card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.10);
 }
 
-.weekly-recipe-image-wrap {
+.weekly-recipe-card.selected{
+  box-shadow: 0 22px 50px rgba(238, 96, 73, 0.35);
+  outline: 2px solid #ee6049;
+}
+
+/* 이미지 영역 */
+.weekly-recipe-image-wrap{
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.18);
+  margin-bottom: 6px;
+}
+
+.weekly-recipe-image-wrap img,
+.recommend-img {
   width: 100%;
-  display: flex;
-  justify-content: center;
-}
-.weekly-recipe-circle {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: #ffd9c7;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
-}
-
-.weekly-recipe-image-wrap img {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
+  height: 100%;
   object-fit: cover;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
 }
 
-.weekly-recipe-info {
+/* 제목 */
+.weekly-recipe-title,
+.recommend-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin: 4px;
   text-align: center;
 }
 
-.weekly-recipe-title {
-  font-size: 18px;
-  font-weight: 800;
-  margin-top: 6px;
-  margin-bottom: 2px;
-}
-
-.weekly-recipe-tags {
+/* 태그 영역 */
+.weekly-recipe-tags,
+.recommend-meta {
   display: flex;
-  justify-content: center;
-  gap: 8px;
   flex-wrap: wrap;
-  margin-top: 6px;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 10px;
 }
 
+/* 태그 뱃지 */
 .tag-badge {
-  background: #ee6049;         
-  color:#fff;                 
-  padding: 3px 12px;          
-  border-radius: 999px;      
-  font-size: 13px;          
-  font-weight: 600;        
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: #ee6049;
+  color: #ffffff;
+  letter-spacing: 0.02em;
 }
-
-
-
 
 
 /* 반응형 */

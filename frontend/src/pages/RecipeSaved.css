@@ -132,15 +132,12 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
-/* 카드 전체 */
 .recipe-card {
   text-align: center;
   cursor: pointer;
   padding: 20px 10px;
-
 }
 
-/* 이미지 원형 */
 .recipe-img-wrap {
   width: 180px;
   height: 180px;
@@ -161,8 +158,7 @@
   object-fit: cover;
 }
 
-/* 레시피 이름 */
-.recipe-name {
+.recipe-title {
   font-size: 20px;
   font-weight: 600;
   color: #333;
