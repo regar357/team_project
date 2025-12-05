@@ -17,7 +17,7 @@ exports.uploadFood = async (req, res) => {
     });
 
     pythonProcess.on("close", async () => {
-      const result = JSON.parse(output); // { items: [{name, category}, ...] }
+      const result = JSON.parse(output); // { items: [{name, category, count}, ...] }
       const items = result.items;
 
       const finalResults = [];
