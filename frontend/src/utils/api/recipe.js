@@ -123,11 +123,33 @@ export async function fetchSavedRecipes() {
 }
 
 export async function deleteRecipe(id) {
-  toggleSaveRecipe(id);
-  await new Promise((r) => setTimeout(r, 150));
-  return true; 
-}
+  const API_ENDPOINT = `/recipe/delete/${id}`; 
+  
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      method: 'DELETE', 
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
+    if (!response.ok) {
+        console.error(`[DELETE API] 실패: 상태 코드 ${response.status}`);
+        const errorData = await response.json().catch(() => ({ message: '알 수 없는 서버 오류' }));
+        throw new Error(errorData.message || `레시피 삭제 실패: ${response.status} 상태`);
+    }
+    
+    console.log(`[DELETE API] 성공: 상태 코드 ${response.status}. 로컬 스토리지 ID 제거 시작.`);
+
+    toggleSaveRecipe(id);
+
+    return true; 
+
+  } catch (error) {
+    console.error(`레시피 ID ${id} 삭제 오류:`, error);
+    throw new Error(`레시피 삭제 서버 오류: ${error.message}`);
+  }
+}
 
 
 
