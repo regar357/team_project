@@ -85,20 +85,25 @@ exports.getRecipeList = async (req, res) => {
 
 exports.deleteRecipe = async (req, res) => {
   const { id } = req.params;
+  console.log("레시피id확인: " + id);
 
-  try {
-    const [result] = await pool.query(
-      "DELETE FROM recipe WHERE recipe_id = ?",
-      [id]
-    );
+  res.json({
+    message: "레시피 삭제 완료",
+    recipe_id: id,
+  });
+  // try {
+  //   const [result] = await pool.query(
+  //     "DELETE FROM recipe WHERE recipe_id = ?",
+  //     [id]
+  //   );
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "삭제할 레시피가 없습니다." });
-    }
+  //   if (result.affectedRows === 0) {
+  //     return res.status(404).json({ message: "삭제할 레시피가 없습니다." });
+  //   }
 
-    return res.json({ message: "레시피 삭제 성공" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "레시피 삭제 실패" });
-  }
+  //   return res.json({ message: "레시피 삭제 성공" });
+  // } catch (err) {
+  //   console.error(err);
+  //   res.status(500).json({ error: "레시피 삭제 실패" });
+  // }
 };
