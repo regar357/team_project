@@ -24,7 +24,11 @@
   font-weight: 700;
   color: var(--primary);
 }
-
+.logo-link {
+  text-decoration: none;
+  color: inherit;   
+  font-weight: inherit;
+}
 .nav {
   display: flex;
   gap: 16px;

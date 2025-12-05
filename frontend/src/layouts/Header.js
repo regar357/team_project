@@ -7,15 +7,15 @@ const Header = () => {
       <div className="header-inner">
 
         <div className="logo">
-          FreshLens
+          <Link to="/" className="logo-link"> 
+            FreshLens
+          </Link>
         </div>
 
         <nav className="nav">
-          <Link to="/">홈</Link>
           {/* <Link to="/">식재료 등록</Link>
           <Link to="/">식재료 목록</Link> */}
-          <Link to="/recipes/saved">저장된 레시피</Link>
-          <Link to="/recipes/search">레시피 찾기</Link>
+          <Link to="/recipes/saved">레시피</Link>
           <Link to="/weekly-plan">주간 식단</Link>
           <Link to="/alerts">알림</Link>
         </nav>
