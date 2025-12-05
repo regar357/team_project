@@ -72,6 +72,11 @@ export default function RecipeSearch() {
 
   return (
     <div className="search-page">
+      <section className="saved-hero">
+        <h1>RECIPE</h1>
+        <p>레시피 / 보관함</p>
+      </section>
+
       {/* 상단 텍스트 */}
       <div className="search-top-row">
         <h2 className="search-main-title">식재료를 선택하세요</h2>
