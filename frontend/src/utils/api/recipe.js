@@ -163,7 +163,7 @@ export async function deleteRecipe(id) {
 
 /* API 레시피 상세 조회 */
 export async function fetchRecipeById(id) {
-  const API_ENDPOINT = `/recipes/list/${id}`; 
+  const API_ENDPOINT = `/recipe/list/${id}`; 
 
   try {
     const response = await fetch(API_ENDPOINT);
