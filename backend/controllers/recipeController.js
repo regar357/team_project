@@ -6,10 +6,6 @@ exports.generateRecipe = async (req, res) => {
   const ingredients = req.body.ingredients; // ["계란","우유","파스타"]
   console.log("전달받은 식재료:" + ingredients);
 
-  res.json({
-    message: "레시피 생성 완료",
-    recipe: ingredients,
-  });
   // try {
   //   const pythonProcess = spawn("python", [
   //     path.join(__dirname, "../../model/레시피 추천 모델 경로"),
@@ -65,22 +61,26 @@ exports.generateRecipe = async (req, res) => {
 };
 
 exports.getRecipeList = async (req, res) => {
-  try {
-    const [rows] = await pool.query(`
-      SELECT recipe_id, recipe_title, recipe_description, priority_used_ingredients,
-             other_ingredients, servings, recipe_steps, recipe_tips, created_at
-      FROM recipe
-      ORDER BY created_at DESC
-    `);
+  res.json({
+    message: "레시피 목록 조회 성공",
+  });
 
-    res.json({
-      message: "레시피 목록 조회 성공",
-      recipes: rows,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "레시피 조회 실패" });
-  }
+  // try {
+  //   const [rows] = await pool.query(`
+  //     SELECT recipe_id, recipe_title, recipe_description, priority_used_ingredients,
+  //            other_ingredients, servings, recipe_steps, recipe_tips, created_at
+  //     FROM recipe
+  //     ORDER BY created_at DESC
+  //   `);
+
+  //   res.json({
+  //     message: "레시피 목록 조회 성공",
+  //     recipes: rows,
+  //   });
+  // } catch (err) {
+  //   console.error(err);
+  //   res.status(500).json({ error: "레시피 조회 실패" });
+  // }
 };
 
 exports.deleteRecipe = async (req, res) => {
