@@ -43,6 +43,7 @@ export const RECIPES = [
 
 
 /* api 연동 */
+/* API 레시피 생성 */
 export async function searchRecipesByIngredients(selectedIngredients) {
     const API_ENDPOINT = '/recipe/generate'; 
 
@@ -60,7 +61,7 @@ export async function searchRecipesByIngredients(selectedIngredients) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(payload), // 데이터를 JSON 문자열로 변환하여 전송
+            body: JSON.stringify(payload), 
         });
 
         if (!response.ok) {
@@ -90,7 +91,7 @@ export async function searchRecipesByIngredients(selectedIngredients) {
 }
 
 
-/* 레시피 저장 */
+/* API 레시피 저장 */
 export async function fetchSavedRecipes() {
   const API_ENDPOINT = '/recipe/list'; 
   
@@ -130,6 +131,7 @@ export async function fetchSavedRecipes() {
   }
 }
 
+/* API 레시피 삭제 */
 export async function deleteRecipe(id) {
   const API_ENDPOINT = `/recipe/delete/${id}`; 
   
@@ -158,6 +160,37 @@ export async function deleteRecipe(id) {
     throw new Error(`레시피 삭제 서버 오류: ${error.message}`);
   }
 }
+
+/* API 레시피 상세 조회 */
+export async function fetchRecipeById(id) {
+  const API_ENDPOINT = `/recipes/list/${id}`; 
+
+  try {
+    const response = await fetch(API_ENDPOINT);
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.warn(`레시피 ID ${id} 상세 정보 없음 (404)`);
+        return null;
+      }
+      throw new Error(`레시피 상세 조회 실패: ${response.status} 상태`);
+    }
+
+    const data = await response.json();
+    console.log(`=== API 레시피 상세 응답 데이터 (GET /recipes/list/${id}) ===`);
+    console.log(data);
+    return data;
+
+  } catch (error) {
+    console.error(`레시피 ID ${id} 상세 조회 오류:`, error);
+    return RECIPES.find((r) => r.id === Number(id)) || null; 
+  }
+}
+
+
+
+
+
 
 
 
@@ -194,10 +227,10 @@ export function fetchAllRecipes() {
   return Promise.resolve(RECIPES);
 }
 
-/* 레시피 상세 조회  */
-export function fetchRecipeById(id) {
-  return Promise.resolve(RECIPES.find((r) => r.id === Number(id)) || null);
-}
+// /* 레시피 상세 조회  */
+// export function fetchRecipeById(id) {
+//   return Promise.resolve(RECIPES.find((r) => r.id === Number(id)) || null);
+// }
 
 /* localStorage로 저장된 레시피 관리 */
 const STORAGE_KEY = "savedRecipes";
