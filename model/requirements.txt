@@ -7,3 +7,13 @@ numpy
 pandas
 scikit-learn
 joblib
+groq
+fastapi
+uvicorn
+sqlalchemy
+sentence-transformers
+faiss-cpu
+python-multipart
+pillow
+python-dotenv
+
