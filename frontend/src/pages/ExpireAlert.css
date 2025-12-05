@@ -1,0 +1,218 @@
+/* 전체 페이지 */
+.alert-page {
+  padding: 40px 80px; 
+  box-sizing: border-box;
+} 
+
+/* 상단 헤더 */
+.alert-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.alert-back-btn {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.alert-title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* 메인 영역 */
+.alert-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 공통 카드 */
+.alert-card {
+  padding: 20px 24px;
+}
+
+/* 첫 두 카드의 행 레이아웃 */
+.alert-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.alert-row-column {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+}
+
+/* 왼쪽 아이콘 동그라미 */
+.alert-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffe0d7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-icon {
+  font-size: 18px;
+}
+
+/* 카드 텍스트 */
+.alert-texts {
+  flex: 1;
+}
+
+.alert-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.alert-card-desc {
+  font-size: 16px;
+  color: #777;
+}
+
+/* 토글 스위치 */
+.alert-toggle {
+  width: 50px;
+  height: 28px;
+  border-radius: 16px;
+  border: none;
+  background: #ddd;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+}
+
+.alert-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.18s ease;
+}
+
+/* ON 상태 */
+.alert-toggle.on {
+  background: #ee6049;
+}
+
+.alert-toggle.on .alert-toggle-knob {
+  transform: translateX(20px);
+}
+
+/* 라디오 그룹 */
+.alert-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 52px; 
+}
+
+.alert-radio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.alert-radio input {
+  display: none;
+}
+
+.alert-radio-mark {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* 체크 되었을 때 안쪽 점 */
+.alert-radio input:checked + .alert-radio-mark {
+  border-color: #ee6049;
+}
+
+.alert-radio input:checked + .alert-radio-mark::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: #ee6049;
+}
+
+.alert-radio-label {
+  font-size: 16px;
+}
+
+.alert-radio-sub {
+  font-size: 15px;
+  color: #999;
+  margin-left: 4px;
+}
+
+/* 알림 기록 카드 */
+.alert-log-card {
+  margin-top: 6px;
+}
+
+.alert-log-header {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.alert-log-divider {
+  border-top: 1.5px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.alert-log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.alert-log-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  padding: 4px 20px;
+}
+
+.alert-log-date {
+  color: #333;
+}
+
+.alert-log-text {
+  color: #555;
+}
+.alert-log-dday {
+  margin-left: 30px;
+  color: #ee6049;      
+  font-weight: 600;
+}
+
+/* 반응형  */
+@media (max-width: 768px) {
+  .alert-page {
+    padding: 24px 16px;
+  }
+
+  .alert-main {
+    gap: 12px;
+  }
+}
