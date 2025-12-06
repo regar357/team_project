@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { searchRecipesByIngredients } from "../utils/api/recipe";
 import { fetchIngredients } from "../utils/api/ingredients";
+// import { IngredientsListPage  } from "./ListPage.js";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
 import "./RecipeSearch.css";
@@ -26,6 +27,7 @@ export default function RecipeSearch() {
     };
     load();
   }, []);
+
 
   // sortMode에 따라 정렬된 식재료 목록 만들기
   const sortedIngredients = [...ingredients].sort((a, b) => {
@@ -56,24 +58,67 @@ export default function RecipeSearch() {
     setSelected((prev) => prev.filter((i) => i !== item));
   };
 
-  // 레시피 찾기 버튼 클릭
   // const handleSearch = async () => {
-  //   setLoading(true);
-  //   setHasSearched(true);
-  //   const data = await searchRecipesByIngredients(selected);
-  //   setResults(data);
-  //   setLoading(false);
-
+  //   try {
+  //     const data = await searchRecipesByIngredients(selected);
+  //     setResults(data); 
+  //   } catch (error) {
+  //     //  에러 처리
+  //   } finally {
+  //   }
   // };
+
   const handleSearch = async () => {
+    setLoading(true);
+    setHasSearched(true);
+
+    console.log("=== 레시피 검색 시작 ===");
+    console.log(`[STATE] Loading: true, HasSearched: true, 선택된 재료 수: ${selected.length}`);
+
     try {
-      const data = await searchRecipesByIngredients(selected);
-      setResults(data); // 받은 결과를 화면에 표시하기 위해 상태에 저장
+        const rawData = await searchRecipesByIngredients(selected);
+        console.log(`[API] 레시피 데이터 수신 성공. 항목 수: ${rawData ? rawData.length : 0}`);
+        const processedRecipes = rawData.map(recipe => {
+            try {
+                return {
+                    ...recipe,
+                    priority_used_ingredients: recipe.priority_used_ingredients 
+                        ? JSON.parse(recipe.priority_used_ingredients) 
+                        : [],
+                    other_ingredients: recipe.other_ingredients 
+                        ? JSON.parse(recipe.other_ingredients) 
+                        : [],
+                    recipe_steps: recipe.recipe_steps 
+                        ? JSON.parse(recipe.recipe_steps) 
+                        : [],
+                    recipe_tips: recipe.recipe_tips 
+                        ? JSON.parse(recipe.recipe_tips) 
+                        : [],
+                    
+                    
+                    title: recipe.recipe_title,
+                    tags: recipe.priority_used_ingredients 
+                        ? JSON.parse(recipe.priority_used_ingredients).slice(0, 3) 
+                        : [],
+                };
+            } catch (e) {
+                console.error("레시피 JSON 파싱 오류:", e, recipe);
+                return recipe;
+            }
+        });
+
+        setResults(processedRecipes); 
+        
     } catch (error) {
-      //  에러 처리
+        console.error("레시피 검색/생성 오류:", error);
+        alert(`레시피 검색 중 오류가 발생했습니다: ${error.message}`);
     } finally {
+        setLoading(false);
+        console.log("=== 레시피 검색 종료 [Loading: false] ===");
     }
-  };
+};
+
+
   return (
     <div className="search-page">
       <section className="saved-hero">
