@@ -20,7 +20,7 @@ function getDday(expiryStr) {
 
   if (diffDays === 0) return "D - DAY";
   if (diffDays > 0) return `D - ${diffDays}`;
-  return `D + ${Math.abs(diffDays)}`; // 이미 지난 경우
+  return `D + ${Math.abs(diffDays)}`;
 }
 
 function getDdayClass(expiryStr) {
@@ -30,10 +30,10 @@ function getDdayClass(expiryStr) {
   expiry.setHours(0, 0, 0, 0);
   const diffDays = Math.round((expiry - today) / (1000 * 60 * 60 * 24));
 
-  if (diffDays <= 0) return "dday dday-danger";   // D-DAY 또는 지남
-  if (diffDays <= 4) return "dday dday-warning";  // D-1 ~ D-4
-  if (diffDays <= 10) return "dday dday-safe";    // D-5 ~ D-10
-  return "dday";                                  // 그 외
+  if (diffDays <= 0) return "dday dday-danger";
+  if (diffDays <= 4) return "dday dday-warning";
+  if (diffDays <= 10) return "dday dday-safe";
+  return "dday";
 }
 
 function IngredientsPage() {
@@ -46,16 +46,59 @@ function IngredientsPage() {
   });
   const [editingIndex, setEditingIndex] = useState(null);
 
+  // 업로드 상태/결과
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+
   // 입력값 변경
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 이미지 파일 선택
-  const handleFileChange = (e) => {
+  // 서버 업로드 함수
+  const uploadFoodImage = async (file) => {
+    const formData = new FormData();
+    // 백엔드가 받는 키가 다르면 "image" -> "file" 등으로 바꿔야 함
+    formData.append("image", file);
+
+    const res = await fetch("/food/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      throw new Error(`이미지 업로드 실패 (${res.status})`);
+    }
+
+    const data = await res.json().catch(() => ({}));
+    return data;
+  };
+
+  // 이미지 파일 선택 + 즉시 업로드
+  const handleFileChange = async (e) => {
     const file = e.target.files?.[0] ?? null;
+
     setForm((prev) => ({ ...prev, imageFile: file }));
+    setUploadError("");
+    setUploadedImageUrl("");
+
+    if (!file) return;
+
+    try {
+      setUploading(true);
+
+      const data = await uploadFoodImage(file);
+
+      //dk응답 키 대응
+      const url = data.url || data.imageUrl || data.path || data.location || "";
+      setUploadedImageUrl(url);
+    } catch (err) {
+      setUploadError(err?.message ?? "업로드 중 오류가 발생했습니다.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   // 새로 등록
@@ -69,10 +112,13 @@ function IngredientsPage() {
       name: form.name,
       category: form.category,
       expiry: form.expiry,
+      imageUrl: uploadedImageUrl || "",
     };
 
     setIngredients((prev) => [...prev, newItem]);
     setForm({ name: "", category: "", expiry: "", imageFile: null });
+    setUploadedImageUrl("");
+    setUploadError("");
     setEditingIndex(null);
   };
 
@@ -92,10 +138,14 @@ function IngredientsPage() {
       name: form.name,
       category: form.category,
       expiry: form.expiry,
+      imageUrl: uploadedImageUrl || updated[editingIndex]?.imageUrl || "",
     };
+
     setIngredients(updated);
     setEditingIndex(null);
     setForm({ name: "", category: "", expiry: "", imageFile: null });
+    setUploadedImageUrl("");
+    setUploadError("");
   };
 
   // 행 클릭 시 폼에 불러오기
@@ -107,6 +157,9 @@ function IngredientsPage() {
       expiry: item.expiry,
       imageFile: null,
     });
+
+    setUploadedImageUrl(item.imageUrl || "");
+    setUploadError("");
     setEditingIndex(idx);
   };
 
@@ -120,7 +173,7 @@ function IngredientsPage() {
           <div className="photo-upload">
             <div className="photo-box">
               <label className="photo-button">
-                <span>+ 사진 업로드</span>
+                <span>{uploading ? "업로드 중..." : "+ 사진 업로드"}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -130,8 +183,21 @@ function IngredientsPage() {
               </label>
               <p className="photo-help">냉장고 속 이미지를 등록하세요</p>
             </div>
+
+            {/* 선택된 파일명 */}
             {form.imageFile && (
               <div className="photo-filename">{form.imageFile.name}</div>
+            )}
+
+            {/* 업로드 결과 표시 */}
+            {uploadedImageUrl && (
+              <div className="photo-filename">업로드 완료</div>
+            )}
+
+            {uploadError && (
+              <div className="photo-filename" style={{ color: "#e74c3c" }}>
+                {uploadError}
+              </div>
             )}
           </div>
 
@@ -184,6 +250,7 @@ function IngredientsPage() {
                 type="button"
                 className="btn btn-secondary"
                 onClick={handleUpdate}
+                disabled={uploading}
               >
                 수정
               </button>
@@ -191,6 +258,7 @@ function IngredientsPage() {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleSave}
+                disabled={uploading}
               >
                 저장
               </button>
@@ -214,9 +282,7 @@ function IngredientsPage() {
                 <tr
                   key={`${item.name}-${idx}`}
                   onClick={() => handleRowClick(idx)}
-                  className={
-                    editingIndex === idx ? "row-selected" : undefined
-                  }
+                  className={editingIndex === idx ? "row-selected" : undefined}
                 >
                   <td>{item.name}</td>
                   <td>{item.category}</td>
