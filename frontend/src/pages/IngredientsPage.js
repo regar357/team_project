@@ -96,12 +96,7 @@ function IngredientsPage() {
       console.log("✅ 이미지 업로드 응답:", data);
 
       // 서버 응답 키 대응
-      const url =
-        data.url ||
-        data.imageUrl ||
-        data.path ||
-        data.location ||
-        "";
+      const url = data.url || data.imageUrl || data.path || data.location || "";
 
       setUploadedImageUrl(url);
     } catch (err) {
@@ -117,7 +112,7 @@ function IngredientsPage() {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify(payload),
     });
@@ -150,8 +145,7 @@ function IngredientsPage() {
       return;
     }
 
-    const imageUrlToSend =
-      uploadedImageUrl || target?.imageUrl || "";
+    const imageUrlToSend = uploadedImageUrl || target?.imageUrl || "";
 
     // 서버로 보낼 payload
     // (백엔드 스펙에 따라 키 이름이 다르면 여기만 맞추면 됨)
@@ -159,7 +153,7 @@ function IngredientsPage() {
       name: form.name,
       category: form.category,
       expiry: form.expiry,
-      imageUrl: imageUrlToSend,
+      //imageUrl: imageUrlToSend,
     };
 
     try {
@@ -173,7 +167,7 @@ function IngredientsPage() {
         name: form.name,
         category: form.category,
         expiry: form.expiry,
-        imageUrl: imageUrlToSend,
+        //imageUrl: imageUrlToSend,
       };
       setIngredients(updated);
 
@@ -325,7 +319,6 @@ function IngredientsPage() {
             </tbody>
           </table>
         </div>
-
       </div>
     </div>
   );

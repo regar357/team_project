@@ -8,8 +8,8 @@ const upload = multer({ dest: "uploads/" }); // 이미지파일 저장 경로 �
 router.get("/", foodController.getFoodList);
 //POST /food/upload
 router.post("/upload", upload.single("image"), foodController.uploadFood);
-//PUT /food/update
-router.put("/:food_id", foodController.updateFood);
+//PUT /food/update/:food_id
+router.put("/update/:food_id", foodController.updateFood);
 //DELETE /food/discard/:food_id
 router.delete("/discard/:food_id", foodController.discardFood);
 

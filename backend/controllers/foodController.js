@@ -44,14 +44,17 @@ exports.uploadFood = async (req, res) => {
   //       if (expirationDays) {
   //         expirationDate = new Date();
   //         expirationDate.setDate(expirationDate.getDate() + expirationDays);
-
-  //         await pool.query(
-  //           "INSERT INTO food (food_name, category, expiration_date, food_count) VALUES (?, ?, ?, ?)",
-  //           [name, category, expirationDate, count]
-  //         );
   //       }
 
+  //       const [insertResult] = await pool.query(
+  //         "INSERT INTO food (food_name, category, expiration_date, food_count) VALUES (?, ?, ?, ?)",
+  //         [name, category, expirationDate, count]
+  //       );
+
+  //       const insertedId = insertResult.insertId;
+
   //       finalResults.push({
+  //         food_id: insertedId,
   //         name,
   //         category,
   //         expirationDays,
@@ -73,27 +76,29 @@ exports.uploadFood = async (req, res) => {
 exports.updateFood = async (req, res) => {
   const { food_id } = req.params;
   const { food_name, food_category, food_Ex } = req.body;
+  console.log("food_id: " + food_id);
+  console.log(req.body);
 
-  try {
-    const [result] = await pool.query(
-      "UPDATE food SET food_name = ?, food_category = ?, food_Ex = ? WHERE id = ?",
-      [food_name, food_category, food_Ex, food_id]
-    );
+  // try {
+  //   const [result] = await pool.query(
+  //     "UPDATE food SET food_name = ?, food_category = ?, food_Ex = ? WHERE id = ?",
+  //     [food_name, food_category, food_Ex, food_id]
+  //   );
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "존재하지 않는 식품 ID" });
-    }
+  //   if (result.affectedRows === 0) {
+  //     return res.status(404).json({ message: "존재하지 않는 식품 ID" });
+  //   }
 
-    res.json({
-      message: "수정 완료",
-      food_id,
-      food_name,
-      food_category,
-      food_Ex,
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  //   res.json({
+  //     message: "수정 완료",
+  //     food_id,
+  //     food_name,
+  //     food_category,
+  //     food_Ex,
+  //   });
+  // } catch (err) {
+  //   res.status(500).json({ error: err.message });
+  // }
 };
 
 exports.getFoodList = async (req, res) => {
