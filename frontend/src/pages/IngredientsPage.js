@@ -93,6 +93,7 @@ function IngredientsPage() {
       setUploading(true);
 
       const data = await uploadFoodImage(file);
+      console.log("이미지를 업로드했습니다."+ data);
 
       // 서버 응답 키 대응
       const url =
