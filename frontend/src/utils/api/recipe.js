@@ -227,8 +227,14 @@ export async function fetchRecipeById(id) {
             }
         } catch (e) {
         }
-        return dataString.split(',').map(item => item.trim()).filter(item => item.length > 0);
-    };
+        try {
+            return dataString.split(',').map(item => item.trim()).filter(item => item.length > 0);
+        } catch (e) {
+             console.warn("safeJsonParseOrSplit: 문자열 분리 실패 (이상 데이터)", dataString);
+             return [];
+        }
+
+      };
   try {
     const response = await fetch(API_ENDPOINT);
 
@@ -243,39 +249,35 @@ export async function fetchRecipeById(id) {
     const data = await response.json();
     console.log(`=== API 레시피 상세 응답 데이터 (GET /recipes/list/${id}) ===`);
     console.log(data);
-    // return data;
 
 
-    const rawRecipe = (data && Array.isArray(data.recipes) && data.recipes.length > 0) 
-                           ? data.recipes[0] 
-                           : null;
+    try {
+        const rawRecipe = (data && Array.isArray(data.recipes) && data.recipes.length > 0) ? data.recipes[0] : null;
 
         if (!rawRecipe) {
             console.warn(`레시피 ID ${id}: 서버 응답에 유효한 레시피 데이터가 없습니다.`);
             return null;
         }
 
-        //  데이터 가공 
-        try {
-            const processedRecipe = {
-                id: rawRecipe.recipe_id, 
-                title: rawRecipe.recipe_title,
-                description: rawRecipe.recipe_description,
-                
-                priority_used_ingredients: safeJsonParseOrSplit(rawRecipe.priority_used_ingredients),
-                other_ingredients: safeJsonParseOrSplit(rawRecipe.other_ingredients),
-                steps: safeJsonParseOrSplit(rawRecipe.recipe_steps),
-                tips: safeJsonParseOrSplit(rawRecipe.recipe_tips),
-                
-                servings: rawRecipe.servings,
-                created_at: rawRecipe.created_at,
-
-                image_url: rawRecipe.image_url ?? '/images/default_recipe.png', 
-                isSaved: getSavedRecipeIds().includes(rawRecipe.recipe_id),
-                
-            };
+        const processedRecipe = {
+            id: rawRecipe.recipe_id, 
+            title: rawRecipe.recipe_title,
+            description: rawRecipe.recipe_description,
             
-            return processedRecipe;
+            priority_used_ingredients: safeJsonParseOrSplit(rawRecipe.priority_used_ingredients),
+            other_ingredients: safeJsonParseOrSplit(rawRecipe.other_ingredients),
+            steps: safeJsonParseOrSplit(rawRecipe.recipe_steps),
+            tips: safeJsonParseOrSplit(rawRecipe.recipe_tips),
+            
+            servings: rawRecipe.servings,
+            created_at: rawRecipe.created_at,
+            
+            image_url: rawRecipe.image_url ?? '/images/default_recipe.png', 
+            
+            isSaved: getSavedRecipeIds().includes(rawRecipe.recipe_id),
+        };
+        
+        return processedRecipe;
 
         } catch (e) {
             console.error(`레시피 ID ${id} 상세 파싱 오류:`, e);
