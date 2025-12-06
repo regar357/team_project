@@ -34,8 +34,8 @@ const RecipeSaved = () => {
 
   const handleDelete = async (id, e) => {
     e.stopPropagation();
-    await deleteRecipe(id);
-    setRecipes((prev) => prev.filter((r) => r.id !== id));
+    await deleteRecipe(Number(id));
+    setRecipes((prev) => prev.filter((r) => r.id !== Number(id)));  
   };
 
   const handleCardClick = (id) => {
@@ -49,14 +49,11 @@ const RecipeSaved = () => {
   );
   const sortedRecipes = filteredRecipes.slice().sort((a, b) => {
     if (sortOrder === '이름순') {
-      return a.title.localeCompare(b.title); 
+        return a.title.localeCompare(b.title); 
     }
-    return 0; 
-  });
-
-  if (loading) {
-    return <div className="saved-page">불러오는 중...</div>;
-  }
+    
+    return new Date(b.created_at || b.id) - new Date(a.created_at || a.id);
+});
 
   return (
     <div className="saved-page">

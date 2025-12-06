@@ -116,8 +116,42 @@ export async function fetchSavedRecipes() {
 
     const data = await response.json();
     console.log("=== API 레시피 응답 데이터 (GET /recipe/list) ===");
-    console.log(data);
+    // console.log(data);
 
+    const rawRecipes = (data && Array.isArray(data.recipes)) ? data.recipes : [];
+    
+    // 데이터 가공
+        const processedRecipes = rawRecipes.map(recipe => {
+            try {
+                const tags = recipe.priority_used_ingredients 
+                    ? JSON.parse(recipe.priority_used_ingredients) 
+                    : [];
+
+                return {
+                    id: recipe.recipe_id, 
+                    title: recipe.recipe_title, 
+                    
+                    priority_used_ingredients: tags,
+                    other_ingredients: recipe.other_ingredients ? JSON.parse(recipe.other_ingredients) : [],
+                    steps: recipe.recipe_steps ? JSON.parse(recipe.recipe_steps) : [],
+                    tips: recipe.recipe_tips ? JSON.parse(recipe.recipe_tips) : [],
+                    
+                    category: recipe.category ?? '기타',
+                    image_url: recipe.image_url ?? '/default_recipe.png', 
+                    tags: tags.slice(0, 3), 
+
+                    created_at: recipe.created_at,
+                };
+            } catch (e) {
+                console.error("레시피 목록 JSON 파싱 오류로 항목 건너뜀:", e, recipe);
+                return null; 
+            }
+        }).filter(r => r !== null);
+
+        console.log(`[정규화] 최종 표시할 레시피 수: ${processedRecipes.length}`);
+        return processedRecipes;
+    
+    
     // const allRecipes = (data && Array.isArray(data.recipes)) ? data.recipes : [];
 
     // const savedIds = getSavedRecipeIds();
@@ -127,9 +161,9 @@ export async function fetchSavedRecipes() {
 
 
     /* 테스트 용 */
-    const allRecipes = RECIPES; 
-    console.log(`[MOCK] 전체 레시피 ${allRecipes.length}개 반환.`);
-    return  allRecipes;
+    // const allRecipes = RECIPES; 
+    // console.log(`[MOCK] 전체 레시피 ${allRecipes.length}개 반환.`);
+    // return  allRecipes;
 
 
 
@@ -164,8 +198,8 @@ export async function deleteRecipe(id) {
     return true; 
 
   } catch (error) {
-    console.error(`레시피 ID ${id} 삭제 오류:`, error);
-    throw new Error(`레시피 삭제 서버 오류: ${error.message}`);
+      console.error(`레시피 ID ${id} 삭제 오류:`, error);
+      throw new Error(`레시피 삭제 서버 오류: ${error.message}`);
   }
 }
 
@@ -187,11 +221,55 @@ export async function fetchRecipeById(id) {
     const data = await response.json();
     console.log(`=== API 레시피 상세 응답 데이터 (GET /recipes/list/${id}) ===`);
     console.log(data);
-    return data;
+    // return data;
+
+
+    const rawRecipe = (data && Array.isArray(data.recipes) && data.recipes.length > 0) 
+                           ? data.recipes[0] 
+                           : null;
+
+        if (!rawRecipe) {
+            console.warn(`레시피 ID ${id}: 서버 응답에 유효한 레시피 데이터가 없습니다.`);
+            return null;
+        }
+
+        // ⭐️ 데이터 가공 (정규화) 로직 시작
+        try {
+            const processedRecipe = {
+                // 1. 필수 ID 및 제목 필드 매핑
+                id: rawRecipe.recipe_id, 
+                title: rawRecipe.recipe_title,
+                description: rawRecipe.recipe_description,
+                
+                // 2. JSON 문자열 필드를 객체/배열로 파싱
+                priority_used_ingredients: rawRecipe.priority_used_ingredients 
+                    ? JSON.parse(rawRecipe.priority_used_ingredients) 
+                    : [],
+                other_ingredients: rawRecipe.other_ingredients 
+                    ? JSON.parse(rawRecipe.other_ingredients) 
+                    : [],
+                steps: rawRecipe.recipe_steps 
+                    ? JSON.parse(rawRecipe.recipe_steps) 
+                    : [],
+                tips: rawRecipe.recipe_tips 
+                    ? JSON.parse(rawRecipe.recipe_tips) 
+                    : [],
+                servings: rawRecipe.servings,
+                created_at: rawRecipe.created_at,
+                image_url: rawRecipe.image_url ?? '/default_recipe.png', 
+                isSaved: getSavedRecipeIds().includes(rawRecipe.recipe_id),
+            };
+            
+            return processedRecipe;
+
+        } catch (e) {
+            console.error(`레시피 ID ${id} 상세 파싱 오류:`, e);
+            throw new Error("레시피 데이터 구조 파싱 중 오류 발생");
+        }
 
   } catch (error) {
     console.error(`레시피 ID ${id} 상세 조회 오류:`, error);
-    return RECIPES.find((r) => r.id === Number(id)) || null; 
+    return null;
   }
 }
 
