@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchRecipeById, toggleSaveRecipe, getSavedRecipeIds } from "../utils/api/recipe";
+import {
+  fetchRecipeById,
+  toggleSaveRecipe,
+  getSavedRecipeIds,
+} from "../utils/api/recipe";
 import "./RecipeDetail.css";
 
 export default function RecipeDetail() {
@@ -18,19 +22,20 @@ export default function RecipeDetail() {
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await fetchRecipeById(Number(id))
+        const data = await fetchRecipeById(Number(id));
         setRecipe(data);
-      
-      if (data) {
-        console.log("--- 상세 레시피 데이터 확인 ---");
-        console.log(`Tips 항목 수: ${data.tips?.length}`); 
-        console.log(`주요 식재료 항목 수: ${data.priority_used_ingredients?.length}`); 
-        console.log(`기타 식재료 항목 수: ${data.other_ingredients?.length}`);
-            const savedIds = getSavedRecipeIds();
-            setIsSaved(savedIds.includes(data.id));
-        }
 
-      } catch(e) {
+        if (data) {
+          console.log("--- 상세 레시피 데이터 확인 ---");
+          console.log(`Tips 항목 수: ${data.tips?.length}`);
+          console.log(
+            `주요 식재료 항목 수: ${data.priority_used_ingredients?.length}`
+          );
+          console.log(`기타 식재료 항목 수: ${data.other_ingredients?.length}`);
+          const savedIds = getSavedRecipeIds();
+          setIsSaved(savedIds.includes(data.id));
+        }
+      } catch (e) {
         setError("레시피를 불러오지 못했습니다.");
         console.error("레시피 로드 오류:", e);
       } finally {
@@ -42,13 +47,17 @@ export default function RecipeDetail() {
 
   const toggleSave = () => {
     if (!recipe) return;
-    toggleSaveRecipe(recipe.id); 
-    setIsSaved(prev => !prev); 
+    toggleSaveRecipe(recipe.id);
+    setIsSaved((prev) => !prev);
   };
-  
 
   if (loading) return <div className="detail-page">불러오는 중...</div>;
-  if (error || !recipe) return <div className="detail-page">{error || "레시피 데이터를 찾을 수 없습니다."}</div>;
+  if (error || !recipe)
+    return (
+      <div className="detail-page">
+        {error || "레시피 데이터를 찾을 수 없습니다."}
+      </div>
+    );
 
   const allIngredients = [
     ...(recipe.priority_used_ingredients || []),
@@ -102,13 +111,15 @@ export default function RecipeDetail() {
       </button>
 
       <div className="detail-grid">
-
         {/* ===== LEFT COLUMN ===== */}
         <div className="left-column">
-
           {/* 이미지 */}
           <div className="detail-image-wrap">
-            <img src={recipe.image_url} alt={recipe.title} className="detail-image" />
+            <img
+              src={recipe.image_url}
+              alt={recipe.title}
+              className="detail-image"
+            />
           </div>
 
           {/* 제목 + 하트 */}
@@ -127,7 +138,7 @@ export default function RecipeDetail() {
 
           {/* 인분 */}
           <p className="detail-meta">🍽 {recipe.servings} 인분 기준</p>
-          
+
           {/* TIP */}
           <div className="tip-section">
             <h2 className="tip-title">TIP</h2>
@@ -137,12 +148,10 @@ export default function RecipeDetail() {
               ))}
             </ul>
           </div>
-
         </div>
 
         {/* ===== RIGHT COLUMN ===== */}
         <div className="right-column">
-
           <div className="detail-box">
             <h2 className="detail-section-title">식재료</h2>
             <ul className="detail-list">
@@ -155,7 +164,9 @@ export default function RecipeDetail() {
 
               ))} */}
               {/* ⭐️ 수정: 합쳐진 식재료 목록 사용 */}
-              {allIngredients.length === 0 && <li>필요한 식재료가 없습니다.</li>}
+              {allIngredients.length === 0 && (
+                <li>필요한 식재료가 없습니다.</li>
+              )}
               {allIngredients.map((ing, idx) => (
                 <li key={idx}>{ing}</li>
               ))}
@@ -173,9 +184,6 @@ export default function RecipeDetail() {
               ))}
             </ol>
           </div>
-
-          
-
         </div>
       </div>
     </div>
