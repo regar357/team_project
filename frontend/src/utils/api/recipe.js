@@ -136,13 +136,13 @@ export async function fetchSavedRecipes() {
     // 데이터 가공
         const processedRecipes = rawRecipes.map(recipe => {
             try {
-                const tags = safeJsonParseOrSplit(recipe.priority_used_ingredients);
+                const priorityTags = safeJsonParseOrSplit(recipe.priority_used_ingredients);
 
                 return {
                     id: recipe.recipe_id, 
                     title: recipe.recipe_title, 
                     
-                    priority_used_ingredients: tags,
+                    priority_used_ingredients: priorityTags,
                     other_ingredients: safeJsonParseOrSplit(recipe.other_ingredients),
                     steps: safeJsonParseOrSplit(recipe.recipe_steps),
                     tips: safeJsonParseOrSplit(recipe.recipe_tips),
