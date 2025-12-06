@@ -76,9 +76,30 @@ export default function RecipeSearch() {
     console.log(`[STATE] Loading: true, HasSearched: true, 선택된 재료 수: ${selected.length}`);
 
     try {
-        const rawData = await searchRecipesByIngredients(selected);
-        console.log(`[API] 레시피 데이터 수신 성공. 항목 수: ${rawData ? rawData.length : 0}`);
-        const processedRecipes = rawData.map(recipe => {
+        const apiResponse = await searchRecipesByIngredients(selected);
+        
+        let rawDataToProcess = [];
+
+        if (apiResponse && apiResponse.recipe && typeof apiResponse.recipe === 'object') {
+            rawDataToProcess = [apiResponse.recipe]; 
+            console.log("[DEBUG] 응답 객체에서 단일 레시피 추출 완료.");
+            
+        } else if (Array.isArray(apiResponse)) {
+            rawDataToProcess = apiResponse;
+            console.log(`[DEBUG 2] 응답이 이미 배열입니다. 처리 항목 수: ${apiResponse.length}`);
+            
+        } else {
+             console.warn("[DEBUG] API 응답이 예상치 못한 형태입니다. 빈 목록으로 처리합니다.", apiResponse);
+             setResults([]);
+             setLoading(false); 
+             return;
+        }
+
+        console.log(`[API] 처리할 레시피 항목 수: ${rawDataToProcess.length}`);
+        
+
+/* 데이터 가공 */        
+        const processedRecipes = rawDataToProcess.map(recipe => {
             try {
                 return {
                     ...recipe,
@@ -96,22 +117,24 @@ export default function RecipeSearch() {
                         : [],
                     
                     
-                    title: recipe.recipe_title,
-                    tags: recipe.priority_used_ingredients 
-                        ? JSON.parse(recipe.priority_used_ingredients).slice(0, 3) 
-                        : [],
+                    title: recipe.recipe_title || recipe.title || '제목 없음', 
+                        tags: recipe.priority_used_ingredients 
+                            ? JSON.parse(recipe.priority_used_ingredients).slice(0, 3) 
+                            : []
                 };
             } catch (e) {
                 console.error("레시피 JSON 파싱 오류:", e, recipe);
                 return recipe;
             }
-        });
-
+        })
+        .filter(recipe => recipe !== null);
         setResults(processedRecipes); 
+        console.log(`[STATE] 최종 결과 설정 완료. 표시될 레시피 수: ${processedRecipes.length}`);
         
     } catch (error) {
         console.error("레시피 검색/생성 오류:", error);
         alert(`레시피 검색 중 오류가 발생했습니다: ${error.message}`);
+        setResults([]); 
     } finally {
         setLoading(false);
         console.log("=== 레시피 검색 종료 [Loading: false] ===");
