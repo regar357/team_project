@@ -1,12 +1,12 @@
 # api_server.py
-# FastAPI 서버: RAG + Groq LLM + 이미지 기반 레시피 추천
+# FastAPI 서버: RAG + Groq LLM 기반 레시피 추천
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import os
 import json
 import traceback
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -15,8 +15,14 @@ from db import SessionLocal, RecipeRecord, init_db
 from rag_recipe import recommend_recipe
 
 # =========================
-# 0. Pydantic 응답 모델
+# 0. Pydantic 응답 / 요청 모델
 # =========================
+
+class RecipeRequest(BaseModel):
+    ingredients: List[str]
+    # 프론트에서 보내는 스타일 힌트 (예: "볶음", "찜", "국/탕", "샐러드")
+    style: Optional[str] = None
+
 
 class RecipeResponse(BaseModel):
     first_recipe: Dict[str, Any]
@@ -59,6 +65,7 @@ app.add_middleware(
 
 # =========================
 # 2. 레시피 이미지 URL 생성
+#   (지금은 프론트에서 이미지를 안 써도, API 스펙은 그대로 둠)
 # =========================
 
 STATIC_BASE_URL = "http://127.0.0.1:8000/static/images"
@@ -96,32 +103,37 @@ def get_image_url(final_recipe: Dict[str, Any]) -> str:
 # =========================
 
 @app.post("/recommend", response_model=RecipeResponse)
-async def recommend_from_text(payload: Dict[str, Any]):
+async def recommend_from_text(payload: RecipeRequest):
     """
     프론트엔드에서 JSON:
     {
-        "ingredients": ["닭가슴살", "양파", "간장", "마늘"]
+        "ingredients": ["닭가슴살", "양파", "간장", "마늘"],
+        "style": "볶음"   # 선택 (없어도 됨)
     }
     이런 형식으로 보냄.
     """
     try:
-        ingredients = payload.get("ingredients")
+        ingredients = payload.ingredients
+        style_hint = payload.style  # "볶음", "찜", "국/탕", "샐러드" 중 하나 (또는 None)
+
         if not ingredients or not isinstance(ingredients, list):
             raise HTTPException(status_code=400, detail="ingredients 리스트가 필요합니다.")
 
         # RAG + LLM 레시피 추천
-        result = recommend_recipe(ingredients)
+        # ⭐ style_hint 을 넘겨서 요리 스타일을 달리 생성하게 함
+        result = recommend_recipe(ingredients, style_hint=style_hint)
         first_recipe = result["first_recipe"]
         final_recipe = result["final_recipe"]
 
-        # 이미지 URL
+        # 이미지 URL (지금은 프론트에서 쓰지 않지만 유지)
         image_url = get_image_url(final_recipe)
 
         # DB 저장
         session = SessionLocal()
         try:
             record = RecipeRecord(
-                ingredients_text=", ".join(ingredients),
+                ingredients_text=", ".join(ingredients)
+                + (f" (style={style_hint})" if style_hint else ""),
                 final_recipe_json=json.dumps(final_recipe, ensure_ascii=False),
             )
             session.add(record)
@@ -142,7 +154,6 @@ async def recommend_from_text(payload: Dict[str, Any]):
         print("=== /recommend 오류 ===")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"서버 내부 오류: {e}")
-
 
 
 # =========================

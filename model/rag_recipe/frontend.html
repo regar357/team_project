@@ -17,12 +17,19 @@
       margin-bottom: 12px;
     }
 
+    /* 개별 레시피 카드 스타일 */
     .card {
       border: 1px solid #ddd;
       border-radius: 8px;
       padding: 12px 16px;
       margin-top: 12px;
       max-width: 700px;
+    }
+
+    /* 카드들을 감싸는 컨테이너 */
+    #recipeCard {
+      max-width: 720px;
+      margin-top: 12px;
     }
 
     #status {
@@ -54,10 +61,6 @@
       margin: 0 0 2px 0;
       line-height: 1.3;
     }
-
-    #recipeCard img {
-      margin-bottom: 8px;
-    }
   </style>
 </head>
 <body>
@@ -84,14 +87,17 @@
   <div id="status"></div>
 
   <h2>최종 레시피</h2>
-  <div id="recipeCard" class="card" style="display:none;"></div>
+  <!-- 이 div는 여러 개 레시피 카드를 감싸는 컨테이너 -->
+  <div id="recipeCard" style="display:none;"></div>
 
   <h2 style="margin-top:32px;">최근 추천 기록</h2>
   <div id="history" class="card" style="display:none;"></div>
 
   <script>
-    // 텍스트 재료로 레시피 요청
-    async function callRecipeAPI(ingredients) {
+    // ============================
+    // 1) 텍스트 재료로 레시피 요청 (렌더링 X, 데이터만 반환)
+    // ============================
+    async function callRecipeAPI(ingredients, styleHint) {
       const response = await fetch("http://127.0.0.1:8000/recommend", {
         method: "POST",
         headers: {
@@ -99,6 +105,7 @@
         },
         body: JSON.stringify({
           ingredients: ingredients,
+          style: styleHint,      // ⭐ 백엔드로 스타일 힌트 같이 보냄
         }),
       });
 
@@ -107,17 +114,23 @@
       }
 
       const data = await response.json();
-      renderRecipe(data, ingredients);   // 👉 최종 렌더링
       return data;
     }
 
-    // === 공통 렌더링 함수 ===
-    function renderRecipe(data, ingredients) {
-      const recipeCard = document.getElementById("recipeCard");
-
+    // ============================
+    // 2) 개별 레시피 카드 HTML 생성 함수
+    //    → LLM이 비워둔 필드가 있어도 기본 내용은 항상 나오게 처리
+    // ============================
+    function buildRecipeCardHTML(data, ingredients, index, styleName) {
       const finalRecipe = data.final_recipe || {};
-      const title = finalRecipe.title || "제목 없음";
-      const desc = finalRecipe.description || "";
+
+      const titleRaw = finalRecipe.title || "제목 없음";
+      const descRaw  = finalRecipe.description || "";
+
+      const desc =
+        descRaw.trim().length > 0
+          ? descRaw
+          : "설명 정보가 없습니다. 입력한 재료를 활용해 간단한 요리를 만들어 보세요.";
 
       // 여러 키 이름 대응
       const priority =
@@ -131,99 +144,71 @@
         [];
 
       const rawSteps = finalRecipe.steps || [];
-
-      // "1. " 같은 번호 제거
-      const steps = rawSteps.map(s =>
-        s.replace(/^\s*\d+\.?\s*/, "")
-      );
-
+      const steps = rawSteps.map(s => s.replace(/^\s*\d+\.?\s*/, ""));
       const tips = finalRecipe.tips || [];
 
-      const imageUrl = data.image_url || "";
+      // ✅ LLM이 아무것도 안 줘도 기본값으로 채워서 보여주기
+      const priorityToShow = priority.length ? priority : (ingredients || []);
+      const othersToShow   = others.length   ? others   : [];
+      const stepsToShow    = steps.length    ? steps    : [
+        "재료를 깨끗이 손질합니다.",
+        "재료의 조리 특성에 맞게 끓이거나 볶거나 버무려서 익혀줍니다.",
+        "간을 보고 취향에 맞게 조절한 후 접시에 담아 제공합니다."
+      ];
+      const tipsToShow     = tips.length     ? tips     : [
+        "간은 입맛에 맞게 조금씩 조절해 주세요.",
+        "재료의 신선도를 확인한 후 사용하면 더 맛있습니다."
+      ];
 
-      recipeCard.style.display = "block";
+      return `
+        <div class="card">
+          <div style="max-width: 700px;">
 
-      recipeCard.innerHTML = `
-        <div style="max-width: 700px;">
+            <h3 style="margin: 0 0 8px 0;">
+              추천 레시피 ${index + 1} (${styleName}) : ${titleRaw}
+            </h3>
+            <p style="margin: 0 0 16px 0;"><b>설명:</b> ${desc}</p>
 
-          <h3 style="margin: 0 0 8px 0;">${title}</h3>
-          <p style="margin: 0 0 16px 0;"><b>설명:</b> ${desc}</p>
-
-          ${
-            imageUrl
-              ? `
-            <div style="margin-bottom:16px;">
-              <img src="${imageUrl}"
-                  width="320"
-                  style="border-radius:10px; border:1px solid #ddd; display:block;" />
-            </div>
-          `
-              : ""
-          }
-
-          ${
-            ingredients && ingredients.length
-              ? `
-            <h4 style="margin: 8px 0 4px 0;">인식된 재료</h4>
+            <h4 style="margin: 8px 0 4px 0;">입력한 재료</h4>
             <ul style="margin:0 0 8px 18px; padding:0;">
-              ${ingredients.map(i => `<li>${i}</li>`).join("")}
+              ${(ingredients || []).map(i => `<li>${i}</li>`).join("")}
             </ul>
-          `
-              : ""
-          }
 
-          ${
-            priority.length
-              ? `
             <h4 style="margin: 8px 0 4px 0;">우선 사용 재료</h4>
             <ul style="margin:0 0 8px 18px; padding:0;">
-              ${priority.map(i => `<li>${i}</li>`).join("")}
+              ${priorityToShow.map(i => `<li>${i}</li>`).join("")}
             </ul>
-          `
-              : ""
-          }
 
-          ${
-            others.length
-              ? `
             <h4 style="margin: 8px 0 4px 0;">다른 재료</h4>
-            <ul style="margin:0 0 8px 18px; padding:0;">
-              ${others.map(i => `<li>${i}</li>`).join("")}
-            </ul>
-          `
-              : ""
-          }
+            ${
+              othersToShow.length
+                ? `<ul style="margin:0 0 8px 18px; padding:0;">
+                     ${othersToShow.map(i => `<li>${i}</li>`).join("")}
+                   </ul>`
+                : `<p style="margin:0 0 8px 0;">추가 재료 정보가 없습니다.</p>`
+            }
 
-          ${
-            steps.length
-              ? `
             <h4 style="margin: 12px 0 4px 0;">조리 순서</h4>
             <ol style="margin:0 0 8px 18px; padding:0;">
-              ${steps.map(s => `<li>${s}</li>`).join("")}
+              ${stepsToShow.map(s => `<li>${s}</li>`).join("")}
             </ol>
-          `
-              : ""
-          }
 
-          ${
-            tips.length
-              ? `
             <h4 style="margin: 12px 0 4px 0;">팁</h4>
             <ul style="margin:0 0 8px 18px; padding:0;">
-              ${tips.map(t => `<li>${t}</li>`).join("")}
+              ${tipsToShow.map(t => `<li>${t}</li>`).join("")}
             </ul>
-          `
-              : ""
-          }
 
+          </div>
         </div>
       `;
     }
 
-    // === 텍스트 버튼 클릭 ===
+    // ============================
+    // 3) 텍스트 버튼 클릭 시 4개의 레시피 생성
+    // ============================
     document.getElementById("sendBtn").addEventListener("click", async () => {
       const inputValue = document.getElementById("ingredientsInput").value;
-      const statusDiv = document.getElementById("status");
+      const statusDiv  = document.getElementById("status");
 
       const ingredients = inputValue
         .split(",")
@@ -235,42 +220,37 @@
         return;
       }
 
+      // ⭐ 요리 스타일 4개 정의
+      const styleHints = ["볶음", "찜", "국/탕", "샐러드"];
+
       try {
-        statusDiv.textContent = "레시피 생성 중...";
-        await callRecipeAPI(ingredients);
-        statusDiv.textContent = "✅ 레시피 생성 완료!";
+        statusDiv.textContent = "레시피 4개 생성 중...";
+
+        // 스타일별로 4번 호출
+        const results = await Promise.all(
+          styleHints.map(style => callRecipeAPI(ingredients, style))
+        );
+
+        // 카드 렌더링
+        const recipeCard = document.getElementById("recipeCard");
+        recipeCard.style.display = "block";
+
+        let allCardsHTML = "";
+        results.forEach((data, idx) => {
+          allCardsHTML += buildRecipeCardHTML(data, ingredients, idx, styleHints[idx]);
+        });
+        recipeCard.innerHTML = allCardsHTML;
+
+        statusDiv.textContent = "✅ 서로 다른 레시피 4개 생성 완료!";
       } catch (err) {
         console.error(err);
         statusDiv.textContent = "에러 발생: " + err.message;
       }
     });
 
-    // === 이미지 관련 코드 (현재 미사용 / 주석 처리 예시) ===
-    /*
-    async function callImageAPI(formData) {
-      const response = await fetch("http://127.0.0.1:8000/recommend_from_image", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("이미지 API 오류: " + response.status);
-      }
-
-      const data = await response.json();
-      renderRecipe(data, []);
-      return data;
-    }
-
-    const imgBtn = document.getElementById("sendImageBtn");
-    if (imgBtn) {
-      imgBtn.addEventListener("click", async () => {
-        ...
-      });
-    }
-    */
-
-    // 페이지 로드시 카드 숨기기
+    // ============================
+    // 4) 페이지 로드시 카드 숨기기
+    // ============================
     window.addEventListener("load", () => {
       const recipeCard = document.getElementById("recipeCard");
       if (recipeCard) recipeCard.style.display = "none";
