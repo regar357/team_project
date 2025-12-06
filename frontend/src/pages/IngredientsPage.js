@@ -1,6 +1,5 @@
-// src/RecipePage.js
 import React, { useState } from "react";
-import "./RecipePage.css";
+import "./IngredientsPage.css";
 
 // 데이터베이스로 연결될거라 지워도 됩니다. 시각화용
 const initialData = [
@@ -37,7 +36,7 @@ function getDdayClass(expiryStr) {
   return "dday";                                  // 그 외
 }
 
-function RecipePage() {
+function IngredientsPage() {
   const [ingredients, setIngredients] = useState(initialData);
   const [form, setForm] = useState({
     name: "",
@@ -235,4 +234,4 @@ function RecipePage() {
   );
 }
 
-export default RecipePage;
+export default IngredientsPage;
