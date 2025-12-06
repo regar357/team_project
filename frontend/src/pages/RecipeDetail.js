@@ -22,6 +22,10 @@ export default function RecipeDetail() {
         setRecipe(data);
       
       if (data) {
+        console.log("--- 상세 레시피 데이터 확인 ---");
+        console.log(`Tips 항목 수: ${data.tips?.length}`); 
+        console.log(`주요 식재료 항목 수: ${data.priority_used_ingredients?.length}`); 
+        console.log(`기타 식재료 항목 수: ${data.other_ingredients?.length}`);
             const savedIds = getSavedRecipeIds();
             setIsSaved(savedIds.includes(data.id));
         }
