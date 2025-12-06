@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import "./IngredientsPage.css";
 
 // 데이터베이스로 연결될거라 지워도 됩니다. 시각화용
+// 수정 API를 쓰려면 id(또는 food_id)가 필요함
 const initialData = [
-  { name: "가지", category: "채소", expiry: "2025-11-30" },
-  { name: "사과", category: "과일", expiry: "2025-11-30" },
+  { id: 1, name: "가지", category: "채소", expiry: "2025-11-30", imageUrl: "" },
+  { id: 2, name: "사과", category: "과일", expiry: "2025-11-30", imageUrl: "" },
 ];
 
 function getDday(expiryStr) {
@@ -60,7 +61,6 @@ function IngredientsPage() {
   // 서버 업로드 함수 (POST /food/upload)
   const uploadFoodImage = async (file) => {
     const formData = new FormData();
-
     formData.append("image", file);
 
     const res = await fetch("/food/upload", {
@@ -80,7 +80,7 @@ function IngredientsPage() {
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0] ?? null;
 
-    // 같은 파일을 다시 선택해도 onChange가 다시 뜨게 하기
+    // 같은 파일 다시 선택 가능
     e.target.value = "";
 
     setForm((prev) => ({ ...prev, imageFile: file }));
@@ -93,7 +93,7 @@ function IngredientsPage() {
       setUploading(true);
 
       const data = await uploadFoodImage(file);
-      console.log("이미지를 업로드했습니다."+ data);
+      console.log("✅ 이미지 업로드 응답:", data);
 
       // 서버 응답 키 대응
       const url =
@@ -111,29 +111,28 @@ function IngredientsPage() {
     }
   };
 
-  // 새로 등록(현재는 프론트 임시 저장)
-  const handleSave = () => {
-    if (!form.name || !form.category || !form.expiry) {
-      alert("식재료명, 카테고리, 유통기한을 모두 입력해 주세요.");
-      return;
+  // 수정 API 호출 함수
+  const updateFood = async (foodId, payload) => {
+    const res = await fetch(`/food/update/${foodId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error(`수정 실패 (${res.status})`);
     }
 
-    const newItem = {
-      name: form.name,
-      category: form.category,
-      expiry: form.expiry,
-      imageUrl: uploadedImageUrl || "",
-    };
-
-    setIngredients((prev) => [...prev, newItem]);
-    setForm({ name: "", category: "", expiry: "", imageFile: null });
-    setUploadedImageUrl("");
-    setUploadError("");
-    setEditingIndex(null);
+    // 응답이 비어있을 수도 있으니 안전 처리
+    const data = await res.json().catch(() => ({}));
+    return data;
   };
 
-  // 선택된 행 수정
-  const handleUpdate = () => {
+  // 선택된 행 수정 + 서버 PUT 연동
+  const handleUpdate = async () => {
     if (editingIndex === null) {
       alert("수정할 항목을 먼저 목록에서 선택해 주세요.");
       return;
@@ -143,19 +142,52 @@ function IngredientsPage() {
       return;
     }
 
-    const updated = [...ingredients];
-    updated[editingIndex] = {
+    const target = ingredients[editingIndex];
+    const foodId = target?.id ?? target?.food_id; // 둘 다 대응
+
+    if (!foodId) {
+      alert("food_id가 없습니다. 목록 데이터에 id(또는 food_id)가 필요합니다.");
+      return;
+    }
+
+    const imageUrlToSend =
+      uploadedImageUrl || target?.imageUrl || "";
+
+    // 서버로 보낼 payload
+    // (백엔드 스펙에 따라 키 이름이 다르면 여기만 맞추면 됨)
+    const payload = {
       name: form.name,
       category: form.category,
       expiry: form.expiry,
-      imageUrl: uploadedImageUrl || updated[editingIndex]?.imageUrl || "",
+      imageUrl: imageUrlToSend,
     };
 
-    setIngredients(updated);
-    setEditingIndex(null);
-    setForm({ name: "", category: "", expiry: "", imageFile: null });
-    setUploadedImageUrl("");
-    setUploadError("");
+    try {
+      const data = await updateFood(foodId, payload);
+      console.log("✅ PUT /food/update 성공:", data);
+
+      // 프론트 화면도 즉시 반영
+      const updated = [...ingredients];
+      updated[editingIndex] = {
+        ...target,
+        name: form.name,
+        category: form.category,
+        expiry: form.expiry,
+        imageUrl: imageUrlToSend,
+      };
+      setIngredients(updated);
+
+      // 입력 상태 정리
+      setEditingIndex(null);
+      setForm({ name: "", category: "", expiry: "", imageFile: null });
+      setUploadedImageUrl("");
+      setUploadError("");
+
+      alert("수정 완료!");
+    } catch (err) {
+      console.log("❌ 수정 오류:", err);
+      alert(err?.message ?? "수정 중 오류가 발생했습니다.");
+    }
   };
 
   // 행 클릭 시 폼에 불러오기
@@ -260,14 +292,6 @@ function IngredientsPage() {
               >
                 수정
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleSave}
-                disabled={uploading}
-              >
-                저장
-              </button>
             </div>
           </div>
         </div>
@@ -286,7 +310,7 @@ function IngredientsPage() {
             <tbody>
               {ingredients.map((item, idx) => (
                 <tr
-                  key={`${item.name}-${idx}`}
+                  key={`${item.id ?? item.name}-${idx}`}
                   onClick={() => handleRowClick(idx)}
                   className={editingIndex === idx ? "row-selected" : undefined}
                 >
