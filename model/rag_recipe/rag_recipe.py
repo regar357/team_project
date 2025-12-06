@@ -269,15 +269,11 @@ def recommend_recipe(expiring_ingredients, style_hint: Optional[str] = None):
 
 # 레시피 json 반환 - 테스트 코드
 if __name__ == "__main__":
-<<<<<<< HEAD
-    test_ingredients = ["닭가슴살", "양파", "간장"]
-=======
+
     test_ings = ["닭가슴살 300g", "양파 2개", "간장", "마늘"]
     # 예: 볶음 스타일로 테스트
     result = recommend_recipe(test_ings, style_hint="볶음")
->>>>>>> 5ce6885cbd45e809ddfcf1afae5a8001b12da300
 
-    result = recommend_recipe(test_ingredients)
     final_recipe = result["final_recipe"]
 
     # FastAPI가 반환하는 JSON 형태 만들기
