@@ -69,20 +69,26 @@ export async function searchRecipesByIngredients(selectedIngredients) {
             throw new Error(errorData.message || `API 호출 실패: ${response.status} 상태`);
         }
 
-        const data = await response.json();
-        console.log("=== API 레시피 응답 데이터 (JSON) ===");
-        console.log(data);
+        const data = await response.json(); 
+        
+        if (data && data.recipe && data.recipe.final_recipe) {
+            const finalRecipe = data.recipe.final_recipe;
+            console.log("[API] 단일 레시피 추출 완료:", finalRecipe.title); 
+            return [finalRecipe]; 
+        }
 
         if (data && Array.isArray(data.recipes)) {
-            return data.recipes;
+            console.log(`[API] 'recipes' 배열 반환. 항목 수: ${data.recipes.length}`);
+            return data.recipes; 
         }
 
-        if (!Array.isArray(data)) {
-            console.warn("API 응답 형식이 배열이 아닙니다. 응답:", data);
-            return [];
+        console.warn("API 응답에서 유효한 레시피 데이터를 찾을 수 없습니다:", data);
+        
+        if (Array.isArray(data)) {
+            return data;
         }
-
-        return data;
+        
+        return []; 
 
     } catch (error) {
         console.error("레시피 검색/생성 중 오류 발생:", error);
