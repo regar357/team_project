@@ -102,7 +102,20 @@ export async function searchRecipesByIngredients(selectedIngredients) {
 /* API 레시피 저장 */
 export async function fetchSavedRecipes() {
   const API_ENDPOINT = '/recipe/list'; 
-  
+
+  const safeJsonParseOrSplit = (dataString) => {
+    if (!dataString || typeof dataString !== 'string') return [];
+    
+    try {
+      const parsed = JSON.parse(dataString);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    } catch (e) {
+    }
+
+    return dataString.split(',').map(item => item.trim()).filter(item => item.length > 0);
+  };
   try {
     const response = await fetch(API_ENDPOINT, {
       method: 'GET', 
@@ -123,22 +136,20 @@ export async function fetchSavedRecipes() {
     // 데이터 가공
         const processedRecipes = rawRecipes.map(recipe => {
             try {
-                const tags = recipe.priority_used_ingredients 
-                    ? JSON.parse(recipe.priority_used_ingredients) 
-                    : [];
+                const tags = safeJsonParseOrSplit(recipe.priority_used_ingredients);
 
                 return {
                     id: recipe.recipe_id, 
                     title: recipe.recipe_title, 
                     
-                    priority_used_ingredients: tags,
-                    other_ingredients: recipe.other_ingredients ? JSON.parse(recipe.other_ingredients) : [],
-                    steps: recipe.recipe_steps ? JSON.parse(recipe.recipe_steps) : [],
-                    tips: recipe.recipe_tips ? JSON.parse(recipe.recipe_tips) : [],
+                    priority_used_ingredients: priorityTags,
+                    other_ingredients: safeJsonParseOrSplit(recipe.other_ingredients),
+                    steps: safeJsonParseOrSplit(recipe.recipe_steps),
+                    tips: safeJsonParseOrSplit(recipe.recipe_tips),
                     
                     category: recipe.category ?? '기타',
                     image_url: recipe.image_url ?? '/images/default_recipe.png', 
-                    tags: tags.slice(0, 3), 
+                    tags: priorityTags.slice(0, 3),
 
                     created_at: recipe.created_at,
                 };
