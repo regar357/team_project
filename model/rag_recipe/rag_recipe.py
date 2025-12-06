@@ -1,6 +1,6 @@
 # rag_recipe.py
 # RAG(FAISS) + Groq LLM 기반 레시피 추천 모듈
-
+import sys
 import json
 import re
 from typing import Optional
@@ -269,14 +269,59 @@ def recommend_recipe(expiring_ingredients, style_hint: Optional[str] = None):
     }
 
 
-# ===== 디버그용 단독 실행 =====
+# ===== 디버그/CLI용 진입점 (Node child_process에서 호출) =====
 if __name__ == "__main__":
-    test_ings = ["닭가슴살 300g", "양파 2개", "간장", "마늘"]
-    # 예: 볶음 스타일로 테스트
-    result = recommend_recipe(test_ings, style_hint="볶음")
+    """
+    Node.js 에서 예를 들면 이렇게 호출한다고 가정:
 
-    print("== 1차 레시피 ==")
-    print(json.dumps(result["first_recipe"], ensure_ascii=False, indent=2))
+      const argsJson = JSON.stringify({
+        ingredients: ["계란", "우유", "파스타"]
+      });
 
-    print("\n== 최종 레시피 ==")
-    print(json.dumps(result["final_recipe"], ensure_ascii=False, indent=2))
+      spawn("python", ["rag_recipe.py", argsJson]);
+
+    이때 sys.argv[1] 에 JSON 문자열이 들어온다.
+    """
+
+    # 1) 인자가 있는지 확인
+    if len(sys.argv) < 2:
+        error_payload = {"error": "JSON 인자가 없습니다. (sys.argv[1])"}
+        print(json.dumps(error_payload, ensure_ascii=False))
+        sys.exit(1)
+
+    raw_json = sys.argv[1]
+
+    # 2) JSON 파싱
+    try:
+        payload = json.loads(raw_json)
+    except json.JSONDecodeError:
+        error_payload = {
+            "error": "JSON 파싱 실패",
+            "raw": raw_json,
+        }
+        print(json.dumps(error_payload, ensure_ascii=False))
+        sys.exit(1)
+
+    # 3) ingredients 리스트 꺼내기
+    #   - {"ingredients":[...]} 형식 또는 그냥 리스트 둘 다 지원
+    if isinstance(payload, dict):
+        ingredients = payload.get("ingredients", [])
+    else:
+        ingredients = payload
+
+    if not isinstance(ingredients, list):
+        error_payload = {
+            "error": "ingredients는 리스트여야 합니다.",
+            "payload": payload,
+        }
+        print(json.dumps(error_payload, ensure_ascii=False))
+        sys.exit(1)
+
+    # 4) 모델 호출
+    result = recommend_recipe(ingredients)
+
+    # 5) 결과를 JSON 문자열로 print → Node 의 stdout으로 전달
+    print(json.dumps(result, ensure_ascii=False))
+
+    # 6) 정상 종료 코드 (슬라이드처럼 SUCCESS 개념)
+    sys.exit(0)
