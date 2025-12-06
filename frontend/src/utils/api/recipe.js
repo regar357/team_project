@@ -43,7 +43,7 @@ export const RECIPES = [
 
 
 /* api 연동 */
-/* API 레시피 생성 */
+/* API 레시피 검색 */
 export async function searchRecipesByIngredients(selectedIngredients) {
     const API_ENDPOINT = '/recipe/generate'; 
 
@@ -195,83 +195,74 @@ export async function fetchRecipeById(id) {
 
 
 
-/* 검색용 더미 데이터 */
-export const dummySearchRecipes = RECIPES.map((r) => ({
-  id: r.id,
-  title: r.title,
-  image_url: r.image_url,  
-  tags: r.tags,            
-  ingredients: r.ingredients,
-}));
+// /* 검색용 더미 데이터 */
+// export const dummySearchRecipes = RECIPES.map((r) => ({
+//   id: r.id,
+//   title: r.title,
+//   image_url: r.image_url,  
+//   tags: r.tags,            
+//   ingredients: r.ingredients,
+// }));
 
-// /* 선택한 재료로 레시피 검색 */
-// export async function searchRecipesByIngredients(selectedIngredients) {
-//   await new Promise((r) => setTimeout(r, 200));
+// // /* 선택한 재료로 레시피 검색 */
+// // export async function searchRecipesByIngredients(selectedIngredients) {
+// //   await new Promise((r) => setTimeout(r, 200));
 
-//   if (!selectedIngredients || selectedIngredients.length === 0) {
-//     return [];
-//   }
+// //   if (!selectedIngredients || selectedIngredients.length === 0) {
+// //     return [];
+// //   }
 
-//   const lower = selectedIngredients.map((i) => i.toLowerCase());
+// //   const lower = selectedIngredients.map((i) => i.toLowerCase());
 
-//   const filtered = dummySearchRecipes.filter((recipe) =>
-//     recipe.ingredients.some((ing) => lower.includes(ing.toLowerCase()))
-//   );
+// //   const filtered = dummySearchRecipes.filter((recipe) =>
+// //     recipe.ingredients.some((ing) => lower.includes(ing.toLowerCase()))
+// //   );
 
-//   // 추천 3개만 리턴
-//   return filtered.slice(0, 3);
+// //   // 추천 3개만 리턴
+// //   return filtered.slice(0, 3);
+// // }
+
+// /* 전체 레시피 목록 */
+// export function fetchAllRecipes() {
+//   return Promise.resolve(RECIPES);
 // }
 
-/* 전체 레시피 목록 */
-export function fetchAllRecipes() {
-  return Promise.resolve(RECIPES);
-}
 
-// /* 레시피 상세 조회  */
-// export function fetchRecipeById(id) {
-//   return Promise.resolve(RECIPES.find((r) => r.id === Number(id)) || null);
-// }
 
-/* localStorage로 저장된 레시피 관리 */
+
+
+
+
+
+
+
+/* 로컬 스토리지 관리 유틸리티 함수 */
+
 const STORAGE_KEY = "savedRecipes";
 
+/* 로컬 스토리지에서 저장된 레시피 ID 목록 */
 export function getSavedRecipeIds() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
-  } catch {
+  } catch (e) {
+    console.error("로컬 스토리지 ID 로드 중 오류 발생:", e);
     return [];
   }
 }
-
+/* 로컬 스토리지에 레시피 ID 목록을 저장 */
 export function setSavedRecipeIds(ids) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
 }
-
+/* 특정 레시피 ID의 저장 상태를 토글(저장 또는 삭제) */
 export function toggleSaveRecipe(id) {
   const current = getSavedRecipeIds();
   const exists = current.includes(id);
+  
   const next = exists ? current.filter((x) => x !== id) : [...current, id];
+  
   setSavedRecipeIds(next);
   return next;
 }
-
-/* 저장된 레시피 목록 */
-// export function fetchSavedRecipes() {
-//   const ids = getSavedRecipeIds();
-//   const list = RECIPES.filter((r) => ids.includes(r.id));
-//   return Promise.resolve(list);
-// }
-// export async function fetchSavedRecipes() {
-//   await new Promise((r) => setTimeout(r, 200));
-//   return RECIPES;
-// }
-
-
-/* 레시피 삭제 */
-// export async function deleteRecipe(id) {
-//   await new Promise((r) => setTimeout(r, 150));
-//   return true; 
-// }

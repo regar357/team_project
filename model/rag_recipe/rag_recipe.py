@@ -3,6 +3,7 @@
 
 import json
 import re
+from typing import Optional
 
 import faiss
 import numpy as np
@@ -77,10 +78,11 @@ def search_recipes(expiring_ingredients, top_k: int = 5):
 
 # ===== 3-1. 1차 LLM 레시피 생성 =====
 
-def generate_recipe_with_llm(expiring_ingredients, search_results):
+def generate_recipe_with_llm(expiring_ingredients, search_results, style_hint: Optional[str] = None):
     """
     RAG로 가져온 레시피 요약 + 임박 재료 정보를 이용해
-    1차 레시피 JSON 생성
+    1차 레시피 JSON 생성.
+    style_hint: "볶음", "찜", "국/탕", "샐러드" 같은 요리 스타일 힌트 (없으면 None)
     """
 
     # RAG로 찾은 레시피들을 간단히 텍스트로 정리
@@ -90,6 +92,14 @@ def generate_recipe_with_llm(expiring_ingredients, search_results):
         title = r.get("title", "제목 없음")
         ingredients = ", ".join(r.get("ingredients", []))
         retrieved_text += f"- {title} | 재료: {ingredients}\n"
+
+    # 스타일 힌트 문장
+    style_sentence = (
+        f"요리 스타일은 반드시 '{style_hint}' 느낌의 요리로 만들어라. "
+        "조리법과 맛, 식감이 그 스타일답게 느껴져야 한다."
+        if style_hint
+        else "요리 스타일은 자유롭게 정하되, 재료를 최대한 활용해서 합리적인 한 가지 요리를 만들어라."
+    )
 
     # 🔥 시스템 프롬프트 (품질 + 한국어 + 이상한 문자 방지에 집중)
     system_prompt = """
@@ -129,6 +139,8 @@ JSON 스키마는 다음과 같다.
 임박 재료: {", ".join(expiring_ingredients)}
 
 이 재료들을 최대한 우선 사용해서 요리 하나를 만들어줘.
+{style_sentence}
+
 아래는 참고용으로 준비한 비슷한 레시피 목록이야. 참고만 하고 그대로 복붙하지는 마.
 
 [참고 레시피 목록]
@@ -167,10 +179,11 @@ JSON 스키마는 다음과 같다.
 
 # ===== 3-2. 2차 LLM 평가/보정 =====
 
-def refine_recipe_with_llm(expiring_ingredients, first_recipe):
+def refine_recipe_with_llm(expiring_ingredients, first_recipe, style_hint: Optional[str] = None):
     """
     1차 레시피를 다시 LLM에 보내서
-    한국어 / 흐름 / 재료 사용 여부 등을 보정하는 단계
+    한국어 / 흐름 / 재료 사용 여부 등을 보정하는 단계.
+    style_hint: 1차 생성 때 사용한 요리 스타일 힌트 (있으면 동일하게 전달)
     """
 
     system_prompt = """
@@ -191,12 +204,18 @@ def refine_recipe_with_llm(expiring_ingredients, first_recipe):
 
     first_recipe_text = json.dumps(first_recipe, ensure_ascii=False, indent=2)
 
+    style_info = (
+        f"\n[요리 스타일 힌트]\n이 레시피는 '{style_hint}' 스타일의 요리답게 느껴지도록 유지·보정해라.\n"
+        if style_hint
+        else ""
+    )
+
     user_prompt = f"""
 다음은 1차로 생성된 레시피야. 기준에 맞게 다듬어줘.
 
 [임박 재료]
 {", ".join(expiring_ingredients)}
-
+{style_info}
 [1차 레시피 JSON]
 {first_recipe_text}
 """
@@ -221,24 +240,23 @@ def refine_recipe_with_llm(expiring_ingredients, first_recipe):
     return final_recipe
 
 
-
-
 # ===== 4. 전체 추천 파이프라인 =====
 
-def recommend_recipe(expiring_ingredients):
+def recommend_recipe(expiring_ingredients, style_hint: Optional[str] = None):
     """
     입력 재료 리스트를 받아
     1차 레시피 + 보정된 최종 레시피를 딕셔너리로 반환.
+    style_hint: "볶음", "찜", "국/탕", "샐러드" 등 스타일 힌트 (없으면 None)
     (API에서 result["first_recipe"], result["final_recipe"] 로 사용)
     """
     # 1) RAG 검색
     search_results = search_recipes(expiring_ingredients, top_k=5)
 
-    # 2) 1차 LLM 레시피 생성
-    first_recipe = generate_recipe_with_llm(expiring_ingredients, search_results)
+    # 2) 1차 LLM 레시피 생성 (스타일 힌트 전달)
+    first_recipe = generate_recipe_with_llm(expiring_ingredients, search_results, style_hint=style_hint)
 
-    # 3) 2차 LLM 평가/보정
-    final_recipe = refine_recipe_with_llm(expiring_ingredients, first_recipe)
+    # 3) 2차 LLM 평가/보정 (같은 스타일 힌트 전달)
+    final_recipe = refine_recipe_with_llm(expiring_ingredients, first_recipe, style_hint=style_hint)
 
     # 4) 이상한 문자/문자열 제거
     first_recipe = clean_recipe_json(first_recipe)
@@ -251,7 +269,13 @@ def recommend_recipe(expiring_ingredients):
 
 # 레시피 json 반환 - 테스트 코드
 if __name__ == "__main__":
+<<<<<<< HEAD
     test_ingredients = ["닭가슴살", "양파", "간장"]
+=======
+    test_ings = ["닭가슴살 300g", "양파 2개", "간장", "마늘"]
+    # 예: 볶음 스타일로 테스트
+    result = recommend_recipe(test_ings, style_hint="볶음")
+>>>>>>> 5ce6885cbd45e809ddfcf1afae5a8001b12da300
 
     result = recommend_recipe(test_ingredients)
     final_recipe = result["final_recipe"]

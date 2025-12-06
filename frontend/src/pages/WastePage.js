@@ -1,19 +1,15 @@
 // src/WastePage.js
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./WastePage.css";
 
-// 데이터베이스로 연결될거라 지워도 됩니다. 시각화용
-const wasteData = [
-  { name: "가지", category: "채소", disposeDate: "2025-11-30", amount: 1 },
-  { name: "사과", category: "과일", disposeDate: "2025-11-30", amount: 2 },
-];
-
+// 요약 계산 함수
 function calcSummary(data) {
   const totalItems = data.length;
-  const totalAmount = data.reduce((sum, item) => sum + item.amount, 0);
+  const totalAmount = data.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
 
   const categoryMap = data.reduce((map, item) => {
-    map[item.category] = (map[item.category] || 0) + item.amount;
+    const cat = item.category || "기타";
+    map[cat] = (map[cat] || 0) + (Number(item.amount) || 0);
     return map;
   }, {});
 
@@ -30,23 +26,76 @@ function calcSummary(data) {
 }
 
 function WastePage() {
+  // 필터 상태
   const [categoryFilter, setCategoryFilter] = useState("전체");
 
-  const filteredData =
-    categoryFilter === "전체"
-      ? wasteData
-      : wasteData.filter((item) => item.category === categoryFilter);
+  // 서버 데이터 상태
+  const [wasteData, setWasteData] = useState([]);
 
-  const { totalItems, totalAmount, topCategory } = calcSummary(filteredData);
+  // 통신 상태
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // GET /discard 호출
+  const fetchDiscard = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/discard", {
+        method: "GET",
+        headers: { "Accept": "application/json" },
+      });
+
+      if (!res.ok) {
+        throw new Error(`GET /discard 실패 (${res.status})`);
+      }
+
+      const data = await res.json().catch(() => []);
+
+      // 혹시 백엔드가 { data: [...] } 형태로 줄 수도 있어서 대응
+      const list = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+
+      // 필드명 표준화(백엔드 키가 달라도 최대한 안전하게)
+      const normalized = list.map((item) => ({
+        name: item.name ?? item.foodName ?? item.ingredientName ?? "",
+        category: item.category ?? item.type ?? "",
+        disposeDate: item.disposeDate ?? item.discardDate ?? item.date ?? "",
+        amount: item.amount ?? item.count ?? item.qty ?? 0,
+      }));
+
+      setWasteData(normalized);
+
+      // 통신 확인 로그(브라우저 콘솔)
+      console.log("✅ GET /discard 응답 수신:", normalized);
+    } catch (err) {
+      setError(err?.message ?? "폐기량 데이터를 불러오지 못했습니다.");
+      console.log("❌ GET /discard 오류:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 최초 진입 시 자동 호출
+  useEffect(() => {
+    fetchDiscard();
+  }, []);
+
+  // 필터링
+  const filteredData = useMemo(() => {
+    if (categoryFilter === "전체") return wasteData;
+    return wasteData.filter((item) => item.category === categoryFilter);
+  }, [wasteData, categoryFilter]);
+
+  // 요약
+  const { totalItems, totalAmount, topCategory } = useMemo(
+    () => calcSummary(filteredData),
+    [filteredData]
+  );
 
   return (
     <div className="page">
-
-      {/* 가운데 흰색 카드 프레임 */}
       <div className="frame">
-        {/* 상단 흰색 헤더 */}
-
-
         {/* 오렌지색 WASTE 영역 */}
         <section className="waste-hero">
           <h1 className="waste-title">WASTE</h1>
@@ -55,6 +104,17 @@ function WastePage() {
 
         {/* 아래 내용 영역 */}
         <main className="waste-content">
+          {/* 로딩/에러 표시 */}
+          {loading && (
+            <div className="waste-empty">데이터 불러오는 중...</div>
+          )}
+
+          {!loading && error && (
+            <div className="waste-empty" style={{ color: "#e74c3c" }}>
+              {error}
+            </div>
+          )}
+
           {/* 필터 영역 */}
           <div className="waste-toolbar">
             <div className="filter-group">
@@ -74,13 +134,24 @@ function WastePage() {
               </select>
             </div>
 
-            <button
-              type="button"
-              className="waste-reset-btn"
-              onClick={() => setCategoryFilter("전체")}
-            >
-              필터 초기화
-            </button>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button
+                type="button"
+                className="waste-reset-btn"
+                onClick={() => setCategoryFilter("전체")}
+              >
+                필터 초기화
+              </button>
+
+              {/* 통신 재확인 버튼 */}
+              <button
+                type="button"
+                className="waste-reset-btn"
+                onClick={fetchDiscard}
+              >
+                새로고침
+              </button>
+            </div>
           </div>
 
           {/* 요약 카드 3개 */}
@@ -111,16 +182,20 @@ function WastePage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredData.map((item, idx) => (
-                  <tr key={`${item.name}-${idx}`}>
-                    <td>{item.name}</td>
-                    <td>{item.category}</td>
-                    <td>{item.disposeDate.replace(/-/g, ".")}</td>
-                    <td>{item.amount}</td>
+                {!loading && !error && filteredData.map((item, idx) => (
+                  <tr key={`${item.name || "item"}-${idx}`}>
+                    <td>{item.name || "-"}</td>
+                    <td>{item.category || "-"}</td>
+                    <td>
+                      {item.disposeDate
+                        ? String(item.disposeDate).replace(/-/g, ".")
+                        : "-"}
+                    </td>
+                    <td>{item.amount ?? 0}</td>
                   </tr>
                 ))}
 
-                {filteredData.length === 0 && (
+                {!loading && !error && filteredData.length === 0 && (
                   <tr>
                     <td colSpan={4} className="waste-empty">
                       선택한 조건에 해당하는 폐기 내역이 없습니다.

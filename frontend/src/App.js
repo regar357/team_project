@@ -1,7 +1,6 @@
 // src/App.js
 import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
-import "./App.css";
 import IngredientsPage from "./pages/IngredientsPage";
 import WastePage from "./pages/WastePage";
 import MainLayout from "./layouts/MainLayout";
@@ -14,7 +13,6 @@ import WeeklyPlan from "./pages/WeeklyPlan";
 import ExpireAlert from "./pages/ExpireAlert";
 
 
-// 라우팅만 담당하는 App 컴포넌트
 function App() {
   return (
     <Routes>

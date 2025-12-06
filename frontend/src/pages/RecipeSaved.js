@@ -17,8 +17,7 @@ const RecipeSaved = () => {
   const [deleteMode, setDeleteMode] = useState(false);
   const [sortOrder, setSortOrder] = useState('등록순');
 
-  // const raw = localStorage.getItem("savedRecipes");
-  // const ids = raw ? JSON.parse(raw) : [];
+
   useEffect(() => {
     fetchSavedRecipes()
       .then((data) => {
