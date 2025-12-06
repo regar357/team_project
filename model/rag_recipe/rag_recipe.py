@@ -244,20 +244,23 @@ def recommend_recipe(expiring_ingredients):
     first_recipe = clean_recipe_json(first_recipe)
     final_recipe = clean_recipe_json(final_recipe)
 
-    # ✅ 딕셔너리 형태로 반환
+    # 딕셔너리 형태로 반환
     return {
-        "first_recipe": first_recipe,
         "final_recipe": final_recipe,
     }
 
-
-# ===== 디버그용 단독 실행 =====
+# 레시피 json 반환 - 테스트 코드
 if __name__ == "__main__":
-    test_ings = ["닭가슴살 300g", "양파 2개", "간장", "마늘"]
-    result = recommend_recipe(test_ings)
+    test_ingredients = ["닭가슴살", "양파", "간장"]
 
-    print("== 1차 레시피 ==")
-    print(json.dumps(result["first_recipe"], ensure_ascii=False, indent=2))
+    result = recommend_recipe(test_ingredients)
+    final_recipe = result["final_recipe"]
 
-    print("\n== 최종 레시피 ==")
-    print(json.dumps(result["final_recipe"], ensure_ascii=False, indent=2))
+    # FastAPI가 반환하는 JSON 형태 만들기
+    output_json = {
+        "final_recipe": final_recipe,
+        "image_url": "http://127.0.0.1:8000/static/images/default_food.jpg"
+    }
+
+    print(json.dumps(output_json, ensure_ascii=False, indent=2))
+

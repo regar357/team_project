@@ -19,7 +19,6 @@ from rag_recipe import recommend_recipe
 # =========================
 
 class RecipeResponse(BaseModel):
-    first_recipe: Dict[str, Any]
     final_recipe: Dict[str, Any]
     image_url: str
 
@@ -111,26 +110,13 @@ async def recommend_from_text(payload: Dict[str, Any]):
 
         # RAG + LLM 레시피 추천
         result = recommend_recipe(ingredients)
-        first_recipe = result["first_recipe"]
         final_recipe = result["final_recipe"]
 
         # 이미지 URL
         image_url = get_image_url(final_recipe)
 
-        # DB 저장
-        session = SessionLocal()
-        try:
-            record = RecipeRecord(
-                ingredients_text=", ".join(ingredients),
-                final_recipe_json=json.dumps(final_recipe, ensure_ascii=False),
-            )
-            session.add(record)
-            session.commit()
-        finally:
-            session.close()
-
+        # 레시피 반환 
         return RecipeResponse(
-            first_recipe=first_recipe,
             final_recipe=final_recipe,
             image_url=image_url,
         )
@@ -143,33 +129,3 @@ async def recommend_from_text(payload: Dict[str, Any]):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"서버 내부 오류: {e}")
 
-
-
-# =========================
-# 5. 최근 추천 기록 조회 (/history)
-# =========================
-
-@app.get("/history", response_model=HistoryResponse)
-async def get_history(limit: int = 5):
-    session = SessionLocal()
-    try:
-        records = (
-            session.query(RecipeRecord)
-            .order_by(RecipeRecord.created_at.desc())
-            .limit(limit)
-            .all()
-        )
-
-        items: List[HistoryItem] = []
-        for r in records:
-            items.append(
-                HistoryItem(
-                    id=r.id,
-                    ingredients_text=r.ingredients_text,
-                    created_at=r.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-                )
-            )
-
-        return HistoryResponse(items=items)
-    finally:
-        session.close()
