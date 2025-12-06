@@ -119,21 +119,21 @@ async def recommend_from_text(payload: RecipeRequest):
             raise HTTPException(status_code=400, detail="ingredients 리스트가 필요합니다.")
 
         # RAG + LLM 레시피 추천
-<<<<<<< HEAD
+
         result = recommend_recipe(ingredients)
-=======
+
         # ⭐ style_hint 을 넘겨서 요리 스타일을 달리 생성하게 함
         result = recommend_recipe(ingredients, style_hint=style_hint)
         first_recipe = result["first_recipe"]
->>>>>>> 5ce6885cbd45e809ddfcf1afae5a8001b12da300
+
         final_recipe = result["final_recipe"]
 
         # 이미지 URL (지금은 프론트에서 쓰지 않지만 유지)
         image_url = get_image_url(final_recipe)
 
-<<<<<<< HEAD
+
         # 레시피 반환 
-=======
+
         # DB 저장
         session = SessionLocal()
         try:
@@ -147,7 +147,7 @@ async def recommend_from_text(payload: RecipeRequest):
         finally:
             session.close()
 
->>>>>>> 5ce6885cbd45e809ddfcf1afae5a8001b12da300
+
         return RecipeResponse(
             final_recipe=final_recipe,
             image_url=image_url,
@@ -161,8 +161,8 @@ async def recommend_from_text(payload: RecipeRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"서버 내부 오류: {e}")
 
-<<<<<<< HEAD
-=======
+
+
 
 # =========================
 # 5. 최근 추천 기록 조회 (/history)
@@ -192,4 +192,4 @@ async def get_history(limit: int = 5):
         return HistoryResponse(items=items)
     finally:
         session.close()
->>>>>>> 5ce6885cbd45e809ddfcf1afae5a8001b12da300
+
