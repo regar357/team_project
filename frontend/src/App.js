@@ -3,6 +3,7 @@ import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import IngredientsPage from "./pages/IngredientsPage";
 import WastePage from "./pages/WastePage";
+import ListPage from "./pages/ListPage";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
 
@@ -25,6 +26,7 @@ function App() {
       <Route path="/weekly-plan" element={<WeeklyPlan />} />
       <Route path="/waste" element={<WastePage />} />
       <Route path="/alerts" element={<ExpireAlert />} />
+      <Route path="/List" element={<ListPage />} />
       </Route>
     </Routes>
   );

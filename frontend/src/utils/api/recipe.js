@@ -188,54 +188,6 @@ export async function fetchRecipeById(id) {
 }
 
 
-
-
-
-
-
-
-
-// /* 검색용 더미 데이터 */
-// export const dummySearchRecipes = RECIPES.map((r) => ({
-//   id: r.id,
-//   title: r.title,
-//   image_url: r.image_url,  
-//   tags: r.tags,            
-//   ingredients: r.ingredients,
-// }));
-
-// // /* 선택한 재료로 레시피 검색 */
-// // export async function searchRecipesByIngredients(selectedIngredients) {
-// //   await new Promise((r) => setTimeout(r, 200));
-
-// //   if (!selectedIngredients || selectedIngredients.length === 0) {
-// //     return [];
-// //   }
-
-// //   const lower = selectedIngredients.map((i) => i.toLowerCase());
-
-// //   const filtered = dummySearchRecipes.filter((recipe) =>
-// //     recipe.ingredients.some((ing) => lower.includes(ing.toLowerCase()))
-// //   );
-
-// //   // 추천 3개만 리턴
-// //   return filtered.slice(0, 3);
-// // }
-
-// /* 전체 레시피 목록 */
-// export function fetchAllRecipes() {
-//   return Promise.resolve(RECIPES);
-// }
-
-
-
-
-
-
-
-
-
-
 /* 로컬 스토리지 관리 유틸리티 함수 */
 
 const STORAGE_KEY = "savedRecipes";

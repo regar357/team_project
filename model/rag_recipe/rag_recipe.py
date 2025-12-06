@@ -262,11 +262,11 @@ def recommend_recipe(expiring_ingredients, style_hint: Optional[str] = None):
     first_recipe = clean_recipe_json(first_recipe)
     final_recipe = clean_recipe_json(final_recipe)
 
-    # ✅ 딕셔너리 형태로 반환
+    # 딕셔너리 형태로 반환
     return {
-        "first_recipe": first_recipe,
         "final_recipe": final_recipe,
     }
+
 
 
 # ===== 디버그/CLI용 진입점 (Node child_process에서 호출) =====
@@ -325,3 +325,4 @@ if __name__ == "__main__":
 
     # 6) 정상 종료 코드 (슬라이드처럼 SUCCESS 개념)
     sys.exit(0)
+

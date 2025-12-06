@@ -14,7 +14,7 @@ const Header = () => {
 
         <nav className="nav">
           <Link to="/ingredients">식재료 등록</Link>
-          <Link to="/">식재료 목록</Link>
+          <Link to="/list">식재료 목록</Link>
           <Link to="/recipes/saved">레시피</Link>
           <Link to="/weekly-plan">주간 식단</Link>
           <Link to="/alerts">알림</Link>
