@@ -218,6 +218,17 @@ export async function deleteRecipe(id) {
 export async function fetchRecipeById(id) {
   const API_ENDPOINT = `/recipe/list/${id}`; 
 
+  const safeJsonParseOrSplit = (dataString) => {
+        if (!dataString || typeof dataString !== 'string') return [];
+        try {
+            const parsed = JSON.parse(dataString);
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
+        } catch (e) {
+        }
+        return dataString.split(',').map(item => item.trim()).filter(item => item.length > 0);
+    };
   try {
     const response = await fetch(API_ENDPOINT);
 
@@ -251,23 +262,17 @@ export async function fetchRecipeById(id) {
                 title: rawRecipe.recipe_title,
                 description: rawRecipe.recipe_description,
                 
-             
-                priority_used_ingredients: rawRecipe.priority_used_ingredients 
-                    ? JSON.parse(rawRecipe.priority_used_ingredients) 
-                    : [],
-                other_ingredients: rawRecipe.other_ingredients 
-                    ? JSON.parse(rawRecipe.other_ingredients) 
-                    : [],
-                steps: rawRecipe.recipe_steps 
-                    ? JSON.parse(rawRecipe.recipe_steps) 
-                    : [],
-                tips: rawRecipe.recipe_tips 
-                    ? JSON.parse(rawRecipe.recipe_tips) 
-                    : [],
+                priority_used_ingredients: safeJsonParseOrSplit(rawRecipe.priority_used_ingredients),
+                other_ingredients: safeJsonParseOrSplit(rawRecipe.other_ingredients),
+                steps: safeJsonParseOrSplit(rawRecipe.recipe_steps),
+                tips: safeJsonParseOrSplit(rawRecipe.recipe_tips),
+                
                 servings: rawRecipe.servings,
                 created_at: rawRecipe.created_at,
+
                 image_url: rawRecipe.image_url ?? '/images/default_recipe.png', 
                 isSaved: getSavedRecipeIds().includes(rawRecipe.recipe_id),
+                
             };
             
             return processedRecipe;
