@@ -57,10 +57,10 @@ function IngredientsPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 서버 업로드 함수
+  // 서버 업로드 함수 (POST /food/upload)
   const uploadFoodImage = async (file) => {
     const formData = new FormData();
-    // 백엔드가 받는 키가 다르면 "image" -> "file" 등으로 바꿔야 함
+
     formData.append("image", file);
 
     const res = await fetch("/food/upload", {
@@ -76,9 +76,12 @@ function IngredientsPage() {
     return data;
   };
 
-  // 이미지 파일 선택 + 즉시 업로드
+  // 파일 선택 즉시 자동 업로드
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0] ?? null;
+
+    // 같은 파일을 다시 선택해도 onChange가 다시 뜨게 하기
+    e.target.value = "";
 
     setForm((prev) => ({ ...prev, imageFile: file }));
     setUploadError("");
@@ -91,8 +94,14 @@ function IngredientsPage() {
 
       const data = await uploadFoodImage(file);
 
-      //dk응답 키 대응
-      const url = data.url || data.imageUrl || data.path || data.location || "";
+      // 서버 응답 키 대응
+      const url =
+        data.url ||
+        data.imageUrl ||
+        data.path ||
+        data.location ||
+        "";
+
       setUploadedImageUrl(url);
     } catch (err) {
       setUploadError(err?.message ?? "업로드 중 오류가 발생했습니다.");
@@ -101,7 +110,7 @@ function IngredientsPage() {
     }
   };
 
-  // 새로 등록
+  // 새로 등록(현재는 프론트 임시 저장)
   const handleSave = () => {
     if (!form.name || !form.category || !form.expiry) {
       alert("식재료명, 카테고리, 유통기한을 모두 입력해 주세요.");
@@ -165,9 +174,7 @@ function IngredientsPage() {
 
   return (
     <div className="recipe-page">
-      {/* 배경 위에 떠 있는 카드 */}
       <div className="recipe-card">
-        {/* 상단 폼 영역 */}
         <div className="recipe-card-top">
           {/* 왼쪽 사진 업로드 */}
           <div className="photo-upload">
@@ -184,12 +191,10 @@ function IngredientsPage() {
               <p className="photo-help">냉장고 속 이미지를 등록하세요</p>
             </div>
 
-            {/* 선택된 파일명 */}
             {form.imageFile && (
               <div className="photo-filename">{form.imageFile.name}</div>
             )}
 
-            {/* 업로드 결과 표시 */}
             {uploadedImageUrl && (
               <div className="photo-filename">업로드 완료</div>
             )}
@@ -295,6 +300,7 @@ function IngredientsPage() {
             </tbody>
           </table>
         </div>
+
       </div>
     </div>
   );
