@@ -70,6 +70,8 @@ export async function searchRecipesByIngredients(selectedIngredients) {
         }
 
         const data = await response.json(); 
+        console.log("=== API 응답 원본 데이터 (JSON) ===");
+        console.log(data);
         
         if (data && data.recipe && data.recipe.final_recipe) {
             const finalRecipe = data.recipe.final_recipe;

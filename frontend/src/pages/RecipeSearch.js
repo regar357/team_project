@@ -80,11 +80,12 @@ export default function RecipeSearch() {
         
         let rawDataToProcess = [];
 
-        if (apiResponse && apiResponse.recipe && typeof apiResponse.recipe === 'object') {
-            rawDataToProcess = [apiResponse.recipe]; 
-            console.log("[DEBUG] 응답 객체에서 단일 레시피 추출 완료.");
+        // if (apiResponse && apiResponse.recipe && typeof apiResponse.recipe === 'object') {
+        //     rawDataToProcess = [apiResponse.recipe]; 
+        //     console.log("[DEBUG] 응답 객체에서 단일 레시피 추출 완료.");
             
-        } else if (Array.isArray(apiResponse)) {
+        // } else 
+        if (Array.isArray(apiResponse)) {
             rawDataToProcess = apiResponse;
             console.log(`[DEBUG 2] 응답이 이미 배열입니다. 처리 항목 수: ${apiResponse.length}`);
             
@@ -124,7 +125,7 @@ export default function RecipeSearch() {
                 };
             } catch (e) {
                 console.error("레시피 JSON 파싱 오류:", e, recipe);
-                return recipe;
+                return null;
             }
         })
         .filter(recipe => recipe !== null);
