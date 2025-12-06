@@ -1,19 +1,25 @@
 const pool = require("../config/db");
 
 exports.getDiscard = async (req, res) => {
-  const query = "SELECT * FROM discarded_food";
+  console.log("수신 성공");
 
-  try {
-    const [rows] = await pool.query(query);
+  res.json({
+    meseage: "API 통신 성공",
+  });
 
-    if (rows.length === 0) {
-      return res.json({
-        message: "폐기량 정보 없음",
-      });
-    }
+  //   const query = "SELECT * FROM discarded_food";
 
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  //   try {
+  //     const [rows] = await pool.query(query);
+
+  //     if (rows.length === 0) {
+  //       return res.json({
+  //         message: "폐기량 정보 없음",
+  //       });
+  //     }
+
+  //     res.json(rows);
+  //   } catch (err) {
+  //     res.status(500).json({ error: err.message });
+  //   }
 };
