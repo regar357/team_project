@@ -13,7 +13,6 @@ from pydantic import BaseModel
 
 from db import SessionLocal, RecipeRecord, init_db
 from rag_recipe import recommend_recipe
-from image_ingredient import extract_ingredients_from_image
 
 # =========================
 # 0. Pydantic 응답 모델
@@ -144,91 +143,6 @@ async def recommend_from_text(payload: Dict[str, Any]):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"서버 내부 오류: {e}")
 
-
-# =========================
-# 4. 이미지 기반 레시피 추천
-# =========================
-
-@app.post("/recommend_from_image", response_model=RecipeResponse)
-async def recommend_from_image(file: UploadFile = File(...)):
-    """
-    음식 사진을 업로드하면:
-    1) uploads/ 폴더에 저장
-    2) YOLO로 재료 인식
-    3) RAG + LLM으로 레시피 추천
-    4) DB 저장 + 이미지 URL 반환
-    """
-    try:
-        # 1) 이미지 파일 여부 / 타입 체크
-        if not file:
-            raise HTTPException(status_code=400, detail="이미지 파일이 없습니다.")
-
-        allowed_types = ["image/jpeg", "image/jpg", "image/png"]
-        if file.content_type not in allowed_types:
-            raise HTTPException(
-                status_code=400,
-                detail=f"지원하지 않는 이미지 형식입니다. jpg/png만 업로드해주세요. (현재: {file.content_type})",
-            )
-
-        # 2) 임시 저장 경로 생성
-        os.makedirs("uploads", exist_ok=True)
-
-        # 카카오톡 파일명 대비: ? 뒤는 제거
-        safe_filename = file.filename.split("?")[0]
-        temp_path = os.path.join("uploads", safe_filename)
-
-        # 2-1) 파일 저장
-        try:
-            file_bytes = await file.read()
-            with open(temp_path, "wb") as f:
-                f.write(file_bytes)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"파일 저장 실패: {e}")
-
-        # 3) YOLO로 재료 인식
-        try:
-            ingredients = extract_ingredients_from_image(temp_path)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"이미지 분석 중 오류: {e}")
-
-        if not ingredients:
-            raise HTTPException(status_code=400, detail="이미지에서 재료를 인식하지 못했습니다.")
-
-        # 4) 텍스트 기반 추천과 동일한 흐름
-        try:
-            result = recommend_recipe(ingredients)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"레시피 생성 중 오류: {e}")
-
-        first_recipe = result["first_recipe"]
-        final_recipe = result["final_recipe"]
-        image_url = get_image_url(final_recipe)
-
-        # 5) DB 저장
-        session = SessionLocal()
-        try:
-            record = RecipeRecord(
-                ingredients_text=", ".join(ingredients),
-                final_recipe_json=json.dumps(final_recipe, ensure_ascii=False),
-            )
-            session.add(record)
-            session.commit()
-        finally:
-            session.close()
-
-        return RecipeResponse(
-            first_recipe=first_recipe,
-            final_recipe=final_recipe,
-            image_url=image_url,
-        )
-
-    except HTTPException:
-        # 이미 의미 있는 에러 메시지를 넣었으니 그대로 전달
-        raise
-    except Exception as e:
-        print("=== /recommend_from_image 오류 ===")
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"서버 내부 오류: {e}")
 
 
 # =========================
