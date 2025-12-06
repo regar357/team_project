@@ -137,7 +137,7 @@ export async function fetchSavedRecipes() {
                     tips: recipe.recipe_tips ? JSON.parse(recipe.recipe_tips) : [],
                     
                     category: recipe.category ?? '기타',
-                    image_url: recipe.image_url ?? '/default_recipe.png', 
+                    image_url: recipe.image_url ?? '/images/default_recipe.png', 
                     tags: tags.slice(0, 3), 
 
                     created_at: recipe.created_at,
@@ -233,15 +233,14 @@ export async function fetchRecipeById(id) {
             return null;
         }
 
-        // ⭐️ 데이터 가공 (정규화) 로직 시작
+        //  데이터 가공 
         try {
             const processedRecipe = {
-                // 1. 필수 ID 및 제목 필드 매핑
                 id: rawRecipe.recipe_id, 
                 title: rawRecipe.recipe_title,
                 description: rawRecipe.recipe_description,
                 
-                // 2. JSON 문자열 필드를 객체/배열로 파싱
+             
                 priority_used_ingredients: rawRecipe.priority_used_ingredients 
                     ? JSON.parse(rawRecipe.priority_used_ingredients) 
                     : [],
@@ -256,7 +255,7 @@ export async function fetchRecipeById(id) {
                     : [],
                 servings: rawRecipe.servings,
                 created_at: rawRecipe.created_at,
-                image_url: rawRecipe.image_url ?? '/default_recipe.png', 
+                image_url: rawRecipe.image_url ?? '/images/default_recipe.png', 
                 isSaved: getSavedRecipeIds().includes(rawRecipe.recipe_id),
             };
             
