@@ -142,7 +142,7 @@ export async function fetchSavedRecipes() {
                     id: recipe.recipe_id, 
                     title: recipe.recipe_title, 
                     
-                    priority_used_ingredients: priorityTags,
+                    priority_used_ingredients: tags,
                     other_ingredients: safeJsonParseOrSplit(recipe.other_ingredients),
                     steps: safeJsonParseOrSplit(recipe.recipe_steps),
                     tips: safeJsonParseOrSplit(recipe.recipe_tips),
