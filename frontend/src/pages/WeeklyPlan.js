@@ -1,7 +1,7 @@
 // src/pages/WeeklyPlan.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../components/common/Button";
+// import Button from "../components/common/Button";
 import { fetchWeeklyRecipes } from "../utils/api/weekly";
 import "./WeeklyPlan.css";
 
@@ -22,11 +22,11 @@ export default function WeeklyPlan() {
   }, []);
 
   const recipes = weeklyRecipes[selectedDay] || [];
-  const dateRangeLabel = "2024.12.01 ~ 12.07";
+  // const dateRangeLabel = "2024.12.01 ~ 12.07";
 
-  const handleReset = () => {
-    alert("RESET 기능은 추후 추천 로직과 연결될 예정입니다.");
-  };
+  // const handleReset = () => {
+  //   alert("RESET 기능은 추후 추천 로직과 연결될 예정입니다.");
+  // };
 
   return (
     <div className="weekly-page">
@@ -54,11 +54,10 @@ export default function WeeklyPlan() {
           ))}
         </div>
       
-
-        {/* RESET */}
+{/* 
         <Button type="primary" onClick={handleReset}>
           RESET
-        </Button>
+        </Button> */}
 
       </div>
 

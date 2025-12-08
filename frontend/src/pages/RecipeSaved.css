@@ -1,8 +1,20 @@
 /* 전체 페이지 패딩 */
-.saved-page {
+/* .saved-page {
   width: 100%;
   padding: 20px 32px;
   box-sizing: border-box;
+} */
+.saved-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 32px 40px;
+  box-sizing: border-box;
+  background: linear-gradient(
+    180deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 45%,
+    var(--bg-gradient-end) 100%
+  );
 }
 
 /* 상단 HERO (“RECIPE / 레시피 보관함”) */
