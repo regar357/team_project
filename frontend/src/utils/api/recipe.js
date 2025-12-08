@@ -27,7 +27,7 @@ export const RECIPES = [
     title: "Egg scramble",
     image_url: "/images/egg.png",
     category: "양식",
-    tags: ["다이어트", "고단백", "양식"],
+    tags: ["다이어트", "고단백"],
     description: "아침으로 먹기 좋은 부드러운 스크램블 에그입니다.",
     servings: 1,
     ingredients: ["계란", "버터", "우유", "소금"],

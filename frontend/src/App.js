@@ -1,11 +1,12 @@
 // src/App.js
 import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
-import IngredientsPage from "./pages/IngredientsPage";
-import WastePage from "./pages/WastePage";
-import ListPage from "./pages/ListPage";
+
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
+import IngredientsPage from "./pages/IngredientsPage";
+import ListPage from "./pages/ListPage";
+import WastePage from "./pages/WastePage";
 
 import RecipeSaved from "./pages/RecipeSaved";
 import RecipeSearch from "./pages/RecipeSearch";

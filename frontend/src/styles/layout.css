@@ -4,9 +4,33 @@
   background: var(--bg);
 }
 
-/* 페이지 내부 컨텐츠 래퍼 */
-.layout-content {
-  padding: 32px 24px;
+
+/* 홈 전용(기존처럼 넓게 쓸 수 있게 여유만 주기) */
+.layout-content-home {
   max-width: var(--container-width);
   margin: 0 auto;
+  padding: 24px 40px 40px;
+}
+
+/* 내부 페이지: 상단 AppHeader 아래에 2열 구조 */
+.layout-main {
+  width: 100%;
+  margin: 0; 
+  padding: 0;
+  display: flex;
+  gap: 32px;
+  box-sizing: border-box;
+
+}
+
+/* 좌측 사이드바 (항상 보이게) */
+.layout-sidebar {
+  width: 330px;            /* 사이드바 폭 */
+  flex-shrink: 0;
+}
+
+/* 우측 실제 페이지 내용 영역 */
+.layout-content {
+  flex: 1;
+  min-width: 0;
 }
