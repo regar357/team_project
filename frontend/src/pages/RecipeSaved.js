@@ -6,13 +6,10 @@ import Card from "../components/common/Card";
 import Button from "../components/common/Button";
 import "./RecipeSaved.css";
 
-const CATEGORIES = ["한식", "양식", "중식", "디저트", "기타"];
-
 const RecipeSaved = () => {
   const navigate = useNavigate();
 
   const [recipes, setRecipes] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([...CATEGORIES]);
   const [loading, setLoading] = useState(true);
   const [deleteMode, setDeleteMode] = useState(false);
   const [sortOrder, setSortOrder] = useState('등록순');
@@ -26,11 +23,6 @@ const RecipeSaved = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const toggleCategory = (cat) => {
-    setSelectedCategories((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
-  };
 
   const handleDelete = async (id, e) => {
     e.stopPropagation();
@@ -44,10 +36,8 @@ const RecipeSaved = () => {
   const handleSortChange = (e) => {
     setSortOrder(e.target.value);
   };
-  const filteredRecipes = recipes.filter((r) =>
-    selectedCategories.includes(r.category)
-  );
-  const sortedRecipes = filteredRecipes.slice().sort((a, b) => {
+ 
+  const sortedRecipes = recipes.slice().sort((a, b) => {
     if (sortOrder === '이름순') {
         return a.title.localeCompare(b.title); 
     }
@@ -63,28 +53,9 @@ const RecipeSaved = () => {
       </section>
 
       <div className="saved-layout">
-        {/* 왼쪽 필터 */}
-        <aside className="filter-panel">
-          <h3 className="filter-title">Filter<br />Options</h3>
-          <div className="filter-subtitle">By Categories</div>
+        
 
-          <ul className="filter-list">
-            {CATEGORIES.map((cat) => (
-              <li key={cat}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(cat)}
-                    onChange={() => toggleCategory(cat)}
-                  />
-                  <span>{cat}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
-        </aside>
-
-        {/* 오른쪽 리스트 */}
+        {/* 리스트 */}
         <section className="saved-content">
           <div className="saved-toolbar">
             <div className="list-count">
@@ -92,10 +63,14 @@ const RecipeSaved = () => {
             </div>
 
           <div className="toolbar-right">
-            <button 
-              className="icon-btn"
-              onClick={() => setDeleteMode(prev => !prev)}
-            > 🗑 </button>
+            
+             <Button
+                    type="primary"
+                    size="sm"
+                    full
+                    onClick={() => setDeleteMode(prev => !prev)}
+                  > 삭제
+                  </Button>
           
             <select 
               className="sort-select"
@@ -137,7 +112,7 @@ const RecipeSaved = () => {
               </Card>
             ))}
 
-            {filteredRecipes.length === 0 && (
+            {(
               <div className="empty">
                 선택한 카테고리에 저장된 레시피가 없습니다.
               </div>
