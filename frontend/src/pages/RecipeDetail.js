@@ -64,46 +64,6 @@ export default function RecipeDetail() {
     ...(recipe.other_ingredients || []),
   ];
 
-  // /* -------------------------
-  //        CHECK SAVED
-  // -------------------------- */
-  // useEffect(() => {
-  //   if (!recipe) return;
-  //   const raw = localStorage.getItem("savedRecipes");
-  //   if (!raw) return;
-
-  //   try {
-  //     const arr = JSON.parse(raw);
-  //     if (arr.includes(recipe.id)) setIsSaved(true);
-  //   } catch {}
-  // }, [recipe]);
-
-  // /* -------------------------
-  //      SAVE / UNSAVE TOGGLE
-  // -------------------------- */
-  // const toggleSave = () => {
-  //   const raw = localStorage.getItem("savedRecipes");
-  //   let arr = [];
-
-  //   try {
-  //     arr = raw ? JSON.parse(raw) : [];
-  //   } catch {
-  //     arr = [];
-  //   }
-
-  //   if (isSaved) {
-  //     arr = arr.filter((rid) => rid !== recipe.id);
-  //   } else {
-  //     arr.push(recipe.id);
-  //   }
-
-  //   localStorage.setItem("savedRecipes", JSON.stringify(arr));
-  //   setIsSaved(!isSaved);
-  // };
-
-  // if (loading) return <div className="detail-page">불러오는 중...</div>;
-  // if (error || !recipe) return <div className="detail-page">{error}</div>;
-
   return (
     <div className="detail-page">
       <button className="back-link" onClick={() => navigate(-1)}>
@@ -154,16 +114,10 @@ export default function RecipeDetail() {
         <div className="right-column">
           <div className="detail-box">
             <h2 className="detail-section-title">식재료</h2>
-            <ul className="detail-list">
-              {/* {/* {/* {recipe.ingredients?.map((ing, idx) => (
-                <li key={idx}>{ing}</li>
-              ))} 
-             
-                .map((ing, idx) => (
-                  <li key={idx}>{ing}</li> 
+            <div className="log-divider" />
 
-              ))} */}
-              {/* ⭐️ 수정: 합쳐진 식재료 목록 사용 */}
+            <ul className="detail-list">
+              {/*  합쳐진 식재료 목록 사용 */}
               {allIngredients.length === 0 && (
                 <li>필요한 식재료가 없습니다.</li>
               )}
@@ -175,6 +129,7 @@ export default function RecipeDetail() {
 
           <div className="detail-box">
             <h2 className="detail-section-title">조리 순서</h2>
+            <div className="log-divider" />
             <ol className="detail-steps">
               {recipe.steps?.map((step, idx) => (
                 <li key={idx}>

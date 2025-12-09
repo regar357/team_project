@@ -64,13 +64,14 @@ const RecipeSaved = () => {
 
           <div className="toolbar-right">
             
-             <Button
-                    type="primary"
-                    size="sm"
-                    full
-                    onClick={() => setDeleteMode(prev => !prev)}
-                  > 삭제
-                  </Button>
+            <Button
+              type="primary"
+              size="sm"
+              full
+              className="saved-delete-btn"
+              onClick={() => setDeleteMode(prev => !prev)}
+            > 삭제
+              </Button>
           
             <select 
               className="sort-select"
@@ -83,19 +84,19 @@ const RecipeSaved = () => {
           </div>
           </div>
 
+
+
           <div className="recipe-grid">
             {sortedRecipes.map((recipe) => (
-              <Card key={recipe.id}>
+              <div key={recipe.id}>
                 <div
-                  className="recipe-card"
-                  onClick={() => handleCardClick(recipe.id)}
+                  className={`recipe-card ${deleteMode ? "delete-mode" : ""}`}
+                  onClick={() => {
+                    if (!deleteMode) {
+                      handleCardClick(recipe.id);}}}
                 >
                   <div className="recipe-img-wrap">
-                    <img
-                      src={recipe.image_url}
-                      alt={recipe.title}
-                      className="recipe-img"
-                    />
+                    <img src={recipe.image_url} alt={recipe.title} />
                   </div>
                   <div className="recipe-title">{recipe.title}</div>
                 </div>
@@ -105,18 +106,18 @@ const RecipeSaved = () => {
                     type="primary"
                     size="sm"
                     full
+                    className="delete-btn"
+
                     onClick={(e) => handleDelete(recipe.id, e)}
                   > 삭제
                   </Button>
                 )}
-              </Card>
-            ))}
-
-            {(
-              <div className="empty">
-                선택한 카테고리에 저장된 레시피가 없습니다.
               </div>
+            ))}
+            {sortedRecipes.length === 0 && !loading && (
+              <div className="empty"> 저장된 레시피가 없습니다.</div>
             )}
+            
           </div>
         </section>
       </div>

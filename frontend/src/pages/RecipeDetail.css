@@ -1,7 +1,14 @@
 .detail-page {
   width: 100%;
-  padding: 40px 36px 80px;
+  min-height: 100vh;
+  padding: 32px 100px;
   box-sizing: border-box;
+  background: linear-gradient(
+    180deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 45%,
+    var(--bg-gradient-end) 100%
+  );
 }
 
 .back-link {
@@ -15,8 +22,8 @@
 
 .detail-grid {
   display: grid;
-  grid-template-columns: minmax(580px, 1.7fr) minmax(500px, 1.2fr); 
-  column-gap: 80px; 
+  grid-template-columns: 1.0fr 1.0fr; 
+  column-gap: 50px;  
   align-items: flex-start;
 }
 
@@ -107,15 +114,17 @@
   display: flex;
   flex-direction: column;
   gap: 26px;
+  width: 500px;
   
 }
 
 /* 공통 박스 */
 .detail-box {
-  padding: 26px 30px;
+  padding: 24px;
   background: #fefcf8;
   border-radius: 18px;
-  min-width: 600px;
+  width: 100%;        /* 부모(.right-column) 안에서만 채우기 */
+
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08),
               0 4px 10px rgba(0, 0, 0, 0.05);
 }
@@ -126,6 +135,11 @@
   font-weight: 700;
   margin-bottom: 14px;
 }
+.log-divider {
+  border-top: 1.5px solid #ddd;
+  margin-bottom: 20px;
+}
+
 
 .detail-list {
   font-size: 18px;
@@ -148,24 +162,24 @@
 .detail-steps li {
   display: flex;
   align-items: flex-start;
-  gap: 30px;
+  gap: 35px;
   margin-bottom: 30px;
 }
 
 .step-number {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   background: #ee6049;
   color: #fff;
   border-radius: 50%;
-  font-size: 16px;
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .step-text {
-  font-size: 20px;
+  font-size: 22px;
   color: #333;
 }
 
