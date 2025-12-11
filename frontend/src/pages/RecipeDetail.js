@@ -73,13 +73,11 @@ export default function RecipeDetail() {
       <div className="detail-grid">
         {/* ===== LEFT COLUMN ===== */}
         <div className="left-column">
+          <div className="detail-box left-box">
           {/* 이미지 */}
           <div className="detail-image-wrap">
             <img
-              src={recipe.image_url}
-              alt={recipe.title}
-              className="detail-image"
-            />
+              src={recipe.image_url}  alt={recipe.title} className="detail-image" />
           </div>
 
           {/* 제목 + 하트 */}
@@ -99,6 +97,8 @@ export default function RecipeDetail() {
           {/* 인분 */}
           <p className="detail-meta">🍽 {recipe.servings} 인분 기준</p>
 
+          <div className="divider" />
+
           {/* TIP */}
           <div className="tip-section">
             <h2 className="tip-title">TIP</h2>
@@ -108,6 +108,7 @@ export default function RecipeDetail() {
               ))}
             </ul>
           </div>
+        </div>
         </div>
 
         {/* ===== RIGHT COLUMN ===== */}

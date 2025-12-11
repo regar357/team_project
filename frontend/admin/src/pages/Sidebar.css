@@ -1,0 +1,75 @@
+/* src/pages/Sidebar.css */
+
+.sidebar {
+  width: 16rem;               /* 원래 w-64 */
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb; /* gray-200 느낌 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 상단 헤더 영역 */
+.sidebar-header {
+  padding: 24px;               /* p-6 */
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.sidebar-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;              /* gray-900 */
+}
+
+/* 네비게이션 영역 */
+.sidebar-nav {
+  flex: 1;
+  padding: 16px;               /* p-4 */
+}
+
+/* 메뉴 리스트 */
+.sidebar-menu {
+  list-style: none;
+}
+
+.sidebar-menu li + li {
+  margin-top: 4px;             /* space-y-1 느낌 */
+}
+
+/* 버튼 공통 스타일 */
+.sidebar-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;                   /* gap-3 */
+  padding: 12px 16px;          /* px-4 py-3 */
+  border-radius: 0.5rem;       /* rounded-lg */
+  border: none;
+  background-color: transparent;
+  color: #374151;              /* text-gray-700 */
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* 기본 hover */
+.sidebar-menu-item:hover {
+  background-color: #f9fafb;   /* hover:bg-gray-50 */
+}
+
+/* 활성 메뉴 */
+.sidebar-menu-item.is-active {
+  background-color: #eff6ff;   /* bg-blue-50 */
+  color: #2563eb;              /* text-blue-600 */
+}
+
+/* 아이콘 */
+.sidebar-menu-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* 라벨 */
+.sidebar-menu-label {
+  flex: 1;
+}

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { searchRecipesByIngredients } from "../utils/api/recipe";
 import { fetchIngredients } from "../utils/api/ingredients";
-// import { IngredientsListPage  } from "./ListPage.js";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
 import "./RecipeSearch.css";
@@ -145,6 +144,7 @@ export default function RecipeSearch() {
 
   return (
     <div className="search-page">
+      <div className="search-page-inner">
       <section className="saved-hero">
         <h1>RECIPE</h1>
         <p>레시피 / 찾기</p>
@@ -153,12 +153,41 @@ export default function RecipeSearch() {
       {/*전체 2컬럼 레이아웃 */}
       <div className="search-layout">
         {/* === 왼쪽 : 식재료 + 추천 레시피 === */}
+        
         <div className="search-left">
+          <section className="ingredient-card">
           {/* 상단 텍스트 */}
           <div className="search-top-row">
             <h2 className="search-main-title">식재료를 선택하세요</h2>
-          </div>
+          
+            
+            <div className="side-sort-row">
+            <button
+              className={`side-sort-tab ${sortMode === "name" ? "active" : ""}`}
+              onClick={() => setSortMode("name")}
+            >
+              이름순
+            </button>
 
+            <button
+              className={`side-sort-tab ${
+                sortMode === "created" ? "active" : ""
+              }`}
+              onClick={() => setSortMode("created")}
+            >
+              등록순
+            </button>
+
+            <button
+              className={`side-sort-tab ${
+                sortMode === "expire" ? "active" : ""
+              }`}
+              onClick={() => setSortMode("expire")}
+            >
+              임박순
+            </button>
+          </div>
+          </div>
           {/* 재료 클라우드 */}
           <div className="ingredient-cloud">
             {filteredIngredients.map((item) => {
@@ -181,25 +210,38 @@ export default function RecipeSearch() {
               </div>
             )}
           </div>
+          </section>
 
           {/* 추천 레시피 영역 */}
           <section className="recommend-section">
-            <h3 className="recommend-title">추천 레시피</h3>
+             <div className={`recommend-box ${results.length > 0 ? "no-header" : ""}`}>
+              {/* <h3 className="recommend-title">추천 레시피</h3> */}
+               {/* 카드가 없을 때만 제목 표시 */}
+                {results.length === 0 && (
+                  <h3 className="recommend-title">추천 레시피</h3>
+                )}
+            {/* 검색 전 / 결과 없음 */}
+              {!hasSearched && results.length === 0 && (
+                <div className="recommend-placeholder">
+                  <p className="recommend-helper">
+                    왼쪽에서 식재료를 선택한 뒤
+                    <br />
+                    <b>“레시피 찾기”</b> 버튼을 눌러보세요.
+                  </p>
+                </div>
+              )}
 
-            {!hasSearched && (
-              <p className="recommend-helper">
-                왼쪽에서 식재료를 선택한 뒤
-                <br />
-                <b>“레시피 찾기”</b> 버튼을 눌러보세요.
-              </p>
-            )}
+              {hasSearched && results.length === 0 && !loading && (
+                <div className="recommend-placeholder">
+                  <p className="recommend-empty">
+                    선택한 재료로 추천할 수 있는 레시피가 없어요.
+                  </p>
+                </div>
+              )}
 
-            {hasSearched && results.length === 0 && !loading && (
-              <p className="recommend-empty">
-                선택한 재료로 추천할 수 있는 레시피가 없어요.
-              </p>
-            )}
-
+{/* 카드가 있을 때는 카드만 보여줌 */}
+            
+           {results.length > 0 && (
             <div className="recommend-row">
               {results.map((recipe) => (
                 <Card key={recipe.id}>
@@ -229,39 +271,14 @@ export default function RecipeSearch() {
                 </Card>
               ))}
             </div>
+            )}
+            </div>
+          
           </section>
         </div>
 
-        {/* === 오른쪽 : 정렬 / 검색 / 레시피 찾기 / 선택된 재료 === */}
+        {/* === 오른쪽 : 검색 / 레시피 찾기 / 선택된 재료 === */}
         <aside className="search-side-panel">
-          {/* 정렬 탭 */}
-          <div className="side-sort-row">
-            <button
-              className={`side-sort-tab ${sortMode === "name" ? "active" : ""}`}
-              onClick={() => setSortMode("name")}
-            >
-              이름순
-            </button>
-
-            <button
-              className={`side-sort-tab ${
-                sortMode === "created" ? "active" : ""
-              }`}
-              onClick={() => setSortMode("created")}
-            >
-              등록순
-            </button>
-
-            <button
-              className={`side-sort-tab ${
-                sortMode === "expire" ? "active" : ""
-              }`}
-              onClick={() => setSortMode("expire")}
-            >
-              임박순
-            </button>
-          </div>
-
           {/* SEARCH 입력 */}
           <div className="side-search-row">
             <input
@@ -314,6 +331,7 @@ export default function RecipeSearch() {
             ))}
           </div>
         </aside>
+      </div>
       </div>
     </div>
   );

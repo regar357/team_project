@@ -134,15 +134,13 @@
   margin-bottom: 6px;
 }
 
-.weekly-recipe-image-wrap img,
-.recommend-img {
+.weekly-recipe-image-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.weekly-recipe-title,
-.recommend-name {
+.weekly-recipe-title {
   font-size: 25px;
   font-weight: 700;
   color: var(--text-main);
@@ -150,8 +148,7 @@
   text-align: center;
 }
 
-.weekly-recipe-tags,
-.recommend-meta {
+.weekly-recipe-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
