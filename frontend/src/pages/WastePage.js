@@ -67,10 +67,10 @@ function WastePage() {
       setWasteData(normalized);
 
       // 통신 확인 로그(브라우저 콘솔)
-      console.log("✅ GET /discard 응답 수신:", normalized);
+      console.log("GET /discard 응답 수신:", normalized);
     } catch (err) {
       setError(err?.message ?? "폐기량 데이터를 불러오지 못했습니다.");
-      console.log("❌ GET /discard 오류:", err);
+      console.log("GET /discard 오류:", err);
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,5 @@
-import { Outlet, useLocation } from "react-router-dom"; 
-import SidebarMenu from "./SidebarMenu";  
+import { Outlet, useLocation } from "react-router-dom";
+import SidebarMenu from "./SidebarMenu";
 import "../styles/global.css";
 import "../styles/variables.css";
 import "../styles/layout.css";
@@ -8,29 +8,21 @@ const MainLayout = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
 
-  // 홈 페이지 : 전체 화면으로 사용
-
-   if (isHome) {
-    return (
-      <div className="layout">
-        <div className="layout-content layout-content-home">
-          <Outlet />
-        </div>
-      </div>
-    );
-  }
-
-  // 페이지: 상단 AppHeader + 좌측 사이드바 + 우측 메인 컨텐츠
   return (
-    <div className="layout">
-
+    <div className={`layout ${isHome ? "layout-home" : ""}`}>
+      {/* 
+        홈이 아닌 페이지에서만 사이드바 + 일반 레이아웃 적용
+        홈은 전체 화면 대시보드 느낌으로 사용
+      */}
 
       <div className="layout-main">
-        <aside className="layout-sidebar">
-          <SidebarMenu />
-        </aside>
+        {!isHome && (
+          <aside className="layout-sidebar">
+            <SidebarMenu />
+          </aside>
+        )}
 
-        <main className="layout-content">
+        <main className={`layout-content ${isHome ? "layout-content-home" : ""}`}>
           <Outlet />
         </main>
       </div>
