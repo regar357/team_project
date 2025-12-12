@@ -6,7 +6,7 @@ import "./RecipeDetail.css";
 export default function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const location = useLocation();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -15,23 +15,68 @@ export default function RecipeDetail() {
   /* LOAD RECIPE DETAILS */
   useEffect(() => {
     const load = async () => {
-     try {
-        const data = await fetchRecipeById(Number(id));
-        setRecipe(data);
+      setLoading(true);
+      setError("");
 
-        if (data) {
-          const savedIds = getSavedRecipeIds();
-          setIsSaved(savedIds.includes(Number(data.id)));
-        }
-
-      } catch (err) {
-        setError("레시피 정보를 불러오지 못했습니다.");
-      } finally {
-        setLoading(false);
+      let targetRecipe = null;
+      // 전달받은 레시피 데이터(state)가 있는지 확인
+      const transmittedData = location.state?.recipeData;
+      if (transmittedData) {
+        console.log("State를 통해 레시피 데이터 수신 완료.");
+        targetRecipe = transmittedData;
+       } else {
+         console.log(`[Detail] DB에서 레시피 ID ${id} 조회 시작.`);
+            try {
+                // 저장된 레시피는 ID가 숫자로 가정하여 조회
+                targetRecipe = await fetchRecipeById(Number(id)); 
+            } catch (err) {
+                setError("저장된 레시피 정보를 불러오지 못했습니다.");
+            }
+    }
+      
+      if (targetRecipe) {
+          setRecipe(targetRecipe);
+          
+          //  저장 상태 확인 
+          // 'TEMP-'로 시작하는 ID는 추천 레시피에서 온 임시 ID로 간주
+          const isTemporary = String(targetRecipe.id).startsWith("TEMP-");
+          
+          if (!isTemporary) {
+              // 저장된 레시피만 ID를 기반으로 isSaved를 체크
+              const recipeIdForCheck = Number(targetRecipe.id); 
+              const savedIds = getSavedRecipeIds(); 
+              setIsSaved(savedIds.includes(recipeIdForCheck));
+          } else {
+              // 임시 ID를 가진 레시피는 초기 상태를 '저장 안 됨'으로 설정
+              setIsSaved(false);
+          }
+      } else {
+          console.error("[Detail] 레시피 데이터를 찾을 수 없습니다.");
+          setError("레시피 데이터를 찾을 수 없습니다.");
       }
-    };
-    load();
-  }, [id]);
+
+      setLoading(false);
+    };
+    load();
+  }, [id, location.state]); // 의존성 배열에 id와 location.state 포함
+
+  //    try {
+  //       const data = await fetchRecipeById(Number(id));
+  //       setRecipe(data);
+
+  //       if (data) {
+  //         const savedIds = getSavedRecipeIds();
+  //         setIsSaved(savedIds.includes(Number(data.id)));
+  //       }
+
+  //     } catch (err) {
+  //       setError("레시피 정보를 불러오지 못했습니다.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   load();
+  // }, [id]);
 
   const handleToggleSave  = async () => {
     if (!recipe) return;

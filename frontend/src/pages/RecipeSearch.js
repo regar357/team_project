@@ -104,7 +104,7 @@ export default function RecipeSearch() {
               const priorityIngredients = safeJsonParseOrSplit(recipe.priority_used_ingredients);
               const otherIngredients = safeJsonParseOrSplit(recipe.other_ingredients);
               return {
-                id: recipe.recipe_id || recipe.id || String(Math.random()),
+                id: recipe.recipe_id || recipe.id || `TEMP-${index}`,
                 ...recipe,
                 priority_used_ingredients: priorityIngredients,
                 other_ingredients: otherIngredients,
@@ -204,7 +204,6 @@ export default function RecipeSearch() {
           {/* 추천 레시피 영역 */}
           <section className="recommend-section">
              <div className={`recommend-box ${results.length > 0 ? "no-header" : ""}`}>
-              {/* <h3 className="recommend-title">추천 레시피</h3> */}
                {/* 카드가 없을 때만 제목 표시 */}
                 {results.length === 0 && (
                   <h3 className="recommend-title">추천 레시피</h3>
@@ -236,7 +235,7 @@ export default function RecipeSearch() {
                 <Card key={recipe.id}>
                   <div
                     className="recommend-card"
-                    onClick={() => navigate(`/recipes/${recipe.id}`)}
+                    onClick={() => navigate(`/recipes/${recipe.id}`,{ state: { recipeData: recipe }})}
                   >
                     <div className="recommend-img-wrap">
                       <img
