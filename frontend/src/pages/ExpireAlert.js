@@ -1,54 +1,132 @@
 // src/pages/ExpireAlert.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../components/common/Card";
-import { fetchAlertHistory } from "../utils/api/alerts";
+import { fetchAlertHistory, createAlert } from "../utils/api/alerts";
 import "./ExpireAlert.css";
+
+// "D-3" / "D-2" / "D-day" → 숫자(3, 2, 0)로 변환
+const timingStringToDays = (timingString) => {
+  if (timingString === "D-day") return 0;
+  return parseInt(timingString.replace("D-", ""), 10);
+};
+
+function parseDateOnly(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/* 알림 날짜 계산 */
+function calculateAlertDate(expirationDateString, daysBefore) {
+    const expiryDate = parseDateOnly(expirationDateString);
+    expiryDate.setDate(expiryDate.getDate() - daysBefore); 
+    expiryDate.setHours(10, 0, 0, 0);
+
+    const pad = (num) => num.toString().padStart(2, '0'); 
+    
+     return `${expiryDate.getFullYear()}-${pad(
+        expiryDate.getMonth() + 1
+        )}-${pad(expiryDate.getDate())} ${pad(
+        expiryDate.getHours()
+        )}:${pad(expiryDate.getMinutes())}:${pad(expiryDate.getSeconds())}`;
+
+  }
+
+// 알림 생성 API 호출 핸들러
+async function handleUserAlertSetting(ingredientName, expirationDate, daysBefore) {
+    const ddayText = daysBefore === 0 ? "D-day" : `D-${daysBefore}`;
+    const message = `${ingredientName}의 유통기한이 ${ddayText} 남았습니다. (${expirationDate})`;
+    const alertDateString = calculateAlertDate(expirationDate, daysBefore);
+
+    console.log(`[${ingredientName}] 최종 알림 시점: ${alertDateString}`);
+
+    const success = await createAlert(message, alertDateString);
+
+    if (success) {
+        console.log("알림 설정이 완료되었습니다.");
+        return true;
+    } else {
+        console.error("알림 설정 실패.");
+        return false;
+    }
+}
+
+// ----------------- [ REACT COMPONENT ] -----------------
 
 const ExpireAlert = () => {
   const navigate = useNavigate();
-
-  // 알림 온/오프
   const [enabled, setEnabled] = useState(true);
-
-  // 선택된 시점 (D-3 / D-2 / D-day)
   const [timing, setTiming] = useState("D-3");
-  
-  
-  // 알림 기록 상태
   const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(false); 
 
-  React.useEffect(() => {
-    const loadHistory = async () => {
-      try {
-        const data = await fetchAlertHistory();
-        setHistory(data);
-      } catch (e) {
-        console.error("알림 기록 불러오기 실패:", e);
-      }
+  // 임시 더미 데이터
+  const DUMMY_FOOD_ITEM = { name: "양파", expiry: "2026-01-20" };
+  
+  // 알림 기록 
+  const loadHistory = async () => {
+        setLoading(true);
+        try {
+            const rawData = await fetchAlertHistory();
+            
+            const normalizedHistory = rawData.map(item => {
+              const id = item.alert_id ?? item.id;
+              const alertDate = item.alert_date ?? item.date ?? "";
+              const msg = item.alert_message ?? item.message ?? "";
+
+              const sentAt = alertDate ? String(alertDate).split(" ")[0].split("T")[0]: "날짜 미정";
+
+              const ddayMatch = msg.match(/D-(\d+|day)/);
+
+              return {id, sentAt, message:msg, dday: ddayMatch ? ddayMatch[0] : "",};
+          });
+            
+            setHistory(normalizedHistory);
+
+        } catch (e) {
+            console.error("알림 기록 불러오기 실패:", e);
+        } finally {
+            setLoading(false);
+        }
+  };
+
+  // 자동 저장 핸들러 함수 (API 호출 및 상태 업데이트)
+  const handleAutoSave = async (newTiming) => {
+        if (!enabled) {
+            console.warn("알림 수신이 비활성화되어 자동 저장을 건너뜁니다.");
+            return;
+        }
+        setTiming(newTiming); 
+
+        const days = timingStringToDays(newTiming);
+
+
+        const success = await handleUserAlertSetting(
+            DUMMY_FOOD_ITEM.name, 
+            DUMMY_FOOD_ITEM.expiry, 
+            days
+        );
+        
+    if (success) {
+            console.log(`알림 시점 설정 완료`);
+            await loadHistory(); 
+    } else {
+            console.error("자동 저장 실패. 이전 설정으로 되돌립니다.");
+        }
     };
-    loadHistory();
-  }, []);
 
-  // // 더미 알림 기록
-  // const history = [
-  //   { date: "2025.11.26", text: "2개의 식품 알림 전송" },
-  //   { date: "2025.11.25", text: "1개의 식품 알림 전송" },
-  //   { date: "2025.11.20", text: "3개의 식품 알림 전송" },
-  //   { date: "2025.11.18", text: "1개의 식품 알림 전송" },
-  // ];
+
+    
+    useEffect(() => {
+        loadHistory();
+    }, []);
+
+
 
   return (
     <div className="alert-page">
       {/* 상단 헤더 */}
       <header className="alert-header">
-        <button
-          className="alert-back-btn"
-          type="button"
-          onClick={() => navigate(-1)}
-        >
-          ←
-        </button>
         <h1 className="alert-title">유통기한 알림</h1>
       </header>
 
@@ -91,13 +169,14 @@ const ExpireAlert = () => {
             </div>
 
             <div className="alert-radio-group">
-              <label className="alert-radio">
+              <label className={`alert-radio ${!enabled ? "disabled" : ""}`}>
                 <input
                   type="radio"
                   name="alertTiming"
                   value="D-3"
                   checked={timing === "D-3"}
-                  onChange={(e) => setTiming(e.target.value)}
+                  onChange={(e) => handleAutoSave(e.target.value)}
+
                 />
                 <span className="alert-radio-mark" />
                 <span className="alert-radio-label">
@@ -105,13 +184,13 @@ const ExpireAlert = () => {
                 </span>
               </label>
 
-              <label className="alert-radio">
+              <label className={`alert-radio ${!enabled ? "disabled" : ""}`}>
                 <input
                   type="radio"
                   name="alertTiming"
                   value="D-2"
                   checked={timing === "D-2"}
-                  onChange={(e) => setTiming(e.target.value)}
+                  onChange={(e) => handleAutoSave(e.target.value)}
                 />
                 <span className="alert-radio-mark" />
                 <span className="alert-radio-label">
@@ -119,13 +198,13 @@ const ExpireAlert = () => {
                 </span>
               </label>
 
-              <label className="alert-radio">
+              <label className={`alert-radio ${!enabled ? "disabled" : ""}`}>
                 <input
                   type="radio"
                   name="alertTiming"
                   value="D-day"
                   checked={timing === "D-day"}
-                  onChange={(e) => setTiming(e.target.value)}
+                  onChange={(e) => handleAutoSave(e.target.value)}
                 />
                 <span className="alert-radio-mark" />
                 <span className="alert-radio-label">
@@ -136,16 +215,18 @@ const ExpireAlert = () => {
           </div>
         </Card>
 
+
         {/* 알림 기록 보기 */}
         <Card className="alert-card alert-log-card">
           <div className="alert-log-header">알림 기록 보기</div>
           <div className="alert-log-divider" />
-
+          {loading && <p className="alert-loading-text">기록을 불러오는 중...</p>}
           <ul className="alert-log-list">
+            {history.length === 0 && !loading && <li className="alert-log-empty">알림 기록이 없습니다.</li>}
             {history.map((item) => (
               <li key={item.id} className="alert-log-item">
                 <span className="alert-log-date">{item.sentAt}</span>
-                <span className="alert-log-text">{item.ingredientName}
+                <span className="alert-log-text">{item.message}
                   <span className="alert-log-dday">{item.dday}</span>
                 </span>
               </li>

@@ -1,103 +1,89 @@
-/* 오버레이 (검은 반투명 배경) */
-.sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.25);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-  z-index: 90;
-}
-.sidebar-overlay.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* 사이드바 */
+ /* 왼쪽 사이드바 전체 */
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 280px;
-  height: 100vh;
-  background: #ffffff;
-  border-right: 1px solid #e5e5e5;
-  transform: translateX(-100%);
-  transition: transform 0.2s ease-out;
-  z-index: 100;
+  width: 330px;
+  height: 100%;
+  background: #f9fafb;              /* 연한 회색 배경 */
+  border-right: 1px solid #e5e7eb;  /* 오른쪽 경계선 */
+  padding: 24px 16px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
 }
 
-.sidebar.open {
-  transform: translateX(0);
+/* 상단 타이틀 */
+.sidebar-header {
+  margin-bottom: 24px;
+  padding: 0 8px;
 }
-
-.sidebar-top {
-  height: 64px;
-  background: #ee6049;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
-
-/* 상단의 햄버거 버튼 */
-.sidebar-menu-btn {
-  border: none;
-  background: transparent;
-  padding: 0;
+.sidebar-logo {
+  font-size: 40px;
+  font-weight: 700;
+  padding: 10px 10px;
   cursor: pointer;
+  color: #ee6049;
+  margin-bottom: 10px;
 }
 
-/* nav 영역 */
+.sidebar-logo:hover {
+  opacity: 0.7;
+}
+
+
+/* 메뉴 리스트 */
 .sidebar-nav {
-  flex: 1;
-  padding: 8px 0;
-}
-
-/* 메인 메뉴 줄 하나 */
-.sidebar-item {
-  border-bottom: 1px solid #f5f5f5;
-}
-
-/* 메인 메뉴 버튼 */
-.sidebar-main-btn {
-  width: 100%;
-  padding: 14px 24px;
-  border: none;
-  background: transparent;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 16px;
-  cursor: pointer;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.sidebar-main-btn:hover {
-  background: #fff5ef;
-}
-
-.sidebar-arrow {
-  font-size: 12px;
-}
-
-/* 서브메뉴 영역 */
-.sidebar-sub-list {
-  padding-left: 24px;
-  background: #fff;
-}
-
-.sidebar-sub-btn {
+/* 각 메뉴 버튼 한 줄 */
+.sidebar-link {
   width: 100%;
-  padding: 10px 24px;
   border: none;
   background: transparent;
-  font-size: 15px;
-  text-align: left;
+  padding: 20px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   cursor: pointer;
+  font-size: 23px;
+  font-weight: 400;
+  color: #374151;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.sidebar-sub-btn:hover {
-  background: #fff1e7;
+/* 아이콘 동그란 배경 */
+.sidebar-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5edff;
+  color: #2563eb;
+  font-size: 18px;
 }
 
+.sidebar-label {
+  flex: 1;
+  text-align: left;
+}
+
+/* 호버 */
+.sidebar-link:hover {
+  background: #e5f0ff;
+  color: #1d4ed8;
+}
+
+/* 현재 페이지(active) 스타일 */
+.sidebar-link.active {
+  background: #e0ecff;
+  color: #1d4ed8;
+}
+
+.sidebar-link.active .sidebar-icon {
+  background: #2563eb;
+  color: #ffffff;
+}

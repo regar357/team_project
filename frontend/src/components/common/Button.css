@@ -12,6 +12,8 @@
 .btn.primary {
   background: #EE6049;
   color: white;
+  font-weight: 700;
+
 }
 .btn.primary:hover {
   background: #e65845;

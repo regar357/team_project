@@ -282,7 +282,7 @@ if __name__ == "__main__":
 
     이때 sys.argv[1] 에 JSON 문자열이 들어온다.
     """
-
+    sys.stdout.reconfigure(encoding='utf-8')
     # 1) 인자가 있는지 확인
     if len(sys.argv) < 2:
         error_payload = {"error": "JSON 인자가 없습니다. (sys.argv[1])"}

@@ -1,62 +1,63 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchSavedRecipes, deleteRecipe } from "../utils/api/recipe";
-import Card from "../components/common/Card";
+import { fetchSavedRecipes, deleteRecipe, toggleSaveRecipe,} from "../utils/api/recipe";
 import Button from "../components/common/Button";
 import "./RecipeSaved.css";
-
-const CATEGORIES = ["한식", "양식", "중식", "디저트", "기타"];
 
 const RecipeSaved = () => {
   const navigate = useNavigate();
 
   const [recipes, setRecipes] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([...CATEGORIES]);
   const [loading, setLoading] = useState(true);
   const [deleteMode, setDeleteMode] = useState(false);
   const [sortOrder, setSortOrder] = useState('등록순');
 
 
   useEffect(() => {
-    fetchSavedRecipes()
-      .then((data) => {
+     const load = async () => {
+      try {
+        const data = await fetchSavedRecipes(); 
         setRecipes(data);
-      })
-      .finally(() => setLoading(false));
+      } catch (e) {
+        console.error("보관함 레시피 로드 실패:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
-  const toggleCategory = (cat) => {
-    setSelectedCategories((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
-  };
 
   const handleDelete = async (id, e) => {
     e.stopPropagation();
-    await deleteRecipe(id);
-    setRecipes((prev) => prev.filter((r) => r.id !== id));
+    try {
+      await deleteRecipe(Number(id));    // 백엔드 삭제
+      toggleSaveRecipe(Number(id));      // 로컬 스토리지에서도 제거
+
+      setRecipes((prev) => prev.filter((r) => r.id !==(Number(id))));  
+    } catch (err) {
+      console.error(err);
+      alert("레시피 삭제 중 오류가 발생했습니다.");
+    }
   };
 
   const handleCardClick = (id) => {
-    navigate(`/recipes/${id}`);
+    if (!deleteMode) {
+      navigate(`/recipes/${id}`);
+    }
   };
   const handleSortChange = (e) => {
     setSortOrder(e.target.value);
   };
-  const filteredRecipes = recipes.filter((r) =>
-    selectedCategories.includes(r.category)
-  );
-  const sortedRecipes = filteredRecipes.slice().sort((a, b) => {
+ 
+  const sortedRecipes = recipes.slice().sort((a, b) => {
     if (sortOrder === '이름순') {
-      return a.title.localeCompare(b.title); 
+        return a.title.localeCompare(b.title); 
     }
-    return 0; 
-  });
-
-  if (loading) {
-    return <div className="saved-page">불러오는 중...</div>;
-  }
+     // 등록순
+    return new Date(b.created_at || b.id) - new Date(a.created_at || a.id);
+});
 
   return (
     <div className="saved-page">
@@ -66,28 +67,9 @@ const RecipeSaved = () => {
       </section>
 
       <div className="saved-layout">
-        {/* 왼쪽 필터 */}
-        <aside className="filter-panel">
-          <h3 className="filter-title">Filter<br />Options</h3>
-          <div className="filter-subtitle">By Categories</div>
+        
 
-          <ul className="filter-list">
-            {CATEGORIES.map((cat) => (
-              <li key={cat}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(cat)}
-                    onChange={() => toggleCategory(cat)}
-                  />
-                  <span>{cat}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
-        </aside>
-
-        {/* 오른쪽 리스트 */}
+        {/* 리스트 */}
         <section className="saved-content">
           <div className="saved-toolbar">
             <div className="list-count">
@@ -95,10 +77,15 @@ const RecipeSaved = () => {
             </div>
 
           <div className="toolbar-right">
-            <button 
-              className="icon-btn"
+            
+            <Button
+              type="primary"
+              size="sm"
+              full
+              className="saved-delete-btn"
               onClick={() => setDeleteMode(prev => !prev)}
-            > 🗑 </button>
+            > 삭제
+              </Button>
           
             <select 
               className="sort-select"
@@ -111,19 +98,17 @@ const RecipeSaved = () => {
           </div>
           </div>
 
+
+
           <div className="recipe-grid">
             {sortedRecipes.map((recipe) => (
-              <Card key={recipe.id}>
+              <div key={recipe.id}>
                 <div
-                  className="recipe-card"
+                  className={`recipe-card ${deleteMode ? "delete-mode" : ""}`}
                   onClick={() => handleCardClick(recipe.id)}
                 >
                   <div className="recipe-img-wrap">
-                    <img
-                      src={recipe.image_url}
-                      alt={recipe.title}
-                      className="recipe-img"
-                    />
+                    <img src={recipe.image_url} alt={recipe.title} />
                   </div>
                   <div className="recipe-title">{recipe.title}</div>
                 </div>
@@ -133,18 +118,18 @@ const RecipeSaved = () => {
                     type="primary"
                     size="sm"
                     full
+                    className="delete-btn"
+
                     onClick={(e) => handleDelete(recipe.id, e)}
                   > 삭제
                   </Button>
                 )}
-              </Card>
-            ))}
-
-            {filteredRecipes.length === 0 && (
-              <div className="empty">
-                선택한 카테고리에 저장된 레시피가 없습니다.
               </div>
+            ))}
+            {sortedRecipes.length === 0 && !loading && (
+              <div className="empty"> 저장된 레시피가 없습니다.</div>
             )}
+            
           </div>
         </section>
       </div>

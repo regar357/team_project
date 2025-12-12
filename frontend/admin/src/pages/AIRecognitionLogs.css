@@ -1,0 +1,397 @@
+/* src/pages/AIRecognitionLogs.css */
+
+.ai-logs {
+  padding: 32px; /* p-8 */
+}
+
+/* 헤더 */
+.ai-logs-header {
+  margin-bottom: 32px; /* mb-8 */
+}
+
+.ai-logs-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827; /* gray-900 */
+  margin-bottom: 8px;
+}
+
+.ai-logs-description {
+  font-size: 0.95rem;
+  color: #4b5563; /* gray-600 */
+}
+
+/* 메인 카드 */
+.ai-logs-card {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb; /* gray-200 */
+}
+
+/* 상단 툴바 */
+.ai-logs-toolbar {
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ai-logs-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ai-logs-select {
+  padding: 8px 16px;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db; /* gray-300 */
+  font-size: 0.9rem;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ai-logs-select:focus {
+  border-color: #3b82f6; /* blue-500 */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+/* 필터 버튼 */
+.ai-logs-filter-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ai-logs-filter-button:hover {
+  background-color: #f9fafb; /* gray-50 */
+}
+
+.ai-logs-filter-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 로그 내보내기 버튼 */
+.ai-logs-export-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 0.5rem;
+  border: none;
+  background-color: #2563eb; /* blue-600 */
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ai-logs-export-button:hover {
+  background-color: #1d4ed8; /* blue-700 */
+}
+
+.ai-logs-export-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 테이블 */
+.ai-logs-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.ai-logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.ai-logs-table thead {
+  background-color: #f9fafb; /* gray-50 */
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ai-logs-table th {
+  text-align: left;
+  padding: 12px 24px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151; /* gray-700 */
+  white-space: nowrap;
+}
+
+.ai-logs-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s ease;
+}
+
+.ai-logs-table tbody tr:hover {
+  background-color: #f9fafb; /* gray-50 */
+}
+
+.ai-logs-table td {
+  padding: 12px 24px;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.cell-strong {
+  color: #111827;
+}
+
+.cell-muted {
+  color: #4b5563;
+}
+
+/* 인식된 식품 요약 */
+.ai-logs-detected {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ai-logs-detected-summary {
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.ai-logs-detected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ai-logs-detected-tag {
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  background-color: #eff6ff; /* blue-50 */
+  color: #1d4ed8;            /* blue-700 */
+}
+
+.ai-logs-detected-tag.more {
+  background-color: #f3f4f6; /* gray-100 */
+  color: #4b5563;
+}
+
+.ai-logs-detected-empty {
+  font-size: 0.9rem;
+  color: #6b7280; /* gray-500 */
+}
+
+/* 상태 배지 */
+.log-status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+}
+
+.log-status-chip.success {
+  background-color: #dcfce7; /* green-100 */
+  color: #15803d;            /* green-700 */
+}
+
+.log-status-chip.fail {
+  background-color: #fee2e2; /* red-100 */
+  color: #b91c1c;            /* red-700 */
+}
+
+/* 상세 버튼 */
+.ai-logs-detail-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 0.5rem;
+  border: none;
+  background-color: transparent;
+  font-size: 0.85rem;
+  color: #2563eb;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ai-logs-detail-button:hover {
+  background-color: #eff6ff; /* blue-50 */
+}
+
+.ai-logs-detail-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 하단 푸터 / 페이지네이션 */
+.ai-logs-footer {
+  padding: 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-logs-count {
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.ai-logs-pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-button {
+  padding: 8px 16px;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background-color: transparent;
+}
+
+.page-button.ghost {
+  border-color: #d1d5db;
+  color: #374151;
+  transition: background-color 0.15s ease;
+}
+
+.page-button.ghost:hover {
+  background-color: #f9fafb;
+}
+
+.page-button.active {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* 상세 카드 그리드 */
+.ai-logs-detail-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .ai-logs-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ai-logs-detail-card {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 24px;
+}
+
+/* 상세 카드 헤더 */
+.ai-logs-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.ai-logs-detail-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.ai-logs-detail-time {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.ai-logs-detail-chip {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background-color: #dcfce7;
+  color: #15803d;
+  font-size: 0.8rem;
+}
+
+/* 상세 내용 */
+.ai-logs-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-logs-detail-label {
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.ai-logs-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.ai-logs-detail-row:last-child {
+  border-bottom: none;
+}
+
+.ai-logs-detail-item-name {
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.ai-logs-detail-conf {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.confidence-track {
+  width: 80px;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: #e5e7eb;
+  overflow: hidden;
+}
+
+.confidence-bar {
+  height: 100%;
+  border-radius: 9999px;
+}
+
+/* 정확도 색상 */
+.confidence-bar.high {
+  background-color: #22c55e; /* green-500 */
+}
+
+.confidence-bar.medium {
+  background-color: #eab308; /* yellow-500 */
+}
+
+.confidence-bar.low {
+  background-color: #f97316; /* orange-500 */
+}
+
+.ai-logs-detail-conf-value {
+  font-size: 0.85rem;
+  color: #4b5563;
+}

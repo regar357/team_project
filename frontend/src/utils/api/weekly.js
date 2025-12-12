@@ -12,7 +12,7 @@ export const WEEKLY_RECIPES = {
     {
       id: 2,
       title: "Egg scramble",
-      tags: ["다이어트", "고단백", "양식"],
+      tags: ["다이어트", "고단백","양식"],
       image_url: "/images/egg.png",
     },
     {
@@ -24,7 +24,7 @@ export const WEEKLY_RECIPES = {
     {
       id: 4,
       title: "Egg scramble",
-      tags: ["다이어트", "고단백", "양식"],
+      tags: ["다이어트", "고단백"],
       image_url: "/images/egg.png",
     },
     {
