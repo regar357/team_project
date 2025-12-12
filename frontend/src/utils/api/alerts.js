@@ -64,18 +64,21 @@ export async function fetchAlertHistory() {
             throw new Error(`알림 기록 조회 실패: ${response.status} 상태`);
         }
 
-        const rawAlerts = await response.json();
-        
-        console.log(`[API GET] ${API_ENDPOINT} 응답 성공:`, rawAlerts); 
+        const data = await response.json();
+        console.log("[fetchAlertHistory] raw response:", data);
 
-        if (!Array.isArray(rawAlerts)) {
-             console.warn("API 응답 형식이 배열이 아닙니다.");
-             return [];
-        }
-        return rawAlerts;
+        
+        if (Array.isArray(data)) return data;
+
+        if (data && Array.isArray(data.alerts)) return data.alerts;
+
+        if (data && Array.isArray(data.data)) return data.data;
+
+        console.warn("[fetchAlertHistory] API 응답이 배열 형태가 아닙니다:", data);
+        return [];
 
     } catch (error) {
-        console.error(`[API GET] ${API_ENDPOINT} 처리 중 오류 발생:`, error);         
+        console.error("[fetchAlertHistory] 오류:", error);
         return [];
     }
 }
