@@ -30,24 +30,24 @@ const dummyAlertHistory = [
 ];
 
 
-// ==== 실제 API 대신 더미 데이터 반환 ====
-export async function fetchAlertHistory() {
-  console.log("[DUMMY] fetchAlertHistory 호출됨");
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(dummyAlertHistory), 300); // 약간의 로딩 느낌
-  });
-}
+// // ==== 실제 API 대신 더미 데이터 반환 ====
+// export async function fetchAlertHistory() {
+//   console.log("[DUMMY] fetchAlertHistory 호출됨");
+//   return new Promise((resolve) => {
+//     setTimeout(() => resolve(dummyAlertHistory), 300); // 약간의 로딩 느낌
+//   });
+// }
 
-// ==== 알림 생성도 더미 처리 ====
-export async function createAlert(message, date) {
-  console.log("[DUMMY] createAlert 호출됨:");
-  console.log("message:", message);
-  console.log("date:", date);
+// // ==== 알림 생성도 더미 처리 ====
+// export async function createAlert(message, date) {
+//   console.log("[DUMMY] createAlert 호출됨:");
+//   console.log("message:", message);
+//   console.log("date:", date);
 
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(true), 300);
-  });
-}
+//   return new Promise((resolve) => {
+//     setTimeout(() => resolve(true), 300);
+//   });
+// }
 
 
 /* API 연동 */
