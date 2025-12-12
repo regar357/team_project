@@ -99,7 +99,7 @@ export default function RecipeSearch() {
         
 
 /* 데이터 가공 */        
-        const processedRecipes = rawDataToProcess.map(recipe => {
+        const processedRecipes = rawDataToProcess.map((recipe,index) => {
             try {
               const priorityIngredients = safeJsonParseOrSplit(recipe.priority_used_ingredients);
               const otherIngredients = safeJsonParseOrSplit(recipe.other_ingredients);
