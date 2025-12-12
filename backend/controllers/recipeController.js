@@ -101,7 +101,7 @@ exports.saveRecipe = async (req, res) => {
     category,
   } = req.body;
 
-  console.log(recipe_title);
+  console.log(priority_used_ingredients, other_ingredients);
 
   try {
     await pool.query(
