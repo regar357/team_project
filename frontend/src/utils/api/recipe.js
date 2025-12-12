@@ -47,7 +47,7 @@ export function safeJsonParseOrSplit(dataString) {
     const parsed = JSON.parse(dataString);
     if (Array.isArray(parsed)) return parsed;
   } catch (e) {}
-  
+
   return dataString
     .split(",")
     .map((item) => item.trim())
@@ -177,7 +177,8 @@ export async function fetchSavedRecipes() {
 
 /* API 레시피 상세 조회 */
 export async function fetchRecipeById(id) {
-  const API_ENDPOINT = `/recipe/list/${id}`;
+  const endpointId = id;
+  const API_ENDPOINT = `/recipe/list/${endpointId}`;
 
   try {
     const response = await fetch(API_ENDPOINT);

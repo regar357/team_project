@@ -27,8 +27,7 @@ export default function RecipeDetail() {
        } else {
          console.log(`[Detail] DB에서 레시피 ID ${id} 조회 시작.`);
             try {
-                // 저장된 레시피는 ID가 숫자로 가정하여 조회
-                targetRecipe = await fetchRecipeById(Number(id)); 
+                targetRecipe = await fetchRecipeById(id); 
             } catch (err) {
                 setError("저장된 레시피 정보를 불러오지 못했습니다.");
             }
@@ -60,23 +59,6 @@ export default function RecipeDetail() {
     load();
   }, [id, location.state]); // 의존성 배열에 id와 location.state 포함
 
-  //    try {
-  //       const data = await fetchRecipeById(Number(id));
-  //       setRecipe(data);
-
-  //       if (data) {
-  //         const savedIds = getSavedRecipeIds();
-  //         setIsSaved(savedIds.includes(Number(data.id)));
-  //       }
-
-  //     } catch (err) {
-  //       setError("레시피 정보를 불러오지 못했습니다.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   load();
-  // }, [id]);
 
   const handleToggleSave  = async () => {
     if (!recipe) return;
@@ -164,14 +146,14 @@ export default function RecipeDetail() {
           <div className="detail-box">
             <h2 className="detail-section-title">조리 순서</h2>
             <div className="log-divider" />
-            <ol className="detail-steps">
+            <div className="detail-steps">
               {recipe.steps?.map((step, idx) => (
-                <li key={idx}>
+                <div key={idx} className="step-item">
                   <span className="step-number">{idx + 1}</span>
                   <span className="step-text">{step}</span>
-                </li>
+                </div>
               ))}
-            </ol>
+            </div>
           </div>
         </div>
       </div>
