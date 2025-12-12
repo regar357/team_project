@@ -10,7 +10,6 @@ export default function RecipeSearch() {
   const navigate = useNavigate();
 
   const [ingredients, setIngredients] = useState([]);
-
   const [selected, setSelected] = useState([]);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,9 +31,11 @@ export default function RecipeSearch() {
   const sortedIngredients = [...ingredients].sort((a, b) => {
     if (sortMode === "name") {
       return a.name.localeCompare(b.name, "ko-KR");
-    }
+    }      
+    // 유통기한 임박순 (가장 빠른 날짜 먼저)
     if (sortMode === "expire") {
-      // 유통기한 임박순 (가장 빠른 날짜 먼저)
+      if (!a.expireAt) return 1;
+      if (!b.expireAt) return -1;
       return new Date(a.expireAt) - new Date(b.expireAt);
     }
     // 등록순: id 기준 오름차순 (food_id)
@@ -46,26 +47,17 @@ export default function RecipeSearch() {
   );
 
   // 재료 선택 토글
-  const toggleIngredient = (item) => {
+  const toggleIngredient = (name) => {
     setSelected((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+      prev.includes(name) ? prev.filter((i) => i !== name) : [...prev, name]
     );
   };
 
   // 오른쪽 태그(✕) 클릭 시 선택 해제
-  const removeSelected = (item) => {
-    setSelected((prev) => prev.filter((i) => i !== item));
+  const removeSelected = (name) => {
+    setSelected((prev) => prev.filter((i) => i !== name));
   };
 
-  // const handleSearch = async () => {
-  //   try {
-  //     const data = await searchRecipesByIngredients(selected);
-  //     setResults(data); 
-  //   } catch (error) {
-  //     //  에러 처리
-  //   } finally {
-  //   }
-  // };
 
   const handleSearch = async () => {
     setLoading(true);
@@ -78,12 +70,7 @@ export default function RecipeSearch() {
         const apiResponse = await searchRecipesByIngredients(selected);
         
         let rawDataToProcess = [];
-
-        // if (apiResponse && apiResponse.recipe && typeof apiResponse.recipe === 'object') {
-        //     rawDataToProcess = [apiResponse.recipe]; 
-        //     console.log("[DEBUG] 응답 객체에서 단일 레시피 추출 완료.");
-            
-        // } else 
+ 
         if (Array.isArray(apiResponse)) {
             rawDataToProcess = apiResponse;
             console.log(`[DEBUG 2] 응답이 이미 배열입니다. 처리 항목 수: ${apiResponse.length}`);
@@ -108,19 +95,11 @@ export default function RecipeSearch() {
                         : [],
                     other_ingredients: recipe.other_ingredients 
                         ? JSON.parse(recipe.other_ingredients) 
-                        : [],
-                    recipe_steps: recipe.recipe_steps 
-                        ? JSON.parse(recipe.recipe_steps) 
-                        : [],
-                    recipe_tips: recipe.recipe_tips 
-                        ? JSON.parse(recipe.recipe_tips) 
-                        : [],
-                    
-                    
+                        : [],    
                     title: recipe.recipe_title || recipe.title || '제목 없음', 
-                        tags: recipe.priority_used_ingredients 
-                            ? JSON.parse(recipe.priority_used_ingredients).slice(0, 3) 
-                            : []
+                    tags: recipe.priority_used_ingredients 
+                        ? JSON.parse(recipe.priority_used_ingredients).slice(0, 3) 
+                        : []
                 };
             } catch (e) {
                 console.error("레시피 JSON 파싱 오류:", e, recipe);

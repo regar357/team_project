@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  fetchRecipeById,
-  toggleSaveRecipe,
-  getSavedRecipeIds,
-} from "../utils/api/recipe";
+import { fetchRecipeById, toggleRecipeSave, getSavedRecipeIds } from "../utils/api/recipe";
 import "./RecipeDetail.css";
 
 export default function RecipeDetail() {
@@ -16,28 +12,20 @@ export default function RecipeDetail() {
   const [error, setError] = useState("");
   const [isSaved, setIsSaved] = useState(false);
 
-  /* -------------------------
-      LOAD RECIPE DETAILS
-  -------------------------- */
+  /* LOAD RECIPE DETAILS */
   useEffect(() => {
     const load = async () => {
-      try {
+     try {
         const data = await fetchRecipeById(Number(id));
         setRecipe(data);
 
         if (data) {
-          console.log("--- 상세 레시피 데이터 확인 ---");
-          console.log(`Tips 항목 수: ${data.tips?.length}`);
-          console.log(
-            `주요 식재료 항목 수: ${data.priority_used_ingredients?.length}`
-          );
-          console.log(`기타 식재료 항목 수: ${data.other_ingredients?.length}`);
           const savedIds = getSavedRecipeIds();
-          setIsSaved(savedIds.includes(data.id));
+          setIsSaved(savedIds.includes(Number(data.id)));
         }
-      } catch (e) {
-        setError("레시피를 불러오지 못했습니다.");
-        console.error("레시피 로드 오류:", e);
+
+      } catch (err) {
+        setError("레시피 정보를 불러오지 못했습니다.");
       } finally {
         setLoading(false);
       }
@@ -45,10 +33,10 @@ export default function RecipeDetail() {
     load();
   }, [id]);
 
-  const toggleSave = () => {
+  const handleToggleSave  = async () => {
     if (!recipe) return;
-    toggleSaveRecipe(recipe.id);
-    setIsSaved((prev) => !prev);
+    const next = await toggleRecipeSave(recipe, isSaved);
+    setIsSaved(next);
   };
 
   if (loading) return <div className="detail-page">불러오는 중...</div>;
@@ -85,7 +73,7 @@ export default function RecipeDetail() {
             <h1 className="detail-title">{recipe.title}</h1>
             <button
               className={`heart-btn ${isSaved ? "saved" : ""}`}
-              onClick={toggleSave}
+              onClick={handleToggleSave}
             >
               {isSaved ? "♥" : "♡"}
             </button>
