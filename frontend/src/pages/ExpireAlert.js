@@ -72,13 +72,13 @@ const ExpireAlert = () => {
             const normalizedHistory = rawData.map(item => {
               const id = item.alert_id ?? item.id;
               const alertDate = item.alert_date ?? item.date ?? "";
-              const message = item.alert_message ?? item.message ?? "";
+              const msg = item.alert_message ?? item.message ?? "";
 
               const sentAt = alertDate ? String(alertDate).split(" ")[0].split("T")[0]: "날짜 미정";
 
-              const ddayMatch = message.match(/D-(\d+|day)/);
+              const ddayMatch = msg.match(/D-(\d+|day)/);
 
-              return {id, sentAt, message, dday: ddayMatch ? ddayMatch[0] : "",};
+              return {id, sentAt, message:msg, dday: ddayMatch ? ddayMatch[0] : "",};
           });
             
             setHistory(normalizedHistory);
@@ -127,13 +127,6 @@ const ExpireAlert = () => {
     <div className="alert-page">
       {/* 상단 헤더 */}
       <header className="alert-header">
-        {/* <button
-          className="alert-back-btn"
-          type="button"
-          onClick={() => navigate(-1)}
-        >
-          ←
-        </button>  */}
         <h1 className="alert-title">유통기한 알림</h1>
       </header>
 
@@ -233,7 +226,7 @@ const ExpireAlert = () => {
             {history.map((item) => (
               <li key={item.id} className="alert-log-item">
                 <span className="alert-log-date">{item.sentAt}</span>
-                <span className="alert-log-text">{item.ingredientName}
+                <span className="alert-log-text">{item.message}
                   <span className="alert-log-dday">{item.dday}</span>
                 </span>
               </li>
