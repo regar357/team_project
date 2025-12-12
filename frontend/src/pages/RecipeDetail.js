@@ -27,7 +27,7 @@ export default function RecipeDetail() {
        } else {
          console.log(`[Detail] DB에서 레시피 ID ${id} 조회 시작.`);
             try {
-                targetRecipe = await fetchRecipeById(id); 
+                targetRecipe = await fetchRecipeById(Number(id)); 
             } catch (err) {
                 setError("저장된 레시피 정보를 불러오지 못했습니다.");
             }
@@ -77,6 +77,7 @@ export default function RecipeDetail() {
   const allIngredients = [
     ...(recipe.priority_used_ingredients || []),
     ...(recipe.other_ingredients || []),
+    ...(Array.isArray(recipe.ingredients) ? recipe.ingredients : []),
   ];
 
   return (
@@ -118,7 +119,7 @@ export default function RecipeDetail() {
           <div className="tip-section">
             <h2 className="tip-title">TIP</h2>
             <ul className="tip-list">
-              {recipe.tips?.map((tip, idx) => (
+              {Array.isArray(recipe.tips) && recipe.tips.map((tip, idx) => (
                 <li key={idx}>{tip}</li>
               ))}
             </ul>
