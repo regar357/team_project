@@ -212,14 +212,20 @@ export async function fetchRecipeById(id) {
         title: rawRecipe.recipe_title,
         description: rawRecipe.recipe_description,
 
-        priority_used_ingredients: safeJsonParseOrSplit(rawRecipe.priority_used_ingredients),
-        other_ingredients:safeJsonParseOrSplit( rawRecipe.other_ingredients),
+        // priority_used_ingredients: safeJsonParseOrSplit(rawRecipe.priority_used_ingredients),
+        // other_ingredients:safeJsonParseOrSplit( rawRecipe.other_ingredients),
+        priority_used_ingredients: Array.isArray(rawRecipe.priority_used_ingredients)
+            ? rawRecipe.priority_used_ingredients
+            : safeJsonParseOrSplit(rawRecipe.priority_used_ingredients),
+            
+        other_ingredients: Array.isArray(rawRecipe.other_ingredients)
+            ? rawRecipe.other_ingredients
+            : safeJsonParseOrSplit(rawRecipe.other_ingredients),
         steps: safeJsonParseOrSplit(rawRecipe.recipe_steps),
         tips:safeJsonParseOrSplit( rawRecipe.recipe_tips),
 
         servings: rawRecipe.servings,
         created_at: rawRecipe.created_at,
-
         image_url: rawRecipe.image_url ?? "/images/default_recipe.png",
 
         // isSaved: getSavedRecipeIds().includes(rawRecipe.recipe_id),
