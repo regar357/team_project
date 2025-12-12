@@ -41,12 +41,13 @@ export const RECIPES = [
 ];
 
 /* api 연동 */
-function safeJsonParseOrSplit(dataString) {
+export function safeJsonParseOrSplit(dataString) {
   if (!dataString || typeof dataString !== "string") return [];
   try {
     const parsed = JSON.parse(dataString);
     if (Array.isArray(parsed)) return parsed;
   } catch (e) {}
+  
   return dataString
     .split(",")
     .map((item) => item.trim())

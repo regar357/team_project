@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { searchRecipesByIngredients } from "../utils/api/recipe";
+import { searchRecipesByIngredients,safeJsonParseOrSplit } from "../utils/api/recipe";
 import { fetchIngredients } from "../utils/api/ingredients";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
@@ -59,6 +59,19 @@ export default function RecipeSearch() {
   };
 
 
+  const parseMaybeArray = (v) => {
+  if (!v) return [];
+  if (Array.isArray(v)) return v;               
+  if (typeof v === "string") {
+    try {
+      const parsed = JSON.parse(v);
+      if (Array.isArray(parsed)) return parsed;
+    } catch (e) {}
+    return v.split(",").map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
   const handleSearch = async () => {
     setLoading(true);
     setHasSearched(true);
@@ -88,20 +101,17 @@ export default function RecipeSearch() {
 /* 데이터 가공 */        
         const processedRecipes = rawDataToProcess.map(recipe => {
             try {
-                return {
-                    ...recipe,
-                    priority_used_ingredients: recipe.priority_used_ingredients 
-                        ? JSON.parse(recipe.priority_used_ingredients) 
-                        : [],
-                    other_ingredients: recipe.other_ingredients 
-                        ? JSON.parse(recipe.other_ingredients) 
-                        : [],    
-                    title: recipe.recipe_title || recipe.title || '제목 없음', 
-                    tags: recipe.priority_used_ingredients 
-                        ? JSON.parse(recipe.priority_used_ingredients).slice(0, 3) 
-                        : []
-                };
-            } catch (e) {
+              const priorityIngredients = safeJsonParseOrSplit(recipe.priority_used_ingredients);
+              const otherIngredients = safeJsonParseOrSplit(recipe.other_ingredients);
+              return {
+                id: recipe.recipe_id || recipe.id || String(Math.random()),
+                ...recipe,
+                priority_used_ingredients: priorityIngredients,
+                other_ingredients: otherIngredients,
+                title: recipe.recipe_title || recipe.title || '제목 없음', 
+                tags: priorityIngredients.slice(0, 3)
+              };
+            }catch (e) {
                 console.error("레시피 JSON 파싱 오류:", e, recipe);
                 return null;
             }

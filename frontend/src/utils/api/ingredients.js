@@ -68,60 +68,57 @@ export const INGREDIENTS = [
   },
 ];
 
-// // 전체 목록
-// export async function fetchIngredients() {
-//   await new Promise((r) => setTimeout(r, 200)); // 시연용 딜레이
-//   return INGREDIENTS;
-// }
-// // export function fetchIngredients() {
-// //   return fetchIngredientList();
-// // }
+// 전체 목록
+export async function fetchIngredients() {
+  await new Promise((r) => setTimeout(r, 200));
+  return INGREDIENTS;
+}
 
-// // 이름으로 검색 (레시피 찾기 search)
-// export function searchIngredientsByName(keyword) {
-//   const lower = keyword.trim().toLowerCase();
-//   if (!lower) return Promise.resolve(INGREDIENTS);
+// 이름으로 검색 (레시피 찾기 search)
+export function searchIngredientsByName(keyword) {
+  const lower = keyword.trim().toLowerCase();
+  if (!lower) return Promise.resolve(INGREDIENTS);
 
-//   const filtered = INGREDIENTS.filter((item) =>
-//     item.name.toLowerCase().includes(lower)
-//   );
-//   return Promise.resolve(filtered);
-// }
+  const filtered = INGREDIENTS.filter((item) =>
+    item.name.toLowerCase().includes(lower)
+  );
+  return Promise.resolve(filtered);
+}
 
 
 // src/api/ingredients.js
 
-const BASE_URL = "http://localhost:3001";
+// const BASE_URL = "http://localhost:3001";
 
-// 전체 식재료 목록 가져오기
-export async function fetchIngredients() {
-  try {
-    const response = await fetch(`${BASE_URL}/ingredients`);
-    if (!response.ok) {
-      throw new Error("식재료 목록 불러오기 실패");
-    }
-    const rows = await response.json();
+// // 전체 식재료 목록 가져오기
+// export async function fetchIngredients() {
+//   try {
+//     const response = await fetch(`${BASE_URL}/ingredients`);
+//     if (!response.ok) {
+//       throw new Error("식재료 목록 불러오기 실패");
+//     }
+//     const rows = await response.json();
 
-    // 백엔드 컬럼명을 프론트용 필드로 매핑
-    return rows.map((row) => ({
-      id: row.food_id,             
-      name: row.food_name,         
-      expireAt: row.food_Ex,      
-    }));
-  } catch (error) {
-    console.error("[fetchIngredients] 오류:", error);
-    throw error;
-  }
-}
+//     // 백엔드 컬럼명을 프론트용 필드로 매핑
+//     return rows.map((row) => ({
+//       id: row.food_id,             
+//       name: row.food_name,         
+//       expireAt: row.food_Ex,      
+//     }));
+//   } catch (error) {
+//     console.error("[fetchIngredients] 오류:", error);
+//     throw error;
+//   }
+// }
 
-// 식재료 검색 (레시피 찾기 페이지에서 사용)
-export async function searchIngredientsByName(keyword) {
+// // 식재료 검색 (레시피 찾기 페이지에서 사용)
+// export async function searchIngredientsByName(keyword) {
 
-  const all = await fetchIngredients();
-  const lower = keyword.trim().toLowerCase();
-  if (!lower) return all;
+//   const all = await fetchIngredients();
+//   const lower = keyword.trim().toLowerCase();
+//   if (!lower) return all;
 
-  return all.filter((item) =>
-    item.name.toLowerCase().includes(lower)
-  );
-}
+//   return all.filter((item) =>
+//     item.name.toLowerCase().includes(lower)
+//   );
+// }
