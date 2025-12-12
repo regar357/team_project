@@ -1,5 +1,5 @@
 // src/pages/AIRecognitionLogs.js
-import { Filter, Download, Eye } from 'lucide-react';
+import { Filter, Download } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import './AIRecognitionLogs.css';
 
@@ -27,7 +27,6 @@ export function AIRecognitionLogs() {
   //     ],
   //     totalItems: 4,
   //     status: '성공',
-  //     processingTime: '2.3초',
   //   },
   //   {
   //     id: 2,
@@ -40,7 +39,6 @@ export function AIRecognitionLogs() {
   //     ],
   //     totalItems: 3,
   //     status: '성공',
-  //     processingTime: '1.8초',
   //   },
   //   {
   //     id: 3,
@@ -52,7 +50,6 @@ export function AIRecognitionLogs() {
   //     ],
   //     totalItems: 2,
   //     status: '성공',
-  //     processingTime: '1.5초',
   //   },
   //   {
   //     id: 4,
@@ -61,7 +58,6 @@ export function AIRecognitionLogs() {
   //     detectedItems: [],
   //     totalItems: 0,
   //     status: '실패',
-  //     processingTime: '3.2초',
   //   },
   //   {
   //     id: 5,
@@ -76,7 +72,6 @@ export function AIRecognitionLogs() {
   //     ],
   //     totalItems: 5,
   //     status: '성공',
-  //     processingTime: '2.7초',
   //   },
   // ];
 
@@ -103,7 +98,7 @@ export function AIRecognitionLogs() {
         if (!res.ok) throw new Error('API 응답 오류');
 
         // 🔸 백엔드에서 반환하는 형식은
-        // [{ id, timestamp, refrigeratorImage, detectedItems, totalItems, status, processingTime }, ...]
+        // [{ id, timestamp, refrigeratorImage, detectedItems, totalItems, status }, ...]
         // 라고 가정
         const data = await res.json();
 
@@ -194,7 +189,6 @@ export function AIRecognitionLogs() {
       'refrigeratorImage',
       'totalItems',
       'status',
-      'processingTime',
     ];
     const rows = filteredLogs.map((log) => [
       log.id,
@@ -202,7 +196,6 @@ export function AIRecognitionLogs() {
       log.refrigeratorImage,
       log.totalItems,
       log.status,
-      log.processingTime,
     ]);
 
     const csvContent = [header, ...rows].map((row) => row.join(',')).join('\n');
@@ -280,9 +273,7 @@ export function AIRecognitionLogs() {
                 <th>시간</th>
                 <th>냉장고 이미지</th>
                 <th>인식된 식품</th>
-                <th>처리 시간</th>
                 <th>상태</th>
-                <th>작업</th>
               </tr>
             </thead>
             <tbody>
@@ -330,25 +321,12 @@ export function AIRecognitionLogs() {
                       </span>
                     )}
                   </td>
-                  <td className="cell-muted">{log.processingTime}</td>
                   <td>
                     <span className={getStatusChipClass(log.status)}>
                       {log.status}
                     </span>
                   </td>
-                  <td>
-                    <button
-                      className="ai-logs-detail-button"
-                      onClick={() =>
-                        window.alert(
-                          `"${log.refrigeratorImage}" 상세 보기 (추후 구현)`
-                        )
-                      }
-                    >
-                      <Eye className="ai-logs-detail-icon" />
-                      <span>상세</span>
-                    </button>
-                  </td>
+                 
                 </tr>
                 );
               })}
@@ -399,11 +377,7 @@ export function AIRecognitionLogs() {
                   <h3 className="ai-logs-detail-title">
                     {log.refrigeratorImage || '냉장고 이미지'}
                   </h3>
-                  <p className="ai-logs-detail-time">
-                    {log.timestamp
-                        ? String(log.timestamp).replace('T', ' ')
-                        : '-'}
-                  </p>
+                
                 </div>
                 <span className="ai-logs-detail-chip">
                   {totalItems}개 인식

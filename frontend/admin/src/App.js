@@ -4,8 +4,7 @@ import { Sidebar } from './pages/Sidebar.js';
 import { Dashboard } from './pages/Dashboard.js';
 import { Ingredients } from './pages/Ingredients.js';
 import { AIRecognitionLogs } from './pages/AIRecognitionLogs.js';
-import { Recipes } from './pages/Recipes.js';
-import { System } from './pages/System.js';
+
 import './App.css';
 
 export default function App() {
@@ -19,10 +18,6 @@ export default function App() {
         return <Ingredients />;
       case 'ai-logs':
         return <AIRecognitionLogs />;
-      case 'recipes':
-        return <Recipes />;
-      case 'system':
-        return <System />;
       default:
         return <Dashboard />;
     }

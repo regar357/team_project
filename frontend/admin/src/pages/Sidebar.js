@@ -1,14 +1,13 @@
 // src/pages/Sidebar.js
-import { LayoutDashboard, Package, Brain, ChefHat, Settings } from 'lucide-react';
-import './Sidebar.css'; // ⭐ 스타일 분리
+import { LayoutDashboard, Package, Brain, } from 'lucide-react';
+import './Sidebar.css'; 
 
 export function Sidebar({ currentPage, onPageChange }) {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'ingredients', label: 'Ingredients', icon: Package },
     { id: 'ai-logs', label: 'AI Recognition Logs', icon: Brain },
-    { id: 'recipes', label: 'Recipes', icon: ChefHat },
-    { id: 'system', label: 'System', icon: Settings },
+
   ];
 
   return (

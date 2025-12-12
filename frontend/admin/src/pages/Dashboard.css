@@ -2,24 +2,27 @@
 
 /* 전체 컨테이너 */
 .dashboard {
-  padding: 32px; /* p-8 */
+  padding: 32px; 
+  max-width: 1000px;      /* 컨텐츠 폭 제한 */
+  margin: 0 auto;        /* 가운데 정렬 */
+  min-height: 100vh;     /* 세로로도 어느 정도 채우기 */
 }
 
 /* 헤더 영역 */
 .dashboard-header {
-  margin-bottom: 32px; /* mb-8 */
+  margin-bottom: 32px; 
 }
 
 .dashboard-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #111827; /* text-gray-900 */
+  color: #111827;
   margin-bottom: 8px;
 }
 
 .dashboard-description {
   font-size: 0.95rem;
-  color: #4b5563; /* text-gray-600 */
+  color: #4b5563;
 }
 
 /* 로딩 메시지 */
@@ -33,61 +36,50 @@
 .dashboard-stats-grid {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 24px; /* gap-6 */
+  gap: 24px; 
   margin-bottom: 32px;
 }
 
-/* 반응형 (md=2, lg=4) */
+/* 반응형 */
 @media (min-width: 768px) {
   .dashboard-stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 1024px) {
-  .dashboard-stats-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
 /* 개별 통계 카드 */
 .dashboard-stat-card {
   background-color: #ffffff;
-  border-radius: 0.5rem; /* rounded-lg */
-  padding: 24px;         /* p-6 */
-  border: 1px solid #e5e7eb; /* border-gray-200 */
+  border-radius: 0.5rem;
+  padding: 24px;        
+  border: 1px solid #e5e7eb; 
 }
 
-/* 카드 상단: 아이콘만 있는 영역 */
+/* 카드 상단: 아이콘 */
 .dashboard-stat-card-header {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  justify-content: flex-start;
+
   align-items: center;
   margin-bottom: 16px;
 }
 
 /* 아이콘 박스 공통 */
 .dashboard-stat-icon {
-  padding: 12px;         /* p-3 */
+  padding: 12px;        
   border-radius: 0.5rem;
 }
 
-/* 아이콘 색상 변형 (상단 네 개 카드) */
+/* 아이콘 색상 변형 */
 .dashboard-stat-icon-ingredients {
-  background-color: #3b82f6; /* blue-500 */
+  background-color: #3b82f6;
 }
 
 .dashboard-stat-icon-analyses {
-  background-color: #8b5cf6; /* purple-500 */
+  background-color: #f97316; 
 }
 
-.dashboard-stat-icon-recipes {
-  background-color: #22c55e; /* green-500 */
-}
-
-.dashboard-stat-icon-this-week {
-  background-color: #f97316; /* orange-500 */
-}
 
 /* 아이콘 자체 */
 .dashboard-stat-icon-inner {
@@ -100,32 +92,25 @@
 .dashboard-stat-card-body {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* justify-content: center; */
 }
 
 .dashboard-stat-label {
   font-size: 0.9rem;
-  color: #4b5563; /* text-gray-600 */
+  color: #4b5563;
   margin-bottom: 4px;
 }
 
 .dashboard-stat-value {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #111827; /* text-gray-900 */
+  color: #111827; 
 }
 
-/* 하단 2컬럼 그리드 */
 .dashboard-bottom-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
-}
-
-@media (min-width: 1024px) {
-  .dashboard-bottom-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 /* 카드 공통 */
@@ -160,7 +145,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #f3f4f6; /* border-gray-100 */
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .dashboard-recent-item:last-child {
@@ -171,17 +156,17 @@
 .dashboard-recent-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .dashboard-recent-image {
   font-size: 0.95rem;
-  color: #111827; /* text-gray-900 */
+  color: #111827;
 }
 
 .dashboard-recent-sub {
   font-size: 0.85rem;
-  color: #6b7280; /* text-gray-500 */
+  color: #6b7280;
 }
 
 /* 상태 배지 */
@@ -194,74 +179,16 @@
 
 /* 상태 색상 */
 .status-complete {
-  background-color: #dcfce7; /* green-100 */
-  color: #15803d;            /* green-700 */
+  background-color: #dcfce7;
+  color: #15803d;            
 }
 
 .status-fail {
-  background-color: #fee2e2; /* red-100 */
-  color: #b91c1c;            /* red-700 */
+  background-color: #fee2e2; 
+  color: #b91c1c;           
 }
 
 .status-neutral {
-  background-color: #e5e7eb; /* gray-200 */
-  color: #374151;            /* gray-700 */
-}
-
-/* 시스템 상태 블록 */
-.dashboard-system-status {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* 각 행 */
-.dashboard-system-row {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.dashboard-system-row-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.dashboard-system-label {
-  font-size: 0.9rem;
-  color: #374151; /* text-gray-700 */
-}
-
-.dashboard-system-value {
-  font-size: 0.9rem;
-  color: #111827;
-}
-
-/* 프로그레스 바 공통 */
-.dashboard-progress-track {
-  width: 100%;
-  height: 8px;              /* h-2 */
-  border-radius: 9999px;
-  background-color: #e5e7eb; /* bg-gray-200 */
-  overflow: hidden;
-}
-
-/* 동적으로 width를 주는 바 */
-.dashboard-progress-bar {
-  height: 100%;
-  border-radius: 9999px;
-}
-
-/* 상태별 색상 */
-.dashboard-progress-bar.ok {
-  background-color: #22c55e; /* green-500 */
-}
-
-.dashboard-progress-bar.warn {
-  background-color: #f97316; /* orange-500 */
-}
-
-.dashboard-progress-bar.good {
-  background-color: #8b5cf6; /* purple-500 */
+  background-color: #e5e7eb; 
+  color: #374151;           
 }
