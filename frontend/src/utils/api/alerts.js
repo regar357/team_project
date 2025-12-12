@@ -50,64 +50,57 @@ export async function createAlert(message, date) {
 }
 
 
-// /* API 연동 */
-// export async function fetchAlertHistory() {
-//     const API_ENDPOINT = "/alerts"; 
+/* API 연동 */
+export async function fetchAlertHistory() {
+    const API_ENDPOINT = "/alerts"; 
     
-//     console.log(`[API GET] ${API_ENDPOINT} 요청 시작`); 
+    console.log(`[API GET] ${API_ENDPOINT} 요청 시작`); 
     
-//     try {
-//         const response = await fetch(API_ENDPOINT);
+    try {
+        const response = await fetch(API_ENDPOINT);
 
-//         if (!response.ok) {
-//             console.error(`[API GET] ${API_ENDPOINT} 응답 실패: 상태 ${response.status}`); 
-//             throw new Error(`알림 기록 조회 실패: ${response.status} 상태`);
-//         }
+        if (!response.ok) {
+            console.error(`[API GET] ${API_ENDPOINT} 응답 실패: 상태 ${response.status}`); 
+            throw new Error(`알림 기록 조회 실패: ${response.status} 상태`);
+        }
 
-//         const rawAlerts = await response.json();
+        const rawAlerts = await response.json();
         
-//         console.log(`[API GET] ${API_ENDPOINT} 응답 성공:`, rawAlerts); 
+        console.log(`[API GET] ${API_ENDPOINT} 응답 성공:`, rawAlerts); 
 
-//         if (!Array.isArray(rawAlerts)) {
-//              console.warn("API 응답 형식이 배열이 아닙니다.");
-//              return [];
-//         }
-//         return rawAlerts;
+        if (!Array.isArray(rawAlerts)) {
+             console.warn("API 응답 형식이 배열이 아닙니다.");
+             return [];
+        }
+        return rawAlerts;
 
-//     } catch (error) {
-//         console.error(`[API GET] ${API_ENDPOINT} 처리 중 오류 발생:`, error);         
-//         return [];
-//     }
-// }
+    } catch (error) {
+        console.error(`[API GET] ${API_ENDPOINT} 처리 중 오류 발생:`, error);         
+        return [];
+    }
+}
 
-// /* API 알림 생성 */
-// export async function createAlert(message, date) {
-//     const API_ENDPOINT = "/alerts/generate";
+/* API 알림 생성 */
+export async function createAlert(message, date) {
+    const API_ENDPOINT = "/alerts/create";
     
-//     const payload = {
-//         alert_date: date,          
-//         alert_message: message,    
-//     };
+    const payload = {
+        alert_date: date,          
+        alert_message: message,    
+    };
 
-//     console.log(`[API POST] 알림 생성 요청 데이터:`, payload);
+    console.log(`[API POST] 알림 생성 요청 데이터:`, payload);
 
-//     try {
-//         const response = await fetch(API_ENDPOINT, {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify(payload)
-//         });
+    const response = await fetch(API_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
 
-//         if (!response.ok) { 
-//             throw new Error(`알림 생성 실패: ${response.status} 상태`);
-//         }
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `알림 생성 실패: ${response.status}`);
+    }
 
-//         const result = await response.json();
-//         console.log(`[API POST] 알림 생성 성공. 응답:`, result);
-//         return true; 
-
-//     } catch (error) {
-//         console.error(`[API POST] 알림 생성 중 오류 발생:`, error);
-//         return false; 
-//     }
-// }
+    return await response.json();
+}

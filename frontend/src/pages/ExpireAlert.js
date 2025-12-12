@@ -11,23 +11,26 @@ const timingStringToDays = (timingString) => {
   return parseInt(timingString.replace("D-", ""), 10);
 };
 
+function parseDateOnly(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
 /* 알림 날짜 계산 */
 function calculateAlertDate(expirationDateString, daysBefore) {
-    const expiryDate = new Date(expirationDateString);
+    const expiryDate = parseDateOnly(expirationDateString);
     expiryDate.setDate(expiryDate.getDate() - daysBefore); 
     expiryDate.setHours(10, 0, 0, 0);
 
     const pad = (num) => num.toString().padStart(2, '0'); 
     
-    const year = expiryDate.getFullYear();
-    const month = pad(expiryDate.getMonth() + 1);
-    const day = pad(expiryDate.getDate());
-    const hours = pad(expiryDate.getHours());
-    const minutes = pad(expiryDate.getMinutes());
-    const seconds = pad(expiryDate.getSeconds());
+     return `${expiryDate.getFullYear()}-${pad(
+        expiryDate.getMonth() + 1
+        )}-${pad(expiryDate.getDate())} ${pad(
+        expiryDate.getHours()
+        )}:${pad(expiryDate.getMinutes())}:${pad(expiryDate.getSeconds())}`;
 
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
+  }
 
 // 알림 생성 API 호출 핸들러
 async function handleUserAlertSetting(ingredientName, expirationDate, daysBefore) {
@@ -67,16 +70,16 @@ const ExpireAlert = () => {
             const rawData = await fetchAlertHistory();
             
             const normalizedHistory = rawData.map(item => {
-                const datePart = item.alert_date ? item.alert_date.split(' ')[0] : '날짜 미정'; 
-                const messageParts = item.alert_message.match(/D-(\d+|day)/);
-                
-                return {
-                    id: item.alert_id,
-                    sentAt: datePart,
-                    ingredientName: item.alert_message, 
-                    dday: messageParts ? messageParts[0] : 'N/A'
-                };
-            });
+              const id = item.alert_id ?? item.id;
+              const alertDate = item.alert_date ?? item.date ?? "";
+              const message = item.alert_message ?? item.message ?? "";
+
+              const sentAt = alertDate ? String(alertDate).split(" ")[0].split("T")[0]: "날짜 미정";
+
+              const ddayMatch = message.match(/D-(\d+|day)/);
+
+              return {id, sentAt, message, dday: ddayMatch ? ddayMatch[0] : "",};
+          });
             
             setHistory(normalizedHistory);
 
@@ -88,14 +91,14 @@ const ExpireAlert = () => {
   };
 
   // 자동 저장 핸들러 함수 (API 호출 및 상태 업데이트)
-  const handleAutoSave = async (newTimingString) => {
+  const handleAutoSave = async (newTiming) => {
         if (!enabled) {
             console.warn("알림 수신이 비활성화되어 자동 저장을 건너뜁니다.");
             return;
         }
-        setTiming(newTimingString); 
+        setTiming(newTiming); 
 
-        const days = timingStringToDays(newTimingString);
+        const days = timingStringToDays(newTiming);
 
 
         const success = await handleUserAlertSetting(
