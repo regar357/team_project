@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  searchRecipesByIngredients,
-  safeJsonParseOrSplit,
-} from "../utils/api/recipe";
+import {searchRecipesByIngredients,safeJsonParseOrSplit,} from "../utils/api/recipe";
 import { fetchIngredients } from "../utils/api/ingredients";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
