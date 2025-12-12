@@ -74,11 +74,20 @@ export default function RecipeDetail() {
       </div>
     );
 
+    console.log("--- [Detail DEBUG] Recipe 객체 전체 확인 ---");
+console.log(recipe); 
+console.log("-----------------------------------------");
+
+console.log("[Detail] priority_used_ingredients:", recipe.priority_used_ingredients);
+console.log("[Detail] other_ingredients:", recipe.other_ingredients);
+
   const allIngredients = [
     ...(recipe.priority_used_ingredients || []),
     ...(recipe.other_ingredients || []),
     ...(Array.isArray(recipe.ingredients) ? recipe.ingredients : []),
   ];
+console.log(`[Detail] 최종 allIngredients 배열 길이: ${allIngredients.length}`);
+console.log("[Detail] 최종 allIngredients 내용:", allIngredients);
 
   return (
     <div className="detail-page">
