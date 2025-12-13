@@ -5,14 +5,19 @@ import "./ListPage.css";
 // D-day 계산
 function getDday(expiryStr) {
   if (!expiryStr) return "";
+  const norm = normalizeExpiryForCalc(expiryStr);
+  if (!norm) return "";
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const expiry = new Date(expiryStr);
+  const expiry = new Date(norm);
   expiry.setHours(0, 0, 0, 0);
 
   const diffMs = expiry.getTime() - today.getTime();
   const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+  if (Number.isNaN(diffDays)) return "";
 
   if (diffDays === 0) return "D - DAY";
   if (diffDays > 0) return `D - ${diffDays}`;
@@ -20,12 +25,17 @@ function getDday(expiryStr) {
 }
 
 function getDdayNumber(expiryStr) {
-  if (!expiryStr) return 99999;
+  const norm = normalizeExpiryForCalc(expiryStr);
+  if (!norm) return 999999; // 정렬용 기본값
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const expiry = new Date(expiryStr);
+  const expiry = new Date(norm);
   expiry.setHours(0, 0, 0, 0);
-  return Math.round((expiry - today) / (1000 * 60 * 60 * 24));
+
+  const diffDays = Math.round((expiry - today) / (1000 * 60 * 60 * 24));
+  if (Number.isNaN(diffDays)) return 999999;
+  return diffDays;
 }
 
 function getDdayClass(expiryStr) {
@@ -36,7 +46,7 @@ function getDdayClass(expiryStr) {
   return "dday";
 }
 
-// 계산용으로 정규화: "YYYY-MM-DD...", "YYYY.MM.DD" 등 → "YYYY-MM-DD"
+// 계산용으로 정규화
 function normalizeExpiryForCalc(expiry) {
   if (!expiry) return "";
   const s = String(expiry);
@@ -44,7 +54,7 @@ function normalizeExpiryForCalc(expiry) {
   return datePart.replace(/\./g, "-").replace(/\//g, "-");
 }
 
-// 화면 표시용: "YYYY-MM-DD..." → "YYYY.MM.DD"
+// 화면 표시용
 function formatExpiryDate(expiry) {
   if (!expiry) return "-";
   const s = String(expiry);
@@ -52,12 +62,11 @@ function formatExpiryDate(expiry) {
   return datePart.replace(/-/g, ".");
 }
 
-// 응답에서 실제 리스트 배열 뽑기 (배열 / data / results / items 대응)
+// 서버 응답 리스트 부분
 function extractListFromResponse(data) {
   if (Array.isArray(data)) return data;
-  if (data && Array.isArray(data.data)) return data.data;
-  if (data && Array.isArray(data.results)) return data.results;
-  if (data && Array.isArray(data.items)) return data.items;
+  if (Array.isArray(data?.results)) return data.results;
+  if (Array.isArray(data?.data)) return data.data;
   return [];
 }
 
@@ -74,6 +83,7 @@ const categories = [
 ];
 
 export default function IngredientsListPage() {
+  // API에서 받은 목록
   const [items, setItems] = useState([]);
 
   const [selectedCategory, setSelectedCategory] = useState("전체");
@@ -104,32 +114,38 @@ export default function IngredientsListPage() {
       console.log("GET /food 응답 원본:", data);
 
       const rawList = extractListFromResponse(data);
-      console.log("정규화 전 리스트(rawList):", rawList);
 
       // 서버 응답을 프론트에서 쓰기 편하게 정규화
       const normalized = rawList.map((item, idx) => {
         const rawExpiry =
+          item.food_ex ??
           item.expirationDate ??
           item.expiry ??
           item.expiryDate ??
           item.expiration_date ??
+          item.food_expiry ??
+          item.food_expiry_date ??
           "";
 
+        const food_id = item.food_id ?? item.id ?? idx;
+        const food_name =
+          item.food_name ?? item.name ?? item.ingredientName ?? "";
+        const food_category =
+          item.food_category ?? item.category ?? item.type ?? "기타";
+
         return {
-          id: item.id ?? item.food_id ?? idx,
-          food_id: item.food_id ?? item.id ?? idx,
-          name: item.name ?? item.foodName ?? item.ingredientName ?? "",
-          category: item.category ?? item.type ?? "기타",
+          food_id,
+          food_name,
+          food_category,
           expiry: normalizeExpiryForCalc(rawExpiry),
         };
       });
 
-      console.log("정규화된 리스트(normalized):", normalized);
       setItems(normalized);
     } catch (err) {
       console.error("GET /food 오류:", err);
       setFetchError(err?.message ?? "목록을 불러오는 중 오류가 발생했습니다.");
-      setItems([]); // 에러 시에도 더미 없이 빈 목록
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -145,7 +161,7 @@ export default function IngredientsListPage() {
 
     // 카테고리 필터
     if (selectedCategory !== "전체") {
-      arr = arr.filter((i) => i.category === selectedCategory);
+      arr = arr.filter((i) => i.food_category === selectedCategory);
     }
 
     // 검색어 필터
@@ -153,18 +169,20 @@ export default function IngredientsListPage() {
     if (q) {
       arr = arr.filter(
         (i) =>
-          i.name.toLowerCase().includes(q) ||
-          i.category.toLowerCase().includes(q)
+          i.food_name.toLowerCase().includes(q) ||
+          i.food_category.toLowerCase().includes(q)
       );
     }
 
     // 정렬
     if (sortMode === "임박순") {
-      arr.sort((a, b) => getDdayNumber(a.expiry) - getDdayNumber(b.expiry));
+      arr.sort(
+        (a, b) => getDdayNumber(a.expiry) - getDdayNumber(b.expiry)
+      );
     } else if (sortMode === "이름순") {
-      arr.sort((a, b) => a.name.localeCompare(b.name, "ko"));
+      arr.sort((a, b) => a.food_name.localeCompare(b.food_name, "ko"));
     } else if (sortMode === "등록순") {
-      arr.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+      arr.sort((a, b) => (b.food_id ?? 0) - (a.food_id ?? 0));
     }
 
     return arr;
@@ -172,10 +190,12 @@ export default function IngredientsListPage() {
 
   // 폐기 버튼 DELETE /food/discard/:food_id
   const handleDispose = async (id) => {
-    const target = items.find((i) => i.id === id || i.food_id === id);
+    const target = items.find(
+      (i) => i.food_id === id || i.id === id
+    );
     if (!target) return;
 
-    const ok = window.confirm(`${target.name}을(를) 폐기 처리할까요?`);
+    const ok = window.confirm(`${target.food_name}을(를) 폐기 처리할까요?`);
     if (!ok) return;
 
     const foodId = target.food_id ?? target.id;
@@ -209,7 +229,6 @@ export default function IngredientsListPage() {
     }
   };
 
-  // 새 식재료 추가 버튼(지금은 임시)
   const handleAdd = () => {
     alert("새 식재료 추가 페이지로 이동 연결 예정!");
   };
@@ -255,7 +274,9 @@ export default function IngredientsListPage() {
                   <button
                     key={m}
                     type="button"
-                    className={`sort-chip ${sortMode === m ? "active" : ""}`}
+                    className={`sort-chip ${
+                      sortMode === m ? "active" : ""
+                    }`}
                     onClick={() => setSortMode(m)}
                   >
                     [{m}]
@@ -312,9 +333,9 @@ export default function IngredientsListPage() {
                 </thead>
                 <tbody>
                   {filtered.map((item) => (
-                    <tr key={item.id ?? item.food_id}>
-                      <td>{item.name}</td>
-                      <td>{item.category}</td>
+                    <tr key={item.food_id}>
+                      <td>{item.food_name}</td>
+                      <td>{item.food_category}</td>
                       <td>{formatExpiryDate(item.expiry)}</td>
                       <td className={getDdayClass(item.expiry)}>
                         {getDday(item.expiry)}
@@ -323,9 +344,7 @@ export default function IngredientsListPage() {
                         <button
                           type="button"
                           className="dispose-btn"
-                          onClick={() =>
-                            handleDispose(item.id ?? item.food_id)
-                          }
+                          onClick={() => handleDispose(item.food_id)}
                         >
                           폐기
                         </button>
@@ -333,7 +352,7 @@ export default function IngredientsListPage() {
                     </tr>
                   ))}
 
-                  {!loading && !fetchError && filtered.length === 0 && (
+                  {!loading && filtered.length === 0 && (
                     <tr>
                       <td colSpan={5} className="empty-row">
                         조회 결과가 없습니다.
