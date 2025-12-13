@@ -33,6 +33,14 @@ function getDdayClass(expiryStr) {
   return "dday";
 }
 
+// 유통기한 표시용: "YYYY-MM-DD..." → "YYYY.MM.DD"
+function formatExpiryDate(expiry) {
+  if (!expiry) return "-";
+  const s = String(expiry);
+  const datePart = s.length >= 10 ? s.slice(0, 10) : s; // 앞 10글자만
+  return datePart.replace(/-/g, ".");
+}
+
 function IngredientsPage() {
   const [ingredients, setIngredients] = useState([]);
 
@@ -336,11 +344,7 @@ function IngredientsPage() {
                   >
                     <td>{item.name}</td>
                     <td>{item.category}</td>
-                    <td>
-                      {item.expiry
-                        ? String(item.expiry).replace(/-/g, ".")
-                        : "-"}
-                    </td>
+                    <td>{formatExpiryDate(item.expiry)}</td>
                     <td className={getDdayClass(item.expiry)}>
                       {item.expiry ? getDday(item.expiry) : "-"}
                     </td>
