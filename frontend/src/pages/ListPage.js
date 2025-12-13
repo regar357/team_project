@@ -35,7 +35,7 @@ function getDdayClass(expiryStr) {
   return "dday";
 }
 
-// 날짜를 계산용으로 정규화: "YYYY-MM-DD...", "YYYY.MM.DD" 등 → "YYYY-MM-DD"
+// 계산용으로 정규화: "YYYY-MM-DD...", "YYYY.MM.DD" 등 → "YYYY-MM-DD"
 function normalizeExpiryForCalc(expiry) {
   if (!expiry) return "";
   const s = String(expiry);
@@ -64,8 +64,8 @@ const categories = [
 ];
 
 export default function IngredientsListPage() {
-  // 실제 목록 상태 (이제 더미 데이터 없이 시작)
-  const [items, setItems] = useState([]);
+  // 실제 목록 상태 (초기에는 더미 데이터로 시작)
+  const [items, setItems] = useState(initialIngredients);
 
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [sortMode, setSortMode] = useState("임박순"); // 임박순 | 이름순 | 등록순
@@ -112,12 +112,17 @@ export default function IngredientsListPage() {
           }))
         : [];
 
-      setItems(normalized);
+      if (normalized.length === 0) {
+        console.warn("/food 응답이 비어 있어 initialIngredients 사용");
+        setItems(initialIngredients);
+      } else {
+        setItems(normalized);
+      }
     } catch (err) {
       console.error("GET /food 오류:", err);
       setFetchError(err?.message ?? "목록을 불러오는 중 오류가 발생했습니다.");
-      // 오류 시에도 더미 데이터는 사용하지 않고 빈 목록 유지
-      setItems([]);
+      // 오류여도 최소한 더미 데이터는 보여주기
+      setItems(initialIngredients);
     } finally {
       setLoading(false);
     }
@@ -273,7 +278,7 @@ export default function IngredientsListPage() {
 
             {/* 테이블 카드 */}
             <div className="table-card">
-              {/* 로딩/에러 표시(필요하면 추가로 꾸며도 됨) */}
+              {/* 로딩/에러 메시지 (원하면 빼도 됨) */}
               {loading && (
                 <div className="empty-row" style={{ textAlign: "center" }}>
                   목록을 불러오는 중입니다...
