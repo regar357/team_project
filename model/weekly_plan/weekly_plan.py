@@ -70,17 +70,18 @@ def build_system_prompt():
 
 def build_user_prompt(ingredients):
     return f"""
-다음은 냉장고에서 인식된 식재료 목록이다.
-각 식재료는 유통기한이 임박한 순서로 정렬되어 있다.
+다음은 백엔드로부터 전달받은
+현재 냉장고 속 식재료 목록이다.
 
 식재료 목록:
 {json.dumps(ingredients, ensure_ascii=False)}
 
 요구사항:
 1. 위 식재료를 기반으로 주간 식단 메뉴를 생성하라
-2. 요일 간 영양 성향이 겹치지 않도록 배분하라
+2. 요일 간 영양 성향(protein / carbs / balanced)이 겹치지 않도록 배분하라
 3. 각 요일은 반드시 2개의 메뉴를 포함해야 한다
-4. 반드시 JSON 형식으로만 출력하라
+4. 메뉴는 서로 중복되지 않도록 한다
+5. 반드시 JSON 형식으로만 출력하라
 """
 
 
