@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+sys.stdout.reconfigure(encoding="utf-8")
 
 # sys.path에 model/ 경로 추가 (가장 중요한 FIX)
 # 현재 파일 경로 weekly_plan/weekly_plan.py
