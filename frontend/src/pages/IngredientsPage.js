@@ -2,13 +2,7 @@
 import React, { useState } from "react";
 import "./IngredientsPage.css";
 
-// 데이터베이스로 연결될거라 지워도 됩니다. 시각화용
-// 수정 API를 쓰려면 id(또는 food_id)가 필요함
-const initialData = [
-  { id: 1, name: "가지", category: "채소", expiry: "2025-11-30", imageUrl: "" },
-  { id: 2, name: "사과", category: "과일", expiry: "2025-11-30", imageUrl: "" },
-];
-
+// D-day 계산
 function getDday(expiryStr) {
   if (!expiryStr) return "";
   const today = new Date();
@@ -25,6 +19,7 @@ function getDday(expiryStr) {
   return `D + ${Math.abs(diffDays)}`;
 }
 
+// D-day 색상 클래스
 function getDdayClass(expiryStr) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -39,7 +34,8 @@ function getDdayClass(expiryStr) {
 }
 
 function IngredientsPage() {
-  const [ingredients, setIngredients] = useState(initialData);
+  const [ingredients, setIngredients] = useState([]);
+
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -94,13 +90,34 @@ function IngredientsPage() {
       setUploading(true);
 
       const data = await uploadFoodImage(file);
-      console.log("✅ 이미지 업로드 응답:", data);
+      console.log("이미지 업로드 응답:", data);
 
-      // 서버 응답 키 대응
-      const url = data.url || data.imageUrl || data.path || data.location || "";
-
+      // 서버 응답 키 대응 (이미지 URL)
+      const url =
+        data.url || data.imageUrl || data.path || data.location || "";
       setUploadedImageUrl(url);
+
+      // 결과 배열을 테이블용 데이터로 변환해서 바로 반영
+      if (Array.isArray(data.results)) {
+        const normalized = data.results.map((item, idx) => ({
+          id: item.food_id ?? item.id ?? idx,
+          food_id: item.food_id ?? item.id ?? idx,
+          name: item.name ?? item.foodName ?? item.ingredientName ?? "",
+          category: item.category ?? item.type ?? "",
+          // 백엔드 응답에 맞춰 유통기한 필드 추론
+          expiry:
+            item.expirationDate ??
+            item.expiry ??
+            item.expiryDate ??
+            item.expiration_date ??
+            "",
+          imageUrl: item.imageUrl ?? "",
+        }));
+
+        setIngredients(normalized);
+      }
     } catch (err) {
+      console.error("업로드 오류:", err);
       setUploadError(err?.message ?? "업로드 중 오류가 발생했습니다.");
     } finally {
       setUploading(false);
@@ -139,7 +156,7 @@ function IngredientsPage() {
     }
 
     const target = ingredients[editingIndex];
-    const foodId = target?.id ?? target?.food_id; // 둘 다 대응
+    const foodId = target?.food_id ?? target?.id; // 둘 다 대응
 
     if (!foodId) {
       alert("food_id가 없습니다. 목록 데이터에 id(또는 food_id)가 필요합니다.");
@@ -153,12 +170,12 @@ function IngredientsPage() {
       name: form.name,
       category: form.category,
       expiry: form.expiry,
-      // imageUrl: imageUrlToSend,
+      // imageUrl: imageUrlToSend, // 백엔드에서 필요하면 주석 해제
     };
 
     try {
       const data = await updateFood(foodId, payload);
-      console.log("✅ PUT /food/update 성공:", data);
+      console.log("PUT /food/update 성공:", data);
 
       // 프론트 화면도 즉시 반영
       const updated = [...ingredients];
@@ -167,7 +184,7 @@ function IngredientsPage() {
         name: form.name,
         category: form.category,
         expiry: form.expiry,
-        // imageUrl: imageUrlToSend,
+        imageUrl: imageUrlToSend,
       };
       setIngredients(updated);
 
@@ -179,7 +196,7 @@ function IngredientsPage() {
 
       alert("수정 완료!");
     } catch (err) {
-      console.log("❌ 수정 오류:", err);
+      console.log("수정 오류:", err);
       alert(err?.message ?? "수정 중 오류가 발생했습니다.");
     }
   };
@@ -206,7 +223,8 @@ function IngredientsPage() {
           <h1>Ingredients upload</h1>
           <p>식품 등록</p>
         </section>
-        {/* 사진 업로드 + 입력 폼 */}
+
+        {/* 사진 업로드 + 입력 폼 카드 */}
         <section className="recipe-top-card">
           {/* 왼쪽 사진 업로드 */}
           <div className="photo-upload">
@@ -295,7 +313,7 @@ function IngredientsPage() {
           </div>
         </section>
 
-        {/* 🔷 카드 2: 아래 목록 테이블 */}
+        {/* 아래 목록 테이블 카드 */}
         <section className="recipe-list-card">
           <div className="recipe-table-wrapper">
             <table className="recipe-table">
@@ -310,18 +328,32 @@ function IngredientsPage() {
               <tbody>
                 {ingredients.map((item, idx) => (
                   <tr
-                    key={`${item.id ?? item.name}-${idx}`}
+                    key={`${item.food_id ?? item.id ?? idx}`}
                     onClick={() => handleRowClick(idx)}
-                    className={editingIndex === idx ? "row-selected" : undefined}
+                    className={
+                      editingIndex === idx ? "row-selected" : undefined
+                    }
                   >
                     <td>{item.name}</td>
                     <td>{item.category}</td>
-                    <td>{item.expiry.replace(/-/g, ".")}</td>
+                    <td>
+                      {item.expiry
+                        ? String(item.expiry).replace(/-/g, ".")
+                        : "-"}
+                    </td>
                     <td className={getDdayClass(item.expiry)}>
-                      {getDday(item.expiry)}
+                      {item.expiry ? getDday(item.expiry) : "-"}
                     </td>
                   </tr>
                 ))}
+
+                {ingredients.length === 0 && (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: "center", padding: 16 }}>
+                      업로드된 식재료가 없습니다. 사진을 업로드해 보세요.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
