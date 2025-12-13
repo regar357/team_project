@@ -1,4 +1,3 @@
-
 /* MainLayout에서 홈일 때 쓰는 컨테이너 */
 .layout-content-home {
     position: relative;
@@ -15,15 +14,8 @@
 }
 
 .layout-content-home::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(4px);
+    content: none;
 }
-
-
-/* 내부 컨텐츠 영역 */
 
 .home {
     position: relative;
@@ -55,9 +47,6 @@
     color: #333;
 }
 
-
-/* 가운데 2×3 카드 그리드 */
-
 .home-main {
     width: 100%;
 }
@@ -82,12 +71,12 @@
 
     text-decoration: none;
     color: #333;
-    border: 5px solid #333;
+    border: 3px solid #333;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); 
     overflow: hidden;
 
-  transform: translateY(0);
-  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out;
+    transform: translateY(0);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; 
 }
 
 .home-menu-card::after {
@@ -117,7 +106,7 @@
 
 /* 타이틀 & 부제 */
 .home-menu-title {
-    font-size: 1.45rem;
+    font-size: 1.85rem;
     font-weight: 800;
     margin-bottom: 8px;
     text-align: center;
@@ -132,16 +121,16 @@
     text-shadow: none; 
 }
 
-/* 호버 효과 */
-.home-menu-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.5);
+.home-menu-card:hover,
+.home-menu-card:active { 
+    transform: translateY(-5px); 
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.25); 
+    border-color: #2563eb; 
 }
-
-
-/*카드별 그라디언트 색 (반투명)*/
-
-/* 전체적으로 0.85~0.9 정도 투명도 → 배경이 살짝 비치게 */
+.home-menu-card:hover .home-menu-title,
+.home-menu-card:active .home-menu-title {
+    color: #2563eb; 
+}
 .home-menu-card:nth-child(1) {
     background: linear-gradient(135deg, #FFB25B, #FF7B3C);
 }
@@ -165,19 +154,19 @@
 .home-menu-card:nth-child(6) {
     background: linear-gradient(135deg, #FFD860, #FFB52D);
 }
- .home-menu-card:nth-child(even) .home-menu-title,
+
+ /* .home-menu-card:nth-child(even) .home-menu-title,
 .home-menu-card:nth-child(even) .home-menu-icon {
-    color: #1d4ed8; /* 약간 더 진한 블루 */
+    color: #1d4ed8; 
 }
 
 .home-menu-card:nth-child(odd) .home-menu-title,
 .home-menu-card:nth-child(odd) .home-menu-icon {
-    color: #2563eb; /* 기본 블루 */
-}
+    color: #2563eb; 
+} */
 
 
-/*반응형 */
-
+/* 반응형  */
 @media (max-width: 1024px) {
     .home-menu-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -207,3 +196,5 @@
         font-size: 1.2rem;
     }
 }
+
+
