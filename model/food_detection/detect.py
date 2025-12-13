@@ -62,13 +62,19 @@ result_json = response.json()
 # ---------------------------
 # 3. 결과 추출 (정답 경로)
 # ---------------------------
-images = result_json.get("images", [])
+results = []
 
-if not images or "results" not in images[0]:
+if isinstance(result_json, list):
+    if len(result_json) > 0 and "results" in result_json[0]:
+        results = result_json[0]["results"]
+
+elif isinstance(result_json, dict):
+    if "images" in result_json and len(result_json["images"]) > 0:
+        results = result_json["images"][0].get("results", [])
+
+if not results:
     print(json.dumps({ "items": [] }, ensure_ascii=False))
     sys.exit(0)
-
-results = images[0]["results"]
 
 # name 추출
 CONF_THRESHOLD = 0.4
