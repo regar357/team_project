@@ -33,20 +33,43 @@ function getDdayClass(expiryStr) {
   return "dday";
 }
 
-// 유통기한 표시용: "YYYY-MM-DD..." → "YYYY.MM.DD"
+// 유통기한 표시
 function formatExpiryDate(expiry) {
   if (!expiry) return "-";
   const s = String(expiry);
-  const datePart = s.length >= 10 ? s.slice(0, 10) : s; // 앞 10글자만
+  const datePart = s.length >= 10 ? s.slice(0, 10) : s;
   return datePart.replace(/-/g, ".");
 }
 
-// date input용: "YYYY-MM-DD...", "YYYY.MM.DD" 등 → "YYYY-MM-DD"
+// date input용
 function normalizeExpiryForInput(expiry) {
   if (!expiry) return "";
   const s = String(expiry);
   const datePart = s.length >= 10 ? s.slice(0, 10) : s;
   return datePart.replace(/\./g, "-").replace(/\//g, "-");
+}
+
+// 백엔드에서 받은 results 배열을 프론트에서 쓰기 좋게 변환
+function normalizeResults(results, fallbackImageUrl) {
+  if (!Array.isArray(results)) return [];
+  return results.map((item, idx) => {
+    const rawExpiry =
+      item.expirationDate ??
+      item.expiry ??
+      item.expiryDate ??
+      item.expiration_date ??
+      "";
+
+    return {
+      id: item.food_id ?? item.id ?? idx,
+      food_id: item.food_id ?? item.id ?? idx,
+      name: item.name ?? item.foodName ?? item.ingredientName ?? "",
+      category: item.category ?? item.type ?? "",
+      // date input에 바로 쓸 수 있게 정규화
+      expiry: normalizeExpiryForInput(rawExpiry),
+      imageUrl: item.imageUrl ?? fallbackImageUrl ?? "",
+    };
+  });
 }
 
 function IngredientsPage() {
@@ -67,7 +90,7 @@ function IngredientsPage() {
   const [uploadError, setUploadError] = useState("");
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
 
-  // 상자 안에 보여줄 이미지 URL (파일 로컬 미리보기용)
+  // 상자 안에 보여줄 이미지 URL
   const [previewUrl, setPreviewUrl] = useState("");
 
   // 입력값 변경
@@ -76,7 +99,7 @@ function IngredientsPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 서버 업로드 함수 (POST /food/upload)
+  // 서버 업로드 함수 POST /food/upload
   const uploadFoodImage = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
@@ -94,7 +117,26 @@ function IngredientsPage() {
     return data;
   };
 
-  // 파일 선택 즉시 자동 업로드
+  // 수정용 텍스트 데이터 저장 함수 POST /food/upload
+  const saveFoodData = async (payload) => {
+    const res = await fetch("/food/upload", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error(`수정 실패 (${res.status})`);
+    }
+
+    const data = await res.json().catch(() => ({}));
+    return data;
+  };
+
+  // 파일 선택 즉시 자동 업로드 / 이미지 + 인식 결과
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0] ?? null;
 
@@ -132,25 +174,7 @@ function IngredientsPage() {
 
       // 결과 배열을 테이블용 데이터로 변환해서 바로 반영
       if (Array.isArray(data.results)) {
-        const normalized = data.results.map((item, idx) => {
-          const rawExpiry =
-            item.expirationDate ??
-            item.expiry ??
-            item.expiryDate ??
-            item.expiration_date ??
-            "";
-
-          return {
-            id: item.food_id ?? item.id ?? idx,
-            food_id: item.food_id ?? item.id ?? idx,
-            name: item.name ?? item.foodName ?? item.ingredientName ?? "",
-            category: item.category ?? item.type ?? "",
-            // date input에 바로 쓸 수 있게 정규화
-            expiry: normalizeExpiryForInput(rawExpiry),
-            imageUrl: item.imageUrl ?? url ?? "",
-          };
-        });
-
+        const normalized = normalizeResults(data.results, url);
         setIngredients(normalized);
       }
     } catch (err) {
@@ -161,27 +185,7 @@ function IngredientsPage() {
     }
   };
 
-  // 수정 API 호출 함수
-  const updateFood = async (foodId, payload) => {
-    const res = await fetch(`/food/update/${foodId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      throw new Error(`수정 실패 (${res.status})`);
-    }
-
-    // 응답이 비어있을 수도 있으니 안전 처리
-    const data = await res.json().catch(() => ({}));
-    return data;
-  };
-
-  // 선택된 행 수정 + 서버 PUT 연동
+  // 선택된 행 수정 + 서버에 반영 POST /food/upload
   const handleUpdate = async () => {
     if (editingIndex === null) {
       alert("수정할 항목을 먼저 목록에서 선택해 주세요.");
@@ -204,33 +208,39 @@ function IngredientsPage() {
 
     // 서버로 보낼 payload
     const payload = {
+      id: foodId,
+      food_id: foodId,
       name: form.name,
       category: form.category,
-      expiry: form.expiry, // 이미 "YYYY-MM-DD" 형식
-      // imageUrl: imageUrlToSend, // 백엔드에서 필요하면 주석 해제
+      expiry: form.expiry,
     };
 
     try {
-      const data = await updateFood(foodId, payload);
-      console.log("PUT /food/update 성공:", data);
+      const data = await saveFoodData(payload);
+      console.log("POST /food/upload(수정) 성공:", data);
 
-      // 프론트 화면도 즉시 반영
-      const updated = [...ingredients];
-      updated[editingIndex] = {
-        ...target,
-        name: form.name,
-        category: form.category,
-        expiry: form.expiry,
-        imageUrl: imageUrlToSend,
-      };
-      setIngredients(updated);
+      if (Array.isArray(data.results)) {
+        // 서버가 변경된 전체(또는 일부) 리스트를 돌려주는 경우
+        const normalized = normalizeResults(data.results);
+        setIngredients(normalized);
+      } else {
+        // 응답 형식이 다르면, 기존 리스트에서 해당 항목만 로컬로 업데이트
+        const updated = [...ingredients];
+        updated[editingIndex] = {
+          ...target,
+          name: form.name,
+          category: form.category,
+          expiry: form.expiry,
+          imageUrl: imageUrlToSend,
+        };
+        setIngredients(updated);
+      }
 
       // 입력 상태 정리
       setEditingIndex(null);
       setForm({ name: "", category: "", expiry: "", imageFile: null });
-      setUploadedImageUrl("");
       setUploadError("");
-      // 미리보기는 남겨도 되고, 비워도 됨. 여기서는 유지.
+
       alert("수정 완료!");
     } catch (err) {
       console.log("수정 오류:", err);
@@ -304,11 +314,6 @@ function IngredientsPage() {
                 </>
               )}
             </div>
-
-            {/* 파일 이름 / 업로드 상태 표시 (옵션) */}
-            {form.imageFile && (
-              <div className="photo-filename">{form.imageFile.name}</div>
-            )}
 
             {uploadedImageUrl && !uploading && (
               <div className="photo-filename">업로드 완료</div>
