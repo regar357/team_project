@@ -99,7 +99,7 @@ function IngredientsPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 서버 업로드 함수 POST /food/upload
+  // 이미지 업로드 함수 POST /food/upload
   const uploadFoodImage = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
@@ -117,10 +117,10 @@ function IngredientsPage() {
     return data;
   };
 
-  // 수정용 텍스트 데이터 저장 함수 POST /food/upload
-  const saveFoodData = async (payload) => {
-    const res = await fetch("/food/upload", {
-      method: "POST",
+  // 수정 API 함수 PUT /food/update/:food_id
+  const updateFood = async (foodId, payload) => {
+    const res = await fetch(`/food/update/${foodId}`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -185,7 +185,7 @@ function IngredientsPage() {
     }
   };
 
-  // 선택된 행 수정 + 서버에 반영 POST /food/upload
+  // 선택된 행 수정 + 서버에 반영 (PUT /food/update/:food_id)
   const handleUpdate = async () => {
     if (editingIndex === null) {
       alert("수정할 항목을 먼저 목록에서 선택해 주세요.");
@@ -208,23 +208,22 @@ function IngredientsPage() {
 
     // 서버로 보낼 payload
     const payload = {
-      id: foodId,
-      food_id: foodId,
       name: form.name,
       category: form.category,
-      expiry: form.expiry,
+      expiry: form.expiry, // "YYYY-MM-DD" 형식
+      // imageUrl: imageUrlToSend, // 백엔드에서 필요하면 주석 해제
     };
 
     try {
-      const data = await saveFoodData(payload);
-      console.log("POST /food/upload(수정) 성공:", data);
+      const data = await updateFood(foodId, payload);
+      console.log("PUT /food/update 성공:", data);
 
+      // 응답에 최신 리스트가 있으면 그걸 사용
       if (Array.isArray(data.results)) {
-        // 서버가 변경된 전체(또는 일부) 리스트를 돌려주는 경우
         const normalized = normalizeResults(data.results);
         setIngredients(normalized);
       } else {
-        // 응답 형식이 다르면, 기존 리스트에서 해당 항목만 로컬로 업데이트
+        // 아니면 로컬에서 해당 항목만 업데이트
         const updated = [...ingredients];
         updated[editingIndex] = {
           ...target,
