@@ -1,4 +1,3 @@
-// src/WastePage.js
 import React, { useEffect, useMemo, useState } from "react";
 import "./WastePage.css";
 
@@ -64,11 +63,31 @@ function WastePage() {
         : [];
 
       // 필드명 표준화(백엔드 키가 달라도 최대한 안전하게)
-      const normalized = list.map((item) => ({
-        name: item.name ?? item.foodName ?? item.ingredientName ?? "",
-        category: item.category ?? item.type ?? "",
-        disposeDate: item.disposeDate ?? item.discardDate ?? item.date ?? "",
-        amount: item.amount ?? item.count ?? item.qty ?? 0,
+      const normalized = list.map((item, idx) => ({
+        // 🔹 DELETE /food/discard/:food_id 호출에 필요한 key
+        food_id: item.food_id ?? item.id ?? idx,
+
+        // 이름, 카테고리
+        name:
+          item.name ??
+          item.food_name ??
+          item.foodName ??
+          item.ingredientName ??
+          "",
+        category:
+          item.category ?? item.food_category ?? item.type ?? item.foodType ?? "",
+
+        // 폐기일
+        disposeDate:
+          item.disposeDate ??
+          item.discardDate ??
+          item.dispose_date ??
+          item.discard_date ??
+          item.date ??
+          "",
+
+        // 폐기량
+        amount: item.amount ?? item.count ?? item.qty ?? item.discardAmount ?? 0,
       }));
 
       setWasteData(normalized);
@@ -80,6 +99,46 @@ function WastePage() {
       console.log("GET /discard 오류:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 🔹 폐기 기록 삭제(또는 취소) → DELETE /food/discard/:food_id
+  const handleDeleteRecord = async (foodId) => {
+    if (!foodId && foodId !== 0) {
+      alert("food_id 정보가 없습니다. 서버 응답 형식을 확인하세요.");
+      return;
+    }
+
+    const target = wasteData.find((item) => item.food_id === foodId);
+    const name = target?.name || "해당 식재료";
+
+    const ok = window.confirm(
+      `${name}의 폐기 기록을 삭제하시겠습니까?`
+    );
+    if (!ok) return;
+
+    try {
+      const res = await fetch(`/food/discard/${foodId}`, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`DELETE /food/discard 실패 (${res.status})`);
+      }
+
+      const data = await res.json().catch(() => ({}));
+      console.log("DELETE /food/discard 응답:", data);
+
+      // 화면에서도 해당 기록 제거
+      setWasteData((prev) =>
+        prev.filter((item) => item.food_id !== foodId)
+      );
+    } catch (err) {
+      console.log("DELETE /food/discard 오류:", err);
+      alert(err?.message ?? "폐기 기록 삭제 중 오류가 발생했습니다.");
     }
   };
 
@@ -156,7 +215,6 @@ function WastePage() {
             </div>
           </div>
 
-          {/* 요약 카드 3개 */}
           <div className="waste-summary">
             <div className="summary-card">
               <div className="summary-label">총 폐기 횟수</div>
@@ -173,7 +231,7 @@ function WastePage() {
           </div>
         </section>
 
-        {/* 🔷 카드 2: 폐기 목록 테이블 */}
+        {/* 폐기 목록 테이블 */}
         <section className="waste-list-card">
           <div className="waste-table-wrapper">
             <table className="waste-table">
@@ -183,27 +241,39 @@ function WastePage() {
                   <th>카테고리</th>
                   <th>폐기일</th>
                   <th>폐기량(개)</th>
+                  <th>기록 삭제</th>
                 </tr>
               </thead>
               <tbody>
                 {!loading &&
                   !error &&
                   filteredData.map((item, idx) => (
-                    <tr key={`${item.name || "item"}-${idx}`}>
+                    <tr key={`${item.food_id ?? item.name ?? "item"}-${idx}`}>
                       <td>{item.name || "-"}</td>
                       <td>{item.category || "-"}</td>
                       <td>
                         {item.disposeDate
-                          ? String(item.disposeDate).replace(/-/g, ".")
+                          ? String(item.disposeDate)
+                              .slice(0, 10)
+                              .replace(/-/g, ".")
                           : "-"}
                       </td>
                       <td>{item.amount ?? 0}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="waste-reset-btn"
+                          onClick={() => handleDeleteRecord(item.food_id)}
+                        >
+                          삭제
+                        </button>
+                      </td>
                     </tr>
                   ))}
 
                 {!loading && !error && filteredData.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="waste-empty">
+                    <td colSpan={5} className="waste-empty">
                       선택한 조건에 해당하는 폐기 내역이 없습니다.
                     </td>
                   </tr>
