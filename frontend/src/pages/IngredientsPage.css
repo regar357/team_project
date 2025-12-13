@@ -138,12 +138,6 @@
   color: #888888;
 }
 
-/* 파일명 / 메시지 */
-.photo-filename {
-  font-size: 13px;
-  color: #666666;
-}
-
 /* 오른쪽 입력 폼 전체 */
 .recipe-form {
   flex: 1; /* 남는 공간 전부 사용 */
