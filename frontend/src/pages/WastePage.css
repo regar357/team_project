@@ -94,12 +94,7 @@ body {
 }
 
 /* WASTE */
-.waste-hero {
-  background: #f26d57;
-  text-align: center;
-  padding: 28px 16px 36px;
-  color: #ffffff;
-}
+
 
 .waste-title {
   font-size: 30px;
@@ -249,9 +244,6 @@ body {
     letter-spacing: 0.15em;
   }
 
-  .waste-hero {
-    padding: 24px 12px 30px;
-  }
 
   .waste-title {
     font-size: 24px;

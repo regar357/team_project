@@ -8,13 +8,13 @@ const SidebarMenu = () => {
   const location = useLocation();
 
   const menuItems = [
-     { id: "ing-add",   label: "식재료 등록",   icon: "📷", path: "/ingredients" },
-    { id: "ing-list",  label: "식재료 목록",   icon: "📋", path: "/List" },
-    { id: "rec-saved", label: "저장된 레시피", icon: "💾", path: "/recipes/saved" },
     { id: "rec-find",  label: "레시피 찾기",   icon: "🍳", path: "/recipes/search" },
+    { id: "ing-list",  label: "식재료 목록",   icon: "📋", path: "/List" },
+    { id: "ing-add",   label: "식재료 등록",   icon: "📷", path: "/ingredients" },
     { id: "weekly", label: "주간식단", icon: "📅", path: "/weekly-plan" },
-    { id: "waste", label: "폐기량 시각화", icon: "📊", path: "/waste" },
     { id: "alerts", label: "유통기한 알림", icon: "🔔", path: "/alerts" },
+    { id: "waste", label: "폐기물 정리", icon: "📊", path: "/waste" },
+    { id: "rec-saved", label: "저장된 레시피", icon: "💾", path: "/recipes/saved" },
   ];
 
   const handleClick = (path) => {

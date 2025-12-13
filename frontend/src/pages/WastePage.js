@@ -96,12 +96,6 @@ function WastePage() {
   return (
     <div className="page">
       <div className="frame">
-        {/* 오렌지색 WASTE 영역 */}
-        <section className="waste-hero">
-          <h1 className="waste-title">WASTE</h1>
-          <p className="waste-subtitle">폐기량 / 조회</p>
-        </section>
-
         {/* 아래 내용 영역 */}
         <main className="waste-content">
           {/* 로딩/에러 표시 */}

@@ -114,9 +114,8 @@ export default function IngredientsListPage() {
     fetchFoodList();
   }, []);
 
-  // -----------------------------
-  // 2) 필터 + 검색 + 정렬
-  // -----------------------------
+
+  // 필터 + 검색 + 정렬
   const filtered = useMemo(() => {
     let arr = [...items];
 
@@ -147,9 +146,8 @@ export default function IngredientsListPage() {
     return arr;
   }, [items, selectedCategory, sortMode, search]);
 
-  // -----------------------------
-  // 3) 폐기 버튼 → DELETE /food/discard/:food_id
-  // -----------------------------
+
+  // 폐기 버튼 → DELETE /food/discard/:food_id
   const handleDispose = async (id) => {
     const target = items.find((i) => i.id === id || i.food_id === id);
     if (!target) return;
@@ -191,7 +189,6 @@ export default function IngredientsListPage() {
   // 새 식재료 추가 버튼(지금은 임시)
   const handleAdd = () => {
     alert("새 식재료 추가 페이지로 이동 연결 예정!");
-    // 예: navigate("/ingredients");
   };
 
   return (
@@ -235,7 +232,7 @@ export default function IngredientsListPage() {
             </div>
           </aside>
 
-          {/* ===== 오른쪽: 리스트 패널 ===== */}
+          {/*리스트 패널 */}
           <div className="list-panel">
             {/* 상단 툴바 */}
             <div className="list-toolbar">
