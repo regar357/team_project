@@ -182,7 +182,7 @@
   padding: 0;
 }
 
-.detail-steps li {
+.step-item {
   display: flex;
   align-items: flex-start;
   gap: 35px;
@@ -199,11 +199,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .step-text {
   font-size: 22px;
   color: #333;
+  flex-grow: 1;
 }
 
 /* 반응형 */

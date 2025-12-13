@@ -52,38 +52,89 @@ exports.generateRecipe = async (req, res) => {
       const result = JSON.parse(output);
       console.log(result);
 
-      const { final_recipe } = result;
+      //const { final_recipe } = result;
 
-      const {
-        title,
-        description,
-        priority_used_ingredients,
-        other_ingredients,
-        servings,
-        steps,
-        tips,
-      } = final_recipe;
+      // const {
+      //   title,
+      //   description,
+      //   priority_used_ingredients,
+      //   other_ingredients,
+      //   servings,
+      //   steps,
+      //   tips,
+      // } = final_recipe;
 
-      await pool.query(
-        `INSERT INTO recipe
-      (recipe_title, recipe_description, priority_used_ingredients, other_ingredients, servings, recipe_steps, recipe_tips)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          title,
-          description,
-          JSON.stringify(priority_used_ingredients),
-          JSON.stringify(other_ingredients),
-          servings,
-          JSON.stringify(steps),
-          JSON.stringify(tips),
-        ]
-      );
+      // await pool.query(
+      //   `INSERT INTO recipe
+      // (recipe_title, recipe_description, priority_used_ingredients, other_ingredients, servings, recipe_steps, recipe_tips)
+      // VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      //   [
+      //     title,
+      //     description,
+      //     JSON.stringify(priority_used_ingredients),
+      //     JSON.stringify(other_ingredients),
+      //     servings,
+      //     JSON.stringify(steps),
+      //     JSON.stringify(tips),
+      //   ]
+      // );
 
       res.json({ message: "레시피 생성 완료", recipe: result });
     } catch (err) {
       res.status(500).json({ error: "JSON Parse Error", detail: err.message });
     }
   });
+};
+
+exports.saveRecipe = async (req, res) => {
+  console.log("레시피 저장 수신 성공");
+
+  const {
+    recipe_title,
+    recipe_description,
+    priority_used_ingredients,
+    other_ingredients,
+    recipe_steps,
+    recipe_tips,
+    img_url,
+    servings,
+    category,
+  } = req.body;
+
+  console.log(priority_used_ingredients, other_ingredients);
+
+  try {
+    await pool.query(
+      `INSERT INTO recipe
+      (recipe_title, recipe_description, priority_used_ingredients, other_ingredients, servings, recipe_steps, recipe_tips)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        recipe_title,
+        recipe_description,
+        JSON.stringify(priority_used_ingredients),
+        JSON.stringify(other_ingredients),
+        servings,
+        JSON.stringify(recipe_steps),
+        JSON.stringify(recipe_tips),
+      ]
+    );
+
+    console.log("DB 저장 성공");
+
+    const recipe_id = await pool.query(
+      `SELECT recipe_id FROM recipe WHERE recipe_title = ?`,
+      [recipe_title]
+    );
+
+    console.log(recipe_id);
+
+    res.json({
+      message: "레시피 저장 성공",
+      recipe_id: recipe_id,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "JSON Parse Error", detail: err.message });
+  }
 };
 
 exports.getRecipeList = async (req, res) => {

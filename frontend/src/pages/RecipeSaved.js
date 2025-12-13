@@ -1,8 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchSavedRecipes, deleteRecipe } from "../utils/api/recipe";
-import Card from "../components/common/Card";
+import { fetchSavedRecipes, deleteRecipe, toggleSaveRecipe,} from "../utils/api/recipe";
 import Button from "../components/common/Button";
 import "./RecipeSaved.css";
 
@@ -16,22 +15,37 @@ const RecipeSaved = () => {
 
 
   useEffect(() => {
-    fetchSavedRecipes()
-      .then((data) => {
+     const load = async () => {
+      try {
+        const data = await fetchSavedRecipes(); 
         setRecipes(data);
-      })
-      .finally(() => setLoading(false));
+      } catch (e) {
+        console.error("보관함 레시피 로드 실패:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
 
   const handleDelete = async (id, e) => {
     e.stopPropagation();
-    await deleteRecipe(Number(id));
-    setRecipes((prev) => prev.filter((r) => r.id !== Number(id)));  
+    try {
+      await deleteRecipe(Number(id));    // 백엔드 삭제
+      toggleSaveRecipe(Number(id));      // 로컬 스토리지에서도 제거
+
+      setRecipes((prev) => prev.filter((r) => r.id !==(Number(id))));  
+    } catch (err) {
+      console.error(err);
+      alert("레시피 삭제 중 오류가 발생했습니다.");
+    }
   };
 
   const handleCardClick = (id) => {
-    navigate(`/recipes/${id}`);
+    if (!deleteMode) {
+      navigate(`/recipes/${id}`);
+    }
   };
   const handleSortChange = (e) => {
     setSortOrder(e.target.value);
@@ -41,7 +55,7 @@ const RecipeSaved = () => {
     if (sortOrder === '이름순') {
         return a.title.localeCompare(b.title); 
     }
-    
+     // 등록순
     return new Date(b.created_at || b.id) - new Date(a.created_at || a.id);
 });
 
@@ -91,9 +105,7 @@ const RecipeSaved = () => {
               <div key={recipe.id}>
                 <div
                   className={`recipe-card ${deleteMode ? "delete-mode" : ""}`}
-                  onClick={() => {
-                    if (!deleteMode) {
-                      handleCardClick(recipe.id);}}}
+                  onClick={() => handleCardClick(recipe.id)}
                 >
                   <div className="recipe-img-wrap">
                     <img src={recipe.image_url} alt={recipe.title} />

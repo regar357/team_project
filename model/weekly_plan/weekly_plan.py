@@ -12,6 +12,10 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 sys.path.append(MODEL_DIR)
 
+# model 폴더를 파이썬 모듈 검색 경로에 추가
+if MODEL_DIR not in sys.path:
+    sys.path.append(MODEL_DIR)
+
 from rag_recipe.llm_client import client
 
 
@@ -78,7 +82,7 @@ def generate_weekly_meal_plan(num_per_day=3):
         max_tokens=2048
     )
 
-    content = response.choices[0].message["content"]
+    content = response.choices[0].message.content
 
     try:
         data = json.loads(content)

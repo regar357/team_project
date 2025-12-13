@@ -3,14 +3,23 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./Home.css";
 
+const HOME_MENU_ITEMS = [
+    { id: "ing-add", label: "식재료 등록", icon: "📷", path: "/ingredients" },
+    { id: "ing-list", label: "식재료 목록", icon: "📋", path: "/list" }, // 경로를 /list로 변경
+    { id: "rec-saved", label: "저장된 레시피", icon: "💾", path: "/recipes/saved" },
+    { id: "rec-find", label: "레시피 찾기", icon: "🍳", path: "/recipes/search" },
+    { id: "weekly", label: "주간식단", icon: "📅", path: "/weekly-plan" },
+    { id: "waste", label: "폐기량 시각화", icon: "📊", path: "/waste" },
+];
+
 const Home = () => {
   return (
     <div className="home">
-      <header className="home-header">
+      {/* <header className="home-header">
         <Link to="/" className="home-logo-link">
           FreshLens
         </Link>
-      </header>
+      </header> */}
 
       <main className="home-main">
         <div className="home-menu-grid">
@@ -44,6 +53,14 @@ const Home = () => {
             <div className="home-menu-title">폐기물 정리</div>
           </Link>
           
+{/*
+          {HOME_MENU_ITEMS.map((item) => (
+            <Link key={item.id} to={item.path} className="home-menu-card">
+              <div className="home-menu-icon">{item.icon}</div>
+              <div className="home-menu-title">{item.label}</div>
+            </Link>
+          ))}
+*/}
         </div>
       </main>
     </div>

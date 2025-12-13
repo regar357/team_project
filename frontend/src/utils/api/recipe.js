@@ -41,6 +41,19 @@ export const RECIPES = [
 ];
 
 /* api 연동 */
+export function safeJsonParseOrSplit(dataString) {
+  if (!dataString || typeof dataString !== "string") return [];
+  try {
+    const parsed = JSON.parse(dataString);
+    if (Array.isArray(parsed)) return parsed;
+  } catch (e) {}
+
+  return dataString
+    .split(",")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
 /* API 레시피 검색 */
 export async function searchRecipesByIngredients(selectedIngredients) {
   const API_ENDPOINT = "/recipe/generate";
@@ -103,21 +116,6 @@ export async function searchRecipesByIngredients(selectedIngredients) {
 export async function fetchSavedRecipes() {
   const API_ENDPOINT = "/recipe/list";
 
-  const safeJsonParseOrSplit = (dataString) => {
-    if (!dataString || typeof dataString !== "string") return [];
-
-    try {
-      const parsed = JSON.parse(dataString);
-      if (Array.isArray(parsed)) {
-        return parsed;
-      }
-    } catch (e) {}
-
-    return dataString
-      .split(",")
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0);
-  };
   try {
     const response = await fetch(API_ENDPOINT, {
       method: "GET",
@@ -157,10 +155,8 @@ export async function fetchSavedRecipes() {
             steps: safeJsonParseOrSplit(recipe.recipe_steps),
             tips: safeJsonParseOrSplit(recipe.recipe_tips),
 
-            category: recipe.category ?? "기타",
             image_url: recipe.image_url ?? "/images/default_recipe.png",
             tags: priorityTags.slice(0, 3),
-
             created_at: recipe.created_at,
           };
         } catch (e) {
@@ -173,83 +169,17 @@ export async function fetchSavedRecipes() {
     console.log(`[정규화] 최종 표시할 레시피 수: ${processedRecipes.length}`);
     return processedRecipes;
 
-    // const allRecipes = (data && Array.isArray(data.recipes)) ? data.recipes : [];
-
-    // const savedIds = getSavedRecipeIds();
-    // const savedRecipes = allRecipes.filter(recipe => savedIds.includes(recipe.id));
-
-    // return savedRecipes;
-
-    /* 테스트 용 */
-    // const allRecipes = RECIPES;
-    // console.log(`[MOCK] 전체 레시피 ${allRecipes.length}개 반환.`);
-    // return  allRecipes;
   } catch (error) {
     console.error("저장된 레시피 목록 조회 오류:", error);
     return [];
   }
 }
 
-/* API 레시피 삭제 */
-export async function deleteRecipe(id) {
-  const API_ENDPOINT = `/recipe/delete/${id}`;
-
-  try {
-    const response = await fetch(API_ENDPOINT, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      console.error(`[DELETE API] 실패: 상태 코드 ${response.status}`);
-      const errorData = await response
-        .json()
-        .catch(() => ({ message: "알 수 없는 서버 오류" }));
-      throw new Error(
-        errorData.message || `레시피 삭제 실패: ${response.status} 상태`
-      );
-    }
-
-    console.log(
-      `[DELETE API] 성공: 상태 코드 ${response.status}. 로컬 스토리지 ID 제거 시작.`
-    );
-
-    toggleSaveRecipe(id);
-
-    return true;
-  } catch (error) {
-    console.error(`레시피 ID ${id} 삭제 오류:`, error);
-    throw new Error(`레시피 삭제 서버 오류: ${error.message}`);
-  }
-}
-
 /* API 레시피 상세 조회 */
 export async function fetchRecipeById(id) {
-  const API_ENDPOINT = `/recipe/list/${id}`;
+  const endpointId = id;
+  const API_ENDPOINT = `/recipe/list/${endpointId}`;
 
-  const safeJsonParseOrSplit = (dataString) => {
-    if (!dataString || typeof dataString !== "string") return [];
-    try {
-      const parsed = JSON.parse(dataString);
-      if (Array.isArray(parsed)) {
-        return parsed;
-      }
-    } catch (e) {}
-    try {
-      return dataString
-        .split(",")
-        .map((item) => item.trim())
-        .filter((item) => item.length > 0);
-    } catch (e) {
-      console.warn(
-        "safeJsonParseOrSplit: 문자열 분리 실패 (이상 데이터)",
-        dataString
-      );
-      return [];
-    }
-  };
   try {
     const response = await fetch(API_ENDPOINT);
 
@@ -267,16 +197,13 @@ export async function fetchRecipeById(id) {
     );
     console.log(data);
 
-    try {
-      const rawRecipe =
-        data && Array.isArray(data.recipes) && data.recipes.length > 0
+    const rawRecipe =
+      data && Array.isArray(data.recipes) && data.recipes.length > 0
           ? data.recipes[0]
           : null;
 
-      if (!rawRecipe) {
-        console.warn(
-          `레시피 ID ${id}: 서버 응답에 유효한 레시피 데이터가 없습니다.`
-        );
+    if (!rawRecipe) {
+      console.warn( `레시피 ID ${id}: 서버 응답에 유효한 레시피 데이터가 없습니다.`);
         return null;
       }
 
@@ -285,29 +212,122 @@ export async function fetchRecipeById(id) {
         title: rawRecipe.recipe_title,
         description: rawRecipe.recipe_description,
 
-        priority_used_ingredients: rawRecipe.priority_used_ingredients,
-        other_ingredients: rawRecipe.other_ingredients,
+        // priority_used_ingredients: safeJsonParseOrSplit(rawRecipe.priority_used_ingredients),
+        // other_ingredients:safeJsonParseOrSplit( rawRecipe.other_ingredients),
+        priority_used_ingredients: Array.isArray(rawRecipe.priority_used_ingredients)
+            ? rawRecipe.priority_used_ingredients
+            : safeJsonParseOrSplit(rawRecipe.priority_used_ingredients),
+            
+        other_ingredients: Array.isArray(rawRecipe.other_ingredients)
+            ? rawRecipe.other_ingredients
+            : safeJsonParseOrSplit(rawRecipe.other_ingredients),
         steps: safeJsonParseOrSplit(rawRecipe.recipe_steps),
-        tips: rawRecipe.recipe_tips,
+        tips:safeJsonParseOrSplit( rawRecipe.recipe_tips),
 
         servings: rawRecipe.servings,
         created_at: rawRecipe.created_at,
-
         image_url: rawRecipe.image_url ?? "/images/default_recipe.png",
 
-        isSaved: getSavedRecipeIds().includes(rawRecipe.recipe_id),
+        // isSaved: getSavedRecipeIds().includes(rawRecipe.recipe_id),
       };
 
       return processedRecipe;
-    } catch (e) {
-      console.error(`레시피 ID ${id} 상세 파싱 오류:`, e);
-      throw new Error("레시피 데이터 구조 파싱 중 오류 발생");
-    }
-  } catch (error) {
+    } catch (error) {
     console.error(`레시피 ID ${id} 상세 조회 오류:`, error);
     return null;
   }
 }
+
+/* 하트 ON → 보관함 저장: POST /recipe/save */
+export async function saveRecipeToServer(recipe) {
+  const API_ENDPOINT = "/recipe/save";
+
+  const payload = {
+    recipe_title: recipe.title,
+    recipe_description: recipe.description ?? "",
+    priority_used_ingredients: JSON.stringify(
+      recipe.priority_used_ingredients ?? []
+    ),
+    other_ingredients: JSON.stringify(recipe.other_ingredients ?? []),
+    recipe_steps: JSON.stringify(recipe.steps ?? []),
+    recipe_tips: JSON.stringify(recipe.tips ?? []),
+    image_url: recipe.image_url ?? "/images/default_recipe.png",
+    servings: recipe.servings ?? 1,
+    category: recipe.category ?? "기타",
+  };
+
+  const response = await fetch(API_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: "알 수 없는 서버 오류" }));
+    throw new Error(
+      errorData.message || `레시피 저장 실패: ${response.status} 상태`
+    );
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+/* API 레시피 삭제 */
+export async function deleteRecipe(id) {
+  const API_ENDPOINT = `/recipe/delete/${id}`;
+
+  const response = await fetch(API_ENDPOINT, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+  if (!response.ok) {
+    console.error(`[DELETE API] 실패: 상태 코드 ${response.status}`);
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: "알 수 없는 서버 오류" }));
+    throw new Error( errorData.message || `레시피 삭제 실패: ${response.status} 상태` );
+    }
+
+    console.log(
+      `[DELETE API] 성공: 상태 코드 ${response.status}. 로컬 스토리지 ID 제거 시작.`
+    );
+
+    // toggleSaveRecipe(id);
+
+  return true;
+  
+}
+
+/* 상세 페이지에서 사용하는 하트 토글  */
+export async function toggleRecipeSave(recipe, isSaved) {
+  if (!recipe) return isSaved;
+
+  if (isSaved) {
+    //  하트 ON → OFF : 보관함에서 삭제
+    if (!recipe.id) {
+      console.warn("삭제할 recipe.id가 없습니다.");
+      return false;
+    }
+    await deleteRecipe(recipe.id);     // 백엔드 삭제
+    toggleSaveRecipe(recipe.id);    // 로컬 스토리지에서도 제거
+
+    return false;
+  } else {
+    // 하트 OFF → ON : 보관함에 저장
+    const saved = await saveRecipeToServer(recipe); // DB에 INSERT
+    const newId = saved.recipe_id ?? recipe.id;
+
+    if (newId) toggleSaveRecipe(newId); // 로컬 스토리지 저장
+    return true;
+  }
+}
+
 
 /* 로컬 스토리지 관리 유틸리티 함수 */
 

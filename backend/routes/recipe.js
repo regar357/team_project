@@ -3,6 +3,8 @@ const router = express.Router();
 const recipeController = require("../controllers/recipeController");
 // /recipe/generate
 router.post("/generate", recipeController.generateRecipe);
+// /recipe/save
+router.post("/save", recipeController.saveRecipe);
 // /recipe/list
 router.get("/list", recipeController.getRecipeList);
 // /recipe/list/:id

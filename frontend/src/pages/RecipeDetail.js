@@ -1,54 +1,69 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  fetchRecipeById,
-  toggleSaveRecipe,
-  getSavedRecipeIds,
-} from "../utils/api/recipe";
+import { useParams, useNavigate,useLocation } from "react-router-dom";
+import { fetchRecipeById, toggleRecipeSave, getSavedRecipeIds } from "../utils/api/recipe";
 import "./RecipeDetail.css";
 
 export default function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const location = useLocation();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isSaved, setIsSaved] = useState(false);
 
-  /* -------------------------
-      LOAD RECIPE DETAILS
-  -------------------------- */
+  /* LOAD RECIPE DETAILS */
   useEffect(() => {
     const load = async () => {
-      try {
-        const data = await fetchRecipeById(Number(id));
-        setRecipe(data);
+      setLoading(true);
+      setError("");
 
-        if (data) {
-          console.log("--- 상세 레시피 데이터 확인 ---");
-          console.log(`Tips 항목 수: ${data.tips?.length}`);
-          console.log(
-            `주요 식재료 항목 수: ${data.priority_used_ingredients?.length}`
-          );
-          console.log(`기타 식재료 항목 수: ${data.other_ingredients?.length}`);
-          const savedIds = getSavedRecipeIds();
-          setIsSaved(savedIds.includes(data.id));
-        }
-      } catch (e) {
-        setError("레시피를 불러오지 못했습니다.");
-        console.error("레시피 로드 오류:", e);
-      } finally {
-        setLoading(false);
+      let targetRecipe = null;
+      // 전달받은 레시피 데이터(state)가 있는지 확인
+      const transmittedData = location.state?.recipeData;
+      if (transmittedData) {
+        console.log("State를 통해 레시피 데이터 수신 완료.");
+        targetRecipe = transmittedData;
+       } else {
+         console.log(`[Detail] DB에서 레시피 ID ${id} 조회 시작.`);
+            try {
+                targetRecipe = await fetchRecipeById(Number(id)); 
+            } catch (err) {
+                setError("저장된 레시피 정보를 불러오지 못했습니다.");
+            }
+    }
+      
+      if (targetRecipe) {
+          setRecipe(targetRecipe);
+          
+          //  저장 상태 확인 
+          // 'TEMP-'로 시작하는 ID는 추천 레시피에서 온 임시 ID로 간주
+          const isTemporary = String(targetRecipe.id).startsWith("TEMP-");
+          
+          if (!isTemporary) {
+              // 저장된 레시피만 ID를 기반으로 isSaved를 체크
+              const recipeIdForCheck = Number(targetRecipe.id); 
+              const savedIds = getSavedRecipeIds(); 
+              setIsSaved(savedIds.includes(recipeIdForCheck));
+          } else {
+              // 임시 ID를 가진 레시피는 초기 상태를 '저장 안 됨'으로 설정
+              setIsSaved(false);
+          }
+      } else {
+          console.error("[Detail] 레시피 데이터를 찾을 수 없습니다.");
+          setError("레시피 데이터를 찾을 수 없습니다.");
       }
-    };
-    load();
-  }, [id]);
 
-  const toggleSave = () => {
+      setLoading(false);
+    };
+    load();
+  }, [id, location.state]); // 의존성 배열에 id와 location.state 포함
+
+
+  const handleToggleSave  = async () => {
     if (!recipe) return;
-    toggleSaveRecipe(recipe.id);
-    setIsSaved((prev) => !prev);
+    const next = await toggleRecipeSave(recipe, isSaved);
+    setIsSaved(next);
   };
 
   if (loading) return <div className="detail-page">불러오는 중...</div>;
@@ -59,10 +74,20 @@ export default function RecipeDetail() {
       </div>
     );
 
+    console.log("--- [Detail DEBUG] Recipe 객체 전체 확인 ---");
+console.log(recipe); 
+console.log("-----------------------------------------");
+
+console.log("[Detail] priority_used_ingredients:", recipe.priority_used_ingredients);
+console.log("[Detail] other_ingredients:", recipe.other_ingredients);
+
   const allIngredients = [
     ...(recipe.priority_used_ingredients || []),
     ...(recipe.other_ingredients || []),
+    ...(Array.isArray(recipe.ingredients) ? recipe.ingredients : []),
   ];
+console.log(`[Detail] 최종 allIngredients 배열 길이: ${allIngredients.length}`);
+console.log("[Detail] 최종 allIngredients 내용:", allIngredients);
 
   return (
     <div className="detail-page">
@@ -85,7 +110,7 @@ export default function RecipeDetail() {
             <h1 className="detail-title">{recipe.title}</h1>
             <button
               className={`heart-btn ${isSaved ? "saved" : ""}`}
-              onClick={toggleSave}
+              onClick={handleToggleSave}
             >
               {isSaved ? "♥" : "♡"}
             </button>
@@ -103,7 +128,7 @@ export default function RecipeDetail() {
           <div className="tip-section">
             <h2 className="tip-title">TIP</h2>
             <ul className="tip-list">
-              {recipe.tips?.map((tip, idx) => (
+              {Array.isArray(recipe.tips) && recipe.tips.map((tip, idx) => (
                 <li key={idx}>{tip}</li>
               ))}
             </ul>
@@ -131,14 +156,14 @@ export default function RecipeDetail() {
           <div className="detail-box">
             <h2 className="detail-section-title">조리 순서</h2>
             <div className="log-divider" />
-            <ol className="detail-steps">
+            <div className="detail-steps">
               {recipe.steps?.map((step, idx) => (
-                <li key={idx}>
+                <div key={idx} className="step-item">
                   <span className="step-number">{idx + 1}</span>
                   <span className="step-text">{step}</span>
-                </li>
+                </div>
               ))}
-            </ol>
+            </div>
           </div>
         </div>
       </div>
