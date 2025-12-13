@@ -64,9 +64,6 @@ const categories = [
 ];
 
 export default function IngredientsListPage() {
-  // 실제 목록 상태 (초기에는 더미 데이터로 시작)
-  const [items, setItems] = useState(initialIngredients);
-
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [sortMode, setSortMode] = useState("임박순"); // 임박순 | 이름순 | 등록순
   const [search, setSearch] = useState("");
