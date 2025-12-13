@@ -194,22 +194,13 @@ export default function IngredientsListPage() {
   return (
     <div className="ingredients-list-page">
       <div className="ingredients-list-frame">
-
-        <div className="topbar-line" />
-
-        <section className="list-hero">
-          <div className="hero-badge" />
-          <div className="hero-text">
-            <div className="hero-title">Ingredient</div>
-            <div className="hero-title sub">List</div>
-            <div className="hero-subtitle">
-              냉장고에 저장된 식재료 목록을 한눈에 확인하세요
-            </div>
-          </div>
+        <section className="saved-hero">
+          <h1>Ingredients list</h1>
+          <p>식품 목록</p>
         </section>
 
         <section className="list-body">
-          {/* ===== 왼쪽: 카테고리 ===== */}
+          {/*카테고리 */}
           <aside className="category-panel">
             <div className="panel-title">By Categories</div>
 

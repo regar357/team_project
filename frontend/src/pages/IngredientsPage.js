@@ -1,3 +1,4 @@
+// src/pages/IngredientsPage.js
 import React, { useState } from "react";
 import "./IngredientsPage.css";
 
@@ -148,12 +149,11 @@ function IngredientsPage() {
     const imageUrlToSend = uploadedImageUrl || target?.imageUrl || "";
 
     // 서버로 보낼 payload
-    // (백엔드 스펙에 따라 키 이름이 다르면 여기만 맞추면 됨)
     const payload = {
       name: form.name,
       category: form.category,
       expiry: form.expiry,
-      //imageUrl: imageUrlToSend,
+      // imageUrl: imageUrlToSend,
     };
 
     try {
@@ -167,7 +167,7 @@ function IngredientsPage() {
         name: form.name,
         category: form.category,
         expiry: form.expiry,
-        //imageUrl: imageUrlToSend,
+        // imageUrl: imageUrlToSend,
       };
       setIngredients(updated);
 
@@ -201,8 +201,13 @@ function IngredientsPage() {
 
   return (
     <div className="recipe-page">
-      <div className="recipe-card">
-        <div className="recipe-card-top">
+      <div className="recipe-inner">
+        <section className="header-hero">
+          <h1>Ingredients upload</h1>
+          <p>식품 등록</p>
+        </section>
+        {/* 사진 업로드 + 입력 폼 */}
+        <section className="recipe-top-card">
           {/* 왼쪽 사진 업로드 */}
           <div className="photo-upload">
             <div className="photo-box">
@@ -288,37 +293,39 @@ function IngredientsPage() {
               </button>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* 아래 목록 테이블 */}
-        <div className="recipe-table-wrapper">
-          <table className="recipe-table">
-            <thead>
-              <tr>
-                <th>식재료명</th>
-                <th>카테고리</th>
-                <th>유통기한</th>
-                <th>임박일</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ingredients.map((item, idx) => (
-                <tr
-                  key={`${item.id ?? item.name}-${idx}`}
-                  onClick={() => handleRowClick(idx)}
-                  className={editingIndex === idx ? "row-selected" : undefined}
-                >
-                  <td>{item.name}</td>
-                  <td>{item.category}</td>
-                  <td>{item.expiry.replace(/-/g, ".")}</td>
-                  <td className={getDdayClass(item.expiry)}>
-                    {getDday(item.expiry)}
-                  </td>
+        {/* 🔷 카드 2: 아래 목록 테이블 */}
+        <section className="recipe-list-card">
+          <div className="recipe-table-wrapper">
+            <table className="recipe-table">
+              <thead>
+                <tr>
+                  <th>식재료명</th>
+                  <th>카테고리</th>
+                  <th>유통기한</th>
+                  <th>임박일</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {ingredients.map((item, idx) => (
+                  <tr
+                    key={`${item.id ?? item.name}-${idx}`}
+                    onClick={() => handleRowClick(idx)}
+                    className={editingIndex === idx ? "row-selected" : undefined}
+                  >
+                    <td>{item.name}</td>
+                    <td>{item.category}</td>
+                    <td>{item.expiry.replace(/-/g, ".")}</td>
+                    <td className={getDdayClass(item.expiry)}>
+                      {getDday(item.expiry)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </div>
   );

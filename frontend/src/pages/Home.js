@@ -17,6 +17,36 @@ const Home = () => {
     <div className="home">
       <main className="home-main">
         <div className="home-menu-grid">
+          <Link to="/recipes/search" className="home-menu-card">
+            <div className="home-menu-icon">👩‍🍳</div>
+            <div className="home-menu-title">레시피 찾기</div>
+          </Link>
+
+          <Link to="/list" className="home-menu-card">
+            <div className="home-menu-icon">📆</div>
+            <div className="home-menu-title">식재료 목록</div>
+          </Link>
+
+          <Link to="/ingredients" className="home-menu-card">
+            <div className="home-menu-icon">✨</div>
+            <div className="home-menu-title">식재료 등록</div>
+          </Link>
+
+          <Link to="/weekly-plan" className="home-menu-card">
+            <div className="home-menu-icon">ℹ️</div>
+            <div className="home-menu-title">주간 식단</div>
+          </Link>
+
+          <Link to="/alerts" className="home-menu-card">
+            <div className="home-menu-icon">🔔</div>
+            <div className="home-menu-title">유통기한 알림</div>
+          </Link>
+
+          <Link to="/waste" className="home-menu-card">
+            <div className="home-menu-icon">🗑️</div>
+            <div className="home-menu-title">폐기물 정리</div>
+          </Link>
+          
           {HOME_MENU_ITEMS.map((item) => (
             <Link key={item.id} to={item.path} className="home-menu-card">
               <div className="home-menu-icon">{item.icon}</div>
