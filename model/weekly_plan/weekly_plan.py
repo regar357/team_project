@@ -112,12 +112,21 @@ def generate_weekly_meal_plan(ingredients): # ingredients: 식재료 목록
 
 # 테스트
 if __name__ == "__main__":
-    ingredients = [
-        "사과",
-        "브로콜리",
-        "닭가슴살",
-        "감자",
-        "양파"
-    ]
+    if len(sys.argv) < 2:
+        print(json.dumps({
+            "weekly_plan": {},
+            "error": "Ingredients list not provided"
+        }, ensure_ascii=False))
+        sys.exit(1)
+
+    try:
+        ingredients = json.loads(sys.argv[1])
+    except json.JSONDecodeError:
+        print(json.dumps({
+            "weekly_plan": {},
+            "error": "Invalid ingredients format. Must be JSON list."
+        }, ensure_ascii=False))
+        sys.exit(1)
+    
     result = generate_weekly_meal_plan(ingredients)
     print(json.dumps(result, ensure_ascii=False, indent=2))
