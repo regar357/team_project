@@ -118,7 +118,7 @@ export default function IngredientsListPage() {
       // 서버 응답을 프론트에서 쓰기 편하게 정규화
       const normalized = rawList.map((item, idx) => {
         const rawExpiry =
-          item.food_ex ??
+          item.food_Ex ??
           item.expirationDate ??
           item.expiry ??
           item.expiryDate ??
