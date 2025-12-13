@@ -4,6 +4,7 @@ from collections import Counter
 import os
 import sys
 from dotenv import load_dotenv
+sys.stdout.reconfigure(encoding="utf-8")
 
 # ---------------------------
 # 0. 환경 변수 로드
@@ -58,7 +59,7 @@ with open(IMAGE_PATH, "rb") as f:
 
 response.raise_for_status()
 result_json = response.json()
-
+# print(json.dumps(result_json, ensure_ascii=False, indent=2))
 # ---------------------------
 # 3. 결과 추출 (정답 경로)
 # ---------------------------

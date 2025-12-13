@@ -3,74 +3,83 @@ const { spawn } = require("child_process");
 const path = require("path");
 
 exports.uploadFood = async (req, res) => {
-  const imagePath = req.file.path; //  uploads/이미지파일
+  const imagePath = path.resolve(req.file.path); //  uploads/이미지파일
   console.log("사진 경로: " + imagePath);
 
-  res.json({
-    message: "사진 업로드 성공",
-    imagePath: imagePath,
-  });
+  // res.json({
+  //   message: "사진 업로드 성공",
+  //   imagePath: imagePath,
+  // });
 
-  // try {
-  //   const pythonProcess = spawn("python", [
-  //     path.join(__dirname, "../../model/yolo/yolo_model.py"),
-  //     imagePath,
-  //   ]);
+  try {
+    const pythonProcess = spawn(
+      "python",
+      [path.join(__dirname, "../../model/food_detection/detect.py"), imagePath],
+      {
+        encoding: "utf-8",
+      }
+    );
 
-  //   let output = "";
-  //   pythonProcess.stdout.on("data", (data) => {
-  //     output += data.toString();
-  //   });
+    let output = "";
+    pythonProcess.stdout.on("data", (data) => {
+      output += data.toString("utf-8");
+    });
 
-  //   pythonProcess.on("close", async () => {
-  //     const result = JSON.parse(output); // { items: [{name, category, count}, ...] }
-  //     const items = result.items;
+    pythonProcess.stderr.on("data", (data) => {
+      console.error("Python stderr:", data.toString());
+    });
 
-  //     const finalResults = [];
+    pythonProcess.on("close", async (code) => {
+      if (code !== 0) {
+        return res.status(500).json({ error: "모델 실행 실패" });
+      }
+      const result = JSON.parse(output); // { items: [{name, category, count}, ...] }
+      console.log("모델 결과: ", result);
+      const items = result.items;
 
-  //     for (const item of items) {
-  //       const { name, category, count } = item;
+      const finalResults = [];
 
-  //       const [expRows] = await pool.query(
-  //         "SELECT expiration_days FROM expiration_mapping WHERE food_name = ?",
-  //         [name]
-  //       );
+      for (const item of items) {
+        const { name, category, count } = item;
 
-  //       const expirationDays = expRows.length
-  //         ? expRows[0].expiration_days
-  //         : null;
+        const [expRows] = await pool.query(
+          "SELECT default_Ex FROM expiration_mapping WHERE food_category = ?",
+          [category]
+        );
 
-  //       let expirationDate = null;
-  //       if (expirationDays) {
-  //         expirationDate = new Date();
-  //         expirationDate.setDate(expirationDate.getDate() + expirationDays);
-  //       }
+        const expirationDays = expRows.length ? expRows[0].default_Ex : null;
 
-  //       const [insertResult] = await pool.query(
-  //         "INSERT INTO food (food_name, category, expiration_date, food_count) VALUES (?, ?, ?, ?)",
-  //         [name, category, expirationDate, count]
-  //       );
+        let expirationDate = null;
+        if (expirationDays) {
+          expirationDate = new Date();
+          expirationDate.setDate(expirationDate.getDate() + expirationDays);
+        }
 
-  //       const insertedId = insertResult.insertId;
+        const [insertResult] = await pool.query(
+          "INSERT INTO food (food_name, food_category, food_Ex, food_count) VALUES (?, ?, ?, ?)",
+          [name, category, expirationDate, count]
+        );
 
-  //       finalResults.push({
-  //         food_id: insertedId,
-  //         name,
-  //         category,
-  //         expirationDays,
-  //         expirationDate,
-  //         count,
-  //       });
-  //     }
+        const insertedId = insertResult.insertId;
 
-  //     res.json({
-  //       message: "등록 완료",
-  //       results: finalResults,
-  //     });
-  //   });
-  // } catch (err) {
-  //   res.status(500).json({ error: err.message });
-  // }
+        finalResults.push({
+          food_id: insertedId,
+          name,
+          category,
+          expirationDays,
+          expirationDate,
+          count,
+        });
+      }
+
+      res.json({
+        message: "등록 완료",
+        results: finalResults,
+      });
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 exports.updateFood = async (req, res) => {
@@ -104,28 +113,19 @@ exports.updateFood = async (req, res) => {
 exports.getFoodList = async (req, res) => {
   console.log("수신 성공");
 
-  res.json({
-    message: "식재료 리스트 출력",
-  });
-
-  // const { sort } = req.query;
-
-  // let query = "SELECT * FROM food";
-
-  // //정렬 조건
-  // if (sort == "name") {
-  //   query += "ORDER BY food_name ASC"; //이름으로 오름차순 정렬.
-  // } else if (sort === "date") {
-  //   query += "ORDER BY id DESC"; //최근 등록순. id로 내림차순
-  // } else {
-  //   query += "ORDER BY id ASC"; //기본 등록순.
-  // }
+  // const query = "SELECT * FROM food";
 
   // try {
   //   const [rows] = await pool.query(query);
-  //   res.json(rows);
+
+  //   res.json({
+  //     message: "식재료 리스트 출력",
+  //     data: rows,
+  //   });
   // } catch (err) {
-  //   res.status(500).json({ error: err.message });
+  //   res.status(500).json({
+  //     error: err.message,
+  //   });
   // }
 };
 
