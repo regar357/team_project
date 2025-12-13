@@ -215,7 +215,7 @@
   color: #ffffff;
 }
 
-/* 🔷 카드 2: 하단 등록된 식재료 목록 */
+/* 하단 등록된 식재료 목록 카드 */
 .recipe-list-card {
   background: #ffffff;
   border-radius: 12px;
@@ -258,18 +258,11 @@
   background: #fff7f3;
 }
 
-/* D-day 공통 스타일 (색상은 리스트 페이지와 통일되게 써도 됨) */
+/* D-day 공통 스타일 */
 .dday {
   font-weight: 700;
 }
 
-/* 필요하면 위험/주의/안전 색상도 같이 정의 가능
-.dday-danger { color: #ff5b5b; }
-.dday-warning { color: #ff9800; }
-.dday-safe { color: #00b050; }
-*/
-
-/* 아이패드·모바일 대응 */
 @media (max-width: 900px) {
   .recipe-inner {
     padding: 0 16px;
