@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {searchRecipesByIngredients,safeJsonParseOrSplit,} from "../utils/api/recipe";
+import {searchRecipesByIngredients} from "../utils/api/recipe";
 import { fetchIngredients } from "../utils/api/ingredients";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
@@ -107,15 +107,15 @@ export default function RecipeSearch() {
 /* 데이터 가공 */        
         const processedRecipes = rawDataToProcess.map((recipe,index) => {
             try {
-              const priorityIngredients = recipe.priority_used_ingredients;
-              const otherIngredients = recipe.other_ingredients;
+              // const priorityIngredients = recipe.priority_used_ingredients;
+              // const otherIngredients = recipe.other_ingredients;
               return {
                 id: recipe.recipe_id || recipe.id || `TEMP-${index}`,
                 ...recipe,
-                priority_used_ingredients: priorityIngredients,
-                other_ingredients: otherIngredients,
+                priority_used_ingredients: recipe.priority_used_ingredients,
+                other_ingredients: recipe.other_ingredients,
                 title: recipe.recipe_title || recipe.title || '제목 없음', 
-                tags: priorityIngredients.slice(0, 3)
+                tags: recipe.priority_used_ingredients.slice(0, 3)
               };
             }catch (e) {
                 console.error("레시피 JSON 파싱 오류:", e, recipe);
@@ -247,10 +247,7 @@ export default function RecipeSearch() {
                         <div
                           className="recommend-card"
                           onClick={() =>
-                            navigate(`/recipes/${recipe.id}`, {
-                              state: { recipeData: recipe },
-                            })
-                          }
+                            navigate(`/recipes/${recipe.id}`, { state: { recipeData: recipe },})}
                         >
                           <div className="recommend-img-wrap">
                             <img
