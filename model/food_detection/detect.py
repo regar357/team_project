@@ -28,7 +28,7 @@ with open(CATEGORY_MAP_PATH, "r", encoding="utf-8") as f:
 # ---------------------------
 url = "https://predict.ultralytics.com"
 headers = {
-    "x-api-key": "API_KEY"
+    "x-api-key": API_KEY
 }
 
 data = {
