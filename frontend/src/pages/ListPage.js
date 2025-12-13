@@ -20,6 +20,7 @@ function getDday(expiryStr) {
 }
 
 function getDdayNumber(expiryStr) {
+  if (!expiryStr) return 99999;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const expiry = new Date(expiryStr);
@@ -35,7 +36,7 @@ function getDdayClass(expiryStr) {
   return "dday";
 }
 
-// 계산용
+// 계산용으로 정규화: "YYYY-MM-DD...", "YYYY.MM.DD" 등 → "YYYY-MM-DD"
 function normalizeExpiryForCalc(expiry) {
   if (!expiry) return "";
   const s = String(expiry);
@@ -43,12 +44,21 @@ function normalizeExpiryForCalc(expiry) {
   return datePart.replace(/\./g, "-").replace(/\//g, "-");
 }
 
-// 화면 표시용
+// 화면 표시용: "YYYY-MM-DD..." → "YYYY.MM.DD"
 function formatExpiryDate(expiry) {
   if (!expiry) return "-";
   const s = String(expiry);
   const datePart = s.length >= 10 ? s.slice(0, 10) : s;
   return datePart.replace(/-/g, ".");
+}
+
+// 응답에서 실제 리스트 배열 뽑기 (배열 / data / results / items 대응)
+function extractListFromResponse(data) {
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.data)) return data.data;
+  if (data && Array.isArray(data.results)) return data.results;
+  if (data && Array.isArray(data.items)) return data.items;
+  return [];
 }
 
 // 카테고리 UI 목록
@@ -64,11 +74,10 @@ const categories = [
 ];
 
 export default function IngredientsListPage() {
-  // 실제 목록 상태 (API에서 받아온 데이터)
   const [items, setItems] = useState([]);
 
   const [selectedCategory, setSelectedCategory] = useState("전체");
-  const [sortMode, setSortMode] = useState("임박순");
+  const [sortMode, setSortMode] = useState("임박순"); // 임박순 | 이름순 | 등록순
   const [search, setSearch] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -92,37 +101,35 @@ export default function IngredientsListPage() {
       }
 
       const data = await res.json();
-      console.log("GET /food 응답:", data);
+      console.log("GET /food 응답 원본:", data);
+
+      const rawList = extractListFromResponse(data);
+      console.log("정규화 전 리스트(rawList):", rawList);
 
       // 서버 응답을 프론트에서 쓰기 편하게 정규화
-      const normalized = Array.isArray(data)
-        ? data.map((item, idx) => ({
-            id: item.id ?? item.food_id ?? idx,
-            food_id: item.food_id ?? item.id ?? idx,
-            name: item.name ?? item.foodName ?? item.ingredientName ?? "",
-            category: item.category ?? item.type ?? "기타",
-            // 계산용으로 정규화된 날짜
-            expiry: normalizeExpiryForCalc(
-              item.expirationDate ??
-                item.expiry ??
-                item.expiryDate ??
-                item.expiration_date ??
-                ""
-            ),
-          }))
-        : [];
+      const normalized = rawList.map((item, idx) => {
+        const rawExpiry =
+          item.expirationDate ??
+          item.expiry ??
+          item.expiryDate ??
+          item.expiration_date ??
+          "";
 
-      if (normalized.length === 0) {
-        console.warn("/food 응답이 비어 있습니다.");
-        setItems([]);
-      } else {
-        // 테이블에 들어갈 데이터 세팅
-        setItems(normalized);
-      }
+        return {
+          id: item.id ?? item.food_id ?? idx,
+          food_id: item.food_id ?? item.id ?? idx,
+          name: item.name ?? item.foodName ?? item.ingredientName ?? "",
+          category: item.category ?? item.type ?? "기타",
+          expiry: normalizeExpiryForCalc(rawExpiry),
+        };
+      });
+
+      console.log("정규화된 리스트(normalized):", normalized);
+      setItems(normalized);
     } catch (err) {
       console.error("GET /food 오류:", err);
       setFetchError(err?.message ?? "목록을 불러오는 중 오류가 발생했습니다.");
-      setItems([]);
+      setItems([]); // 에러 시에도 더미 없이 빈 목록
     } finally {
       setLoading(false);
     }
@@ -202,7 +209,7 @@ export default function IngredientsListPage() {
     }
   };
 
-  // 새 식재료 추가 버튼
+  // 새 식재료 추가 버튼(지금은 임시)
   const handleAdd = () => {
     alert("새 식재료 추가 페이지로 이동 연결 예정!");
   };
@@ -241,6 +248,7 @@ export default function IngredientsListPage() {
 
           {/* 리스트 패널 */}
           <div className="list-panel">
+            {/* 상단 툴바 */}
             <div className="list-toolbar">
               <div className="sort-group">
                 {["임박순", "이름순", "등록순"].map((m) => (
@@ -277,6 +285,7 @@ export default function IngredientsListPage() {
 
             {/* 테이블 카드 */}
             <div className="table-card">
+              {/* 로딩/에러 메시지 */}
               {loading && (
                 <div className="empty-row" style={{ textAlign: "center" }}>
                   목록을 불러오는 중입니다...
@@ -324,7 +333,7 @@ export default function IngredientsListPage() {
                     </tr>
                   ))}
 
-                  {!loading && filtered.length === 0 && (
+                  {!loading && !fetchError && filtered.length === 0 && (
                     <tr>
                       <td colSpan={5} className="empty-row">
                         조회 결과가 없습니다.
