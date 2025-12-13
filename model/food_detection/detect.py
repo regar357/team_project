@@ -3,15 +3,14 @@ import requests
 from collections import Counter
 import os
 import sys
-
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 # ---------------------------
 # 0. 환경 변수 로드
 # ---------------------------
-#load_dotenv()
+load_dotenv()
 
-#API_KEY = os.getenv("ULTRALYTICS_API_KEY")
+API_KEY = os.getenv("ULTRALYTICS_API_KEY")
 
 # ---------------------------
 # 1. category_map.json 로드
@@ -29,7 +28,7 @@ with open(CATEGORY_MAP_PATH, "r", encoding="utf-8") as f:
 # ---------------------------
 url = "https://predict.ultralytics.com"
 headers = {
-    "x-api-key": "551f61b5606bd15c1074997b2798ff8eabf8ab1337"
+    "x-api-key": "API_KEY"
 }
 
 data = {
