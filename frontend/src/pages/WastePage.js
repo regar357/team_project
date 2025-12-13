@@ -55,44 +55,37 @@ function WastePage() {
 
       const data = await res.json().catch(() => []);
 
-      // 혹시 백엔드가 { data: [...] } 형태로 줄 수도 있어서 대응
       const list = Array.isArray(data)
         ? data
         : Array.isArray(data?.data)
         ? data.data
         : [];
 
-      // 필드명 표준화(백엔드 키가 달라도 최대한 안전하게)
+
+      // discard_id    폐기 테이블 인덱스
+      // food_id       식재료 테이블 인덱스
+      // food_name     식재료명
+      // food_category 카테고리
+      // food_Ex       유통기한
+      // discard_date  폐기일
       const normalized = list.map((item, idx) => ({
-        // 🔹 DELETE /food/discard/:food_id 호출에 필요한 key
-        food_id: item.food_id ?? item.id ?? idx,
+        discard_id: item.discard_id ?? idx,
+        food_id: item.food_id ?? null,
+        name: item.food_name ?? "",
+        category: item.food_category ?? "기타",
+        expiry: item.food_Ex ?? "", // 필요 시 사용 가능
+        discardDate: item.discard_date ?? "",
 
-        // 이름, 카테고리
-        name:
-          item.name ??
-          item.food_name ??
-          item.foodName ??
-          item.ingredientName ??
-          "",
-        category:
-          item.category ?? item.food_category ?? item.type ?? item.foodType ?? "",
-
-        // 폐기일
-        disposeDate:
-          item.disposeDate ??
-          item.discardDate ??
-          item.dispose_date ??
-          item.discard_date ??
-          item.date ??
-          "",
-
-        // 폐기량
-        amount: item.amount ?? item.count ?? item.qty ?? item.discardAmount ?? 0,
+        amount:
+          item.amount ??
+          item.discard_amount ??
+          item.count ??
+          item.qty ??
+          0,
       }));
 
       setWasteData(normalized);
 
-      // 통신 확인 로그(브라우저 콘솔)
       console.log("GET /discard 응답 수신:", normalized);
     } catch (err) {
       setError(err?.message ?? "폐기량 데이터를 불러오지 못했습니다.");
@@ -102,7 +95,7 @@ function WastePage() {
     }
   };
 
-  // 🔹 폐기 기록 삭제(또는 취소) → DELETE /food/discard/:food_id
+  // 폐기 기록 삭제 DELETE /food/discard/:food_id
   const handleDeleteRecord = async (foodId) => {
     if (!foodId && foodId !== 0) {
       alert("food_id 정보가 없습니다. 서버 응답 형식을 확인하세요.");
@@ -112,9 +105,7 @@ function WastePage() {
     const target = wasteData.find((item) => item.food_id === foodId);
     const name = target?.name || "해당 식재료";
 
-    const ok = window.confirm(
-      `${name}의 폐기 기록을 삭제하시겠습니까?`
-    );
+    const ok = window.confirm(`${name}의 폐기 기록을 삭제하시겠습니까?`);
     if (!ok) return;
 
     try {
@@ -248,12 +239,14 @@ function WastePage() {
                 {!loading &&
                   !error &&
                   filteredData.map((item, idx) => (
-                    <tr key={`${item.food_id ?? item.name ?? "item"}-${idx}`}>
+                    <tr
+                      key={item.discard_id ?? `${item.food_id ?? "item"}-${idx}`}
+                    >
                       <td>{item.name || "-"}</td>
                       <td>{item.category || "-"}</td>
                       <td>
-                        {item.disposeDate
-                          ? String(item.disposeDate)
+                        {item.discardDate
+                          ? String(item.discardDate)
                               .slice(0, 10)
                               .replace(/-/g, ".")
                           : "-"}

@@ -1,4 +1,3 @@
-// src/pages/WeeklyPlan.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import Button from "../components/common/Button";

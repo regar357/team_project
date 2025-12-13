@@ -1,4 +1,3 @@
-// src/pages/IngredientsPage.js
 import React, { useState } from "react";
 import "./IngredientsPage.css";
 

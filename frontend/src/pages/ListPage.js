@@ -1,4 +1,3 @@
-// src/pages/ListPage.js
 import React, { useMemo, useState, useEffect } from "react";
 import "./ListPage.css";
 
