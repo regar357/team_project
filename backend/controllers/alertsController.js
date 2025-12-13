@@ -24,7 +24,7 @@ exports.createAlerts = async (req, res) => {
 
   // 같은 메시지로 오늘 알림이 이미 생성되었는지 확인
   const checkQuery = `
-    SELECT id 
+    SELECT alert_id 
     FROM expiry_alert_log
     WHERE alert_message = ?
       AND DATE(alert_date) = CURDATE()

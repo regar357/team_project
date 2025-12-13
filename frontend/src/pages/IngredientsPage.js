@@ -1,14 +1,7 @@
-// src/pages/IngredientsPage.js
 import React, { useState } from "react";
 import "./IngredientsPage.css";
 
-// 데이터베이스로 연결될거라 지워도 됩니다. 시각화용
-// 수정 API를 쓰려면 id(또는 food_id)가 필요함
-const initialData = [
-  { id: 1, name: "가지", category: "채소", expiry: "2025-11-30", imageUrl: "" },
-  { id: 2, name: "사과", category: "과일", expiry: "2025-11-30", imageUrl: "" },
-];
-
+// D-day 계산
 function getDday(expiryStr) {
   if (!expiryStr) return "";
   const today = new Date();
@@ -25,6 +18,7 @@ function getDday(expiryStr) {
   return `D + ${Math.abs(diffDays)}`;
 }
 
+// D-day 색상 클래스
 function getDdayClass(expiryStr) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -38,8 +32,50 @@ function getDdayClass(expiryStr) {
   return "dday";
 }
 
+// 유통기한 표시
+function formatExpiryDate(expiry) {
+  if (!expiry) return "-";
+  const s = String(expiry);
+  const datePart = s.length >= 10 ? s.slice(0, 10) : s;
+  return datePart.replace(/-/g, ".");
+}
+
+// date input용
+function normalizeExpiryForInput(expiry) {
+  if (!expiry) return "";
+  const s = String(expiry);
+  const datePart = s.length >= 10 ? s.slice(0, 10) : s;
+  return datePart.replace(/\./g, "-").replace(/\//g, "-");
+}
+
+// 백엔드에서 받은 results 배열을 프론트에서 쓰기 좋게 변환
+function normalizeResults(results, fallbackImageUrl) {
+  if (!Array.isArray(results)) return [];
+  return results.map((item, idx) => {
+    const rawExpiry =
+      item.expirationDate ??
+      item.expiry ??
+      item.expiryDate ??
+      item.expiration_date ??
+      "";
+
+    return {
+      id: item.food_id ?? item.id ?? idx,
+      food_id: item.food_id ?? item.id ?? idx,
+      name: item.name ?? item.foodName ?? item.ingredientName ?? "",
+      category: item.category ?? item.type ?? "",
+      // date input에 바로 쓸 수 있게 정규화
+      expiry: normalizeExpiryForInput(rawExpiry),
+      imageUrl: item.imageUrl ?? fallbackImageUrl ?? "",
+    };
+  });
+}
+
 function IngredientsPage() {
-  const [ingredients, setIngredients] = useState(initialData);
+  // 아래 테이블에 표시할 식재료 목록
+  const [ingredients, setIngredients] = useState([]);
+
+  // 우측 수정 폼
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -53,13 +89,16 @@ function IngredientsPage() {
   const [uploadError, setUploadError] = useState("");
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
 
+  // 상자 안에 보여줄 이미지 URL
+  const [previewUrl, setPreviewUrl] = useState("");
+
   // 입력값 변경
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 서버 업로드 함수 (POST /food/upload)
+  // 이미지 업로드 함수 POST /food/upload
   const uploadFoodImage = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
@@ -77,37 +116,7 @@ function IngredientsPage() {
     return data;
   };
 
-  // 파일 선택 즉시 자동 업로드
-  const handleFileChange = async (e) => {
-    const file = e.target.files?.[0] ?? null;
-
-    // 같은 파일 다시 선택 가능
-    e.target.value = "";
-
-    setForm((prev) => ({ ...prev, imageFile: file }));
-    setUploadError("");
-    setUploadedImageUrl("");
-
-    if (!file) return;
-
-    try {
-      setUploading(true);
-
-      const data = await uploadFoodImage(file);
-      console.log("✅ 이미지 업로드 응답:", data);
-
-      // 서버 응답 키 대응
-      const url = data.url || data.imageUrl || data.path || data.location || "";
-
-      setUploadedImageUrl(url);
-    } catch (err) {
-      setUploadError(err?.message ?? "업로드 중 오류가 발생했습니다.");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  // 수정 API 호출 함수
+  // 수정 API 함수 PUT /food/update/:food_id
   const updateFood = async (foodId, payload) => {
     const res = await fetch(`/food/update/${foodId}`, {
       method: "PUT",
@@ -122,12 +131,60 @@ function IngredientsPage() {
       throw new Error(`수정 실패 (${res.status})`);
     }
 
-    // 응답이 비어있을 수도 있으니 안전 처리
     const data = await res.json().catch(() => ({}));
     return data;
   };
 
-  // 선택된 행 수정 + 서버 PUT 연동
+  // 파일 선택 즉시 자동 업로드 / 이미지 + 인식 결과
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0] ?? null;
+
+    // 같은 파일 다시 선택 가능
+    e.target.value = "";
+
+    setForm((prev) => ({ ...prev, imageFile: file }));
+    setUploadError("");
+    setUploadedImageUrl("");
+
+    // 이전 미리보기 URL 정리 + 새 URL 생성
+    if (!file) {
+      setPreviewUrl((prevUrl) => {
+        if (prevUrl) URL.revokeObjectURL(prevUrl);
+        return "";
+      });
+      return;
+    }
+
+    setPreviewUrl((prevUrl) => {
+      if (prevUrl) URL.revokeObjectURL(prevUrl);
+      return URL.createObjectURL(file);
+    });
+
+    try {
+      setUploading(true);
+
+      const data = await uploadFoodImage(file);
+      console.log("이미지 업로드 응답:", data);
+
+      // 서버 응답 키 대응 (이미지 URL)
+      const url =
+        data.url || data.imageUrl || data.path || data.location || "";
+      setUploadedImageUrl(url);
+
+      // 결과 배열을 테이블용 데이터로 변환해서 바로 반영
+      if (Array.isArray(data.results)) {
+        const normalized = normalizeResults(data.results, url);
+        setIngredients(normalized);
+      }
+    } catch (err) {
+      console.error("업로드 오류:", err);
+      setUploadError(err?.message ?? "업로드 중 오류가 발생했습니다.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // 선택된 행 수정 + 서버에 반영 (PUT /food/update/:food_id)
   const handleUpdate = async () => {
     if (editingIndex === null) {
       alert("수정할 항목을 먼저 목록에서 선택해 주세요.");
@@ -139,7 +196,7 @@ function IngredientsPage() {
     }
 
     const target = ingredients[editingIndex];
-    const foodId = target?.id ?? target?.food_id; // 둘 다 대응
+    const foodId = target?.food_id ?? target?.id; // 둘 다 대응
 
     if (!foodId) {
       alert("food_id가 없습니다. 목록 데이터에 id(또는 food_id)가 필요합니다.");
@@ -152,48 +209,55 @@ function IngredientsPage() {
     const payload = {
       name: form.name,
       category: form.category,
-      expiry: form.expiry,
-      // imageUrl: imageUrlToSend,
+      expiry: form.expiry, // "YYYY-MM-DD" 형식
+      // imageUrl: imageUrlToSend, // 백엔드에서 필요하면 주석 해제
     };
 
     try {
       const data = await updateFood(foodId, payload);
-      console.log("✅ PUT /food/update 성공:", data);
+      console.log("PUT /food/update 성공:", data);
 
-      // 프론트 화면도 즉시 반영
-      const updated = [...ingredients];
-      updated[editingIndex] = {
-        ...target,
-        name: form.name,
-        category: form.category,
-        expiry: form.expiry,
-        // imageUrl: imageUrlToSend,
-      };
-      setIngredients(updated);
+      // 응답에 최신 리스트가 있으면 그걸 사용
+      if (Array.isArray(data.results)) {
+        const normalized = normalizeResults(data.results);
+        setIngredients(normalized);
+      } else {
+        // 아니면 로컬에서 해당 항목만 업데이트
+        const updated = [...ingredients];
+        updated[editingIndex] = {
+          ...target,
+          name: form.name,
+          category: form.category,
+          expiry: form.expiry,
+          imageUrl: imageUrlToSend,
+        };
+        setIngredients(updated);
+      }
 
       // 입력 상태 정리
       setEditingIndex(null);
       setForm({ name: "", category: "", expiry: "", imageFile: null });
-      setUploadedImageUrl("");
       setUploadError("");
 
       alert("수정 완료!");
     } catch (err) {
-      console.log("❌ 수정 오류:", err);
+      console.log("수정 오류:", err);
       alert(err?.message ?? "수정 중 오류가 발생했습니다.");
     }
   };
 
-  // 행 클릭 시 폼에 불러오기
+  // 행 클릭 시 폼에 불러오기 (→ 수정 준비)
   const handleRowClick = (idx) => {
     const item = ingredients[idx];
     setForm({
       name: item.name,
       category: item.category,
-      expiry: item.expiry,
+      expiry: normalizeExpiryForInput(item.expiry),
       imageFile: null,
     });
 
+    // 행에 이미지 정보가 있다면 상자에서도 그 이미지 보여주기
+    setPreviewUrl("");
     setUploadedImageUrl(item.imageUrl || "");
     setUploadError("");
     setEditingIndex(idx);
@@ -206,28 +270,50 @@ function IngredientsPage() {
           <h1>Ingredients upload</h1>
           <p>식품 등록</p>
         </section>
-        {/* 사진 업로드 + 입력 폼 */}
+
+        {/* 사진 업로드 + 입력 폼 카드 */}
         <section className="recipe-top-card">
           {/* 왼쪽 사진 업로드 */}
           <div className="photo-upload">
-            <div className="photo-box">
-              <label className="photo-button">
-                <span>{uploading ? "업로드 중..." : "+ 사진 업로드"}</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  style={{ display: "none" }}
-                />
-              </label>
-              <p className="photo-help">냉장고 속 이미지를 등록하세요</p>
+            <div
+              className={`photo-box ${
+                previewUrl || uploadedImageUrl ? "has-image" : ""
+              }`}
+            >
+              {previewUrl || uploadedImageUrl ? (
+                <>
+                  <img
+                    src={previewUrl || uploadedImageUrl}
+                    alt="업로드된 식재료"
+                    className="photo-preview"
+                  />
+                  <label className="photo-button photo-button-overlay">
+                    <span>{uploading ? "업로드 중..." : "이미지 변경"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                  </label>
+                </>
+              ) : (
+                <>
+                  <label className="photo-button">
+                    <span>{uploading ? "업로드 중..." : "+ 사진 업로드"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                  </label>
+                  <p className="photo-help">냉장고 속 이미지를 등록하세요</p>
+                </>
+              )}
             </div>
 
-            {form.imageFile && (
-              <div className="photo-filename">{form.imageFile.name}</div>
-            )}
-
-            {uploadedImageUrl && (
+            {uploadedImageUrl && !uploading && (
               <div className="photo-filename">업로드 완료</div>
             )}
 
@@ -295,7 +381,7 @@ function IngredientsPage() {
           </div>
         </section>
 
-        {/* 🔷 카드 2: 아래 목록 테이블 */}
+        {/* 아래 목록 테이블 카드 */}
         <section className="recipe-list-card">
           <div className="recipe-table-wrapper">
             <table className="recipe-table">
@@ -310,18 +396,28 @@ function IngredientsPage() {
               <tbody>
                 {ingredients.map((item, idx) => (
                   <tr
-                    key={`${item.id ?? item.name}-${idx}`}
+                    key={`${item.food_id ?? item.id ?? idx}`}
                     onClick={() => handleRowClick(idx)}
-                    className={editingIndex === idx ? "row-selected" : undefined}
+                    className={
+                      editingIndex === idx ? "row-selected" : undefined
+                    }
                   >
                     <td>{item.name}</td>
                     <td>{item.category}</td>
-                    <td>{item.expiry.replace(/-/g, ".")}</td>
+                    <td>{formatExpiryDate(item.expiry)}</td>
                     <td className={getDdayClass(item.expiry)}>
-                      {getDday(item.expiry)}
+                      {item.expiry ? getDday(item.expiry) : "-"}
                     </td>
                   </tr>
                 ))}
+
+                {ingredients.length === 0 && (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: "center", padding: 16 }}>
+                      업로드된 식재료가 없습니다. 사진을 업로드해 보세요.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
