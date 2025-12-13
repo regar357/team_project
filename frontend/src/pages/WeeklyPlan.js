@@ -1,122 +1,283 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { fetchIngredients } from "../utils/api/ingredients";
-// import { generateWeeklyPlan } from "../utils/api/weekly";
-import { fetchWeeklyRecipes } from "../utils/api/weekly";
+// // // src/pages/WeeklyPlan.js
+// // import React from "react";
+// // import Card from "../components/common/Card";
+// // import { weeklyPlanDummy } from "../utils/api/weekly";
+// // import "./WeeklyPlan.css";
+
+
+
+// // const DAYS_TOP = ["Mon", "Tue", "Wed", "Thu"];
+// // const DAYS_BOTTOM = ["Fri", "Sat", "Sun"];
+
+// // function getMenu(day, rowIndex) {
+// //   return weeklyPlanDummy.filter((item) => item.day === day)[rowIndex];
+// // }
+
+// // export default function WeeklyPlan() {
+// //   return (
+// //     <div className="weekly-page">
+// //       <h1 className="weekly-title">주간 식단</h1>
+
+// //       {/* ===== 윗줄: Mon~Thu ===== */}
+// //       <div className="weekly-block">
+// //         <div className="weekly-days weekly-days-4">
+// //           {DAYS_TOP.map((day) => (
+// //             <div key={day} className="weekly-day">{day}</div>
+// //           ))}
+// //         </div>
+
+// //         <div className="weekly-table">
+// //           {[0, 1].map((row) => (
+// //             <div key={row} className="weekly-row weekly-row-4">
+// //               {DAYS_TOP.map((day) => {
+// //                 const menu = getMenu(day, row);
+// //                 return (
+// //                   <Card key={`${day}-${row}`} className="weekly-card">
+// //                     {menu ? menu.title : "-"}
+// //                   </Card>
+// //                 );
+// //               })}
+// //             </div>
+// //           ))}
+// //         </div>
+// //       </div>
+
+// //       {/* ===== 아랫줄: Fri~Sun ===== */}
+// //       {/* ===== 아랫줄: Fri~Sun ===== */}
+// // <div className="weekly-block">
+// //   <div className="weekly-days weekly-days-4">
+// //     {["Fri", "Sat", "Sun", ""].map((day, idx) => (
+// //       <div key={idx} className="weekly-day">
+// //         {day}
+// //       </div>
+// //     ))}
+// //   </div>
+
+// //   <div className="weekly-table">
+// //     {[0, 1].map((row) => (
+// //       <div key={row} className="weekly-row weekly-row-4">
+// //         {["Fri", "Sat", "Sun"].map((day) => {
+// //           const menu = getMenu(day, row);
+// //           return (
+// //             <Card key={`${day}-${row}`} className="weekly-card">
+// //               {menu ? menu.title : "-"}
+// //             </Card>
+// //           );
+// //         })}
+
+// //         {/* 빈 카드 (크기 맞추기용) */}
+// //         <div className="weekly-card weekly-empty" />
+// //       </div>
+// //     ))}
+// //   </div>
+// // </div>
+
+      
+// //     </div>
+// //   );
+// // }
+
+// // src/pages/WeeklyPlan.js
+// import React from "react";
+// import Card from "../components/common/Card";
+// import { weeklyPlanDummy } from "../utils/api/weekly";
+// import "./WeeklyPlan.css";
+
+// // 요일 리스트를 하나로 합치고, 빈 요소를 채워서 4의 배수로 맞춥니다.
+// const DAYS = [
+//     // 윗줄
+//     "Mon", "Tue", "Wed", "Thu", 
+//     // 아랫줄
+//     "Fri", "Sat", "Sun", "Empty" // Empty는 스타일링용 더미입니다.
+// ];
+
+// // 4개씩 분리
+// const DAYS_TOP = DAYS.slice(0, 4); 
+// const DAYS_BOTTOM = DAYS.slice(4, 8); // ["Fri", "Sat", "Sun", "Empty"]
+
+// function getMenu(day, rowIndex) {
+//   return weeklyPlanDummy.filter((item) => item.day === day)[rowIndex];
+// }
+
+// export default function WeeklyPlan() {
+//   return (
+//     <div className="weekly-page">
+//       <h1 className="weekly-title">주간 식단</h1>
+
+//       {/* 🚨🚨 추가: 전체 컨텐츠를 감싸는 컨테이너 (중앙 정렬용) */}
+//       <div className="weekly-content-wrap">
+//           {/* ===== 윗줄: Mon~Thu ===== */}
+//           <div className="weekly-block">
+//             {/* 🚨 요일 헤더 */}
+//             <div className="weekly-days weekly-days-4">
+//               {DAYS_TOP.map((day) => (
+//                 <div 
+//                     key={day} 
+//                     className={`weekly-day ${day !== "Empty" ? "day-tab" : ""}`}
+//                 >
+//                     {day !== "Empty" ? day : ""}
+//                 </div>
+//               ))}
+//             </div>
+
+//             {/* 🚨 메뉴 카드 */}
+//             <div className="weekly-table">
+//               {[0, 1].map((row) => (
+//                 <div key={row} className="weekly-row weekly-row-4">
+//                   {DAYS_TOP.map((day) => {
+//                     if (day === "Empty") {
+//                       return <div key={`${day}-${row}`} className="weekly-card weekly-empty" />;
+//                     }
+//                     const menu = getMenu(day, row);
+//                     return (
+//                       <Card key={`${day}-${row}`} className="weekly-card">
+//                         {menu ? menu.title : "-"}
+//                       </Card>
+//                     );
+//                   })}
+//                 </div>
+//               ))}
+//             </div>
+//           </div>
+
+//           {/* ===== 아랫줄: Fri~Sun (4칸 맞추기) ===== */}
+//           <div className="weekly-block">
+//             {/* 🚨 요일 헤더 */}
+//             <div className="weekly-days weekly-days-4">
+//               {DAYS_BOTTOM.map((day) => (
+//                 <div 
+//                     key={day} 
+//                     className={`weekly-day ${day !== "Empty" ? "day-tab" : ""}`}
+//                 >
+//                   {day !== "Empty" ? day : ""}
+//                 </div>
+//               ))}
+//             </div>
+
+//             {/* 🚨 메뉴 카드 */}
+//             <div className="weekly-table">
+//               {[0, 1].map((row) => (
+//                 <div key={row} className="weekly-row weekly-row-4">
+//                   {DAYS_BOTTOM.map((day) => {
+//                     if (day === "Empty") {
+//                       return <div key={`${day}-${row}`} className="weekly-card weekly-empty" />;
+//                     }
+//                     const menu = getMenu(day, row);
+//                     return (
+//                       <Card key={`${day}-${row}`} className="weekly-card">
+//                         {menu ? menu.title : "-"}
+//                       </Card>
+//                     );
+//                   })}
+//                 </div>
+//               ))}
+//             </div>
+//           </div>
+
+//       </div>
+//     </div>
+//   );
+// }
+// src/pages/WeeklyPlan.js
+
+import React from "react";
+import Card from "../components/common/Card";
+// 🚨🚨 수정: 새로운 더미 데이터 구조를 위한 헬퍼 함수를 import
+import { getMenuFromDummy } from "../utils/api/weekly"; 
 import "./WeeklyPlan.css";
 
-const DAY_TABS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+const DAYS = [
+    "Mon", "Tue", "Wed", "Thu", 
+    "Fri", "Sat", "Sun", "Empty"
+];
+
+const DAYS_TOP = DAYS.slice(0, 4); 
+const DAYS_BOTTOM = DAYS.slice(4, 8); 
+
+function getMenu(day, rowIndex) {
+  return getMenuFromDummy(day, rowIndex); 
+}
 
 export default function WeeklyPlan() {
-  const navigate = useNavigate();
-
-  const [selectedDay, setSelectedDay] = useState("Mon");
-  const [weeklyRecipes, setWeeklyRecipes] = useState({});
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const load = async () => {
-      const weekly = await fetchWeeklyRecipes();
-      setWeeklyRecipes(weekly);
-      setLoading(false);
-    };
-    load();
-  }, []);
-
-  //   // 식재료 가져와서 AI 모델로 주간 식단 생성
-  // useEffect(() => {
-  //   const load = async () => {
-  //     try {
-  //       // 현재 보유 식재료 목록 가져오기
-  //       const ingredients = await fetchIngredients();
-  //       const ingredientNames = ingredients.map((i) => i.name);
-
-  //       console.log("[WeeklyPlan] 가져온 식재료:", ingredientNames);
-
-  //       // AI 모델에 주간 식단 생성 요청
-  //       const weekly = await generateWeeklyPlan(ingredientNames);
-
-  //       console.log("[WeeklyPlan] AI 추천 결과:", weekly);
-
-  //       setWeeklyRecipes(weekly);
-  //     } catch (err) {
-  //       console.error("주간 식단 불러오기 실패:", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   load();
-  // }, []);
-
-  const recipes = weeklyRecipes[selectedDay] || [];
-  const displayedRecipes = recipes.slice(0, 3);
-
-
   return (
-    <div className="weekly-page">
-      {/* 1줄째: 로고 + 날짜 범위 */}
-      <div className="weekly-top-row">
+  <div className="weekly-page">
 
-        <div className="weekly-logo">
-          <span className="weekly-logo-circle" />
-          <div className="weekly-logo-text">
-            <span>WEEKLY</span>
-            <span>PLAN</span>
-          </div>
-        </div>
-        
-        <div className="weekly-tabs">
-          {DAY_TABS.map((day) => (
-            <button
-              key={day}
-              type="button"
-              className={`weekly-tab ${selectedDay === day ? "active" : ""}`}
-              onClick={() => setSelectedDay(day)}
-            >
-              {day}
-            </button>
-          ))}
-        </div>
-      </div>
+      <div className="weekly-content-wrap">
+          <section className="saved-hero">  
+            <h1>WEEKLY PLAN</h1>  <p>주간 식단</p>
+          </section>
 
-      {/* =====  카드 그리드 ===== */}
-      <section className="weekly-main">
-          {loading && ( <p className="weekly-loading">AI가 주간 식단을 생성 중입니다...</p> )}
-          
-          { !loading && displayedRecipes.length === 0 && (
-            <p className="weekly-empty">
-            아직 선택한 요일에 등록된 식단이 없습니다. 
-            </p>
-        )}
-        
-        <div className="weekly-recipes-grid">
+          {/* ===== 윗줄: Mon~Thu ===== */}
+          <div className="weekly-block">
+            {/* 🚨 요일 헤더 */}
+            <div className="weekly-days weekly-days-4">
+              {DAYS_TOP.map((day) => (
+                <div 
+                    key={day} 
+                    className={`weekly-day ${day !== "Empty" ? "day-tab" : ""}`}
+                >
+                    {day !== "Empty" ? day : ""}
+                </div>
+              ))}
+            </div>
 
-        {displayedRecipes.map((r) => (
-          <div key={r.id}>
-            <div
-              className="weekly-recipe-card"
-              onClick={() => navigate(`/recipes/${r.id}`,{ state: { recipeData: r }})}
-            >
-              <div className="weekly-recipe-image-wrap">
-                <img src={r.image_url} alt={r.title} />
-              </div>
-
-              <div className="weekly-recipe-info">
-                <div className="weekly-recipe-title">{r.title}</div>
-              </div>
-
-              <div className="weekly-recipe-tags">
-                { r.tags?.map((tag) => (
-                    <span key={tag} className="tag-badge"> {tag} </span>
-                  ))}
-              </div>
+            {/* 🚨 메뉴 카드 */}
+            <div className="weekly-table">
+              {[0, 1].map((row) => (
+                <div key={row} className="weekly-row weekly-row-4">
+                  {DAYS_TOP.map((day) => {
+                    if (day === "Empty") {
+                      return <div key={`${day}-${row}`} className="weekly-card weekly-empty" />;
+                    }
+                    const menu = getMenu(day, row);
+                    return (
+                      <Card key={`${day}-${row}`} className="weekly-card">
+                        {/* 🚨 menu가 undefined 일 때 "-" 표시 */}
+                        {menu ? menu.title : "-"}
+                      </Card>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-      </section>
 
-    </div>
-  );
+          {/* ===== 아랫줄: Fri~Sun (4칸 맞추기) ===== */}
+          <div className="weekly-block">
+            {/* 🚨 요일 헤더 */}
+            <div className="weekly-days weekly-days-4">
+              {DAYS_BOTTOM.map((day) => (
+                <div 
+                    key={day} 
+                    className={`weekly-day ${day !== "Empty" ? "day-tab" : ""}`}
+                >
+                  {day !== "Empty" ? day : ""}
+                </div>
+              ))}
+            </div>
+
+            {/* 🚨 메뉴 카드 */}
+            <div className="weekly-table">
+              {[0, 1].map((row) => (
+                <div key={row} className="weekly-row weekly-row-4">
+                  {DAYS_BOTTOM.map((day) => {
+                    if (day === "Empty") {
+                      return <div key={`${day}-${row}`} className="weekly-card weekly-empty" />;
+                    }
+                    const menu = getMenu(day, row);
+                    return (
+                      <Card key={`${day}-${row}`} className="weekly-card">
+                        {menu ? menu.title : "-"}
+                      </Card>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+
+      </div>
+    </div>
+  );
 }
