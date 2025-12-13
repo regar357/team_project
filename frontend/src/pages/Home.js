@@ -35,7 +35,7 @@ const Home = () => {
 
           <Link to="/ingredients" className="home-menu-card">
             <div className="home-menu-icon">✨</div>
-            <div className="home-menu-title">식재료 등록하기</div>
+            <div className="home-menu-title">식재료 등록</div>
           </Link>
 
           <Link to="/weekly-plan" className="home-menu-card">
@@ -53,14 +53,6 @@ const Home = () => {
             <div className="home-menu-title">폐기물 정리</div>
           </Link>
           
-{/*
-          {HOME_MENU_ITEMS.map((item) => (
-            <Link key={item.id} to={item.path} className="home-menu-card">
-              <div className="home-menu-icon">{item.icon}</div>
-              <div className="home-menu-title">{item.label}</div>
-            </Link>
-          ))}
-*/}
         </div>
       </main>
     </div>

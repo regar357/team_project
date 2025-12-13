@@ -1,119 +1,82 @@
-/* 기본 폰트 / 배경 */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+:root {
+  --accent: #f26d57;
+  --accent-soft: #ffe3d6;
+  --gray-line: #dedede;
+  --text-main: #333333;
+  --bg: #f3f3f3;
+  --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.06);
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
-    "Noto Sans KR", sans-serif;
-  background: #f3f3f3;
+/* 🔹 hero 타이틀 (Ingredients upload랑 동일 스타일) */
+.header-hero {
+  text-align: center;
+  margin-bottom: 32px;
 }
 
-/* 페이지 전체 */
-.page {
-  min-height: 100vh;
-  padding: 0;
-  background: #f3f3f3;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 왼쪽 위 회색 텍스트 */
-.page-label {
-  font-size: 18px;
-  color: #c4c4c4;
-  padding: 20px 24px 8px;
-}
-
-/* 가운데 흰색 카드 */
-.frame {
-  flex: 1;
-  width: 100%;
-  margin: 0;
-  background: #ffffff;
-  border-radius: 0;
-  box-shadow: none;
-  overflow: hidden;
-}
-
-/* ===== 상단 헤더 ===== */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 30px;
-  background: #ffffff;
-  color: #f26d57;
-}
-
-/* 햄버거 메뉴 버튼 */
-.menu-btn {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  padding: 0;
-  cursor: pointer;
-}
-
-.menu-btn span {
-  display: block;
-  width: 18px;
-  height: 2px;
-  background: #f26d57;
-  border-radius: 999px;
-}
-
-/* 중앙 FreshLens 텍스트 */
-.topbar-logo {
+.header-hero h1 {
+  font-size: 32px;
   font-weight: 700;
-  letter-spacing: 0.18em;
-  font-size: 20px;
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+  color: #333;
 }
 
-/* 오른쪽 아이콘 자리 */
-.topbar-icons {
+.header-hero p {
+  font-size: 14px;
+  color: #777;
+}
+
+/* 🔹 페이지 전체 – 다른 메뉴와 비슷한 그라디언트 + 가운데 정렬 */
+.waste-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px 0 80px;
+  box-sizing: border-box;
+  background: linear-gradient(
+    180deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 45%,
+    var(--bg-gradient-end) 100%
+  );
   display: flex;
-  align-items: center;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* 가운데 폭 제한 */
+.waste-inner {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 🔶 카드 1: 필터 + 요약 */
+.waste-top-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  padding: 24px 24px 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   gap: 18px;
 }
 
-.icon-btn {
-  width: 24px;
-  height: 24px;
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-}
-
-/* WASTE */
-
-
-.waste-title {
-  font-size: 30px;
-  letter-spacing: 0.45em;
-  text-indent: 0.45em; /* 첫 글자 밀림 보정 */
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-
-.waste-subtitle {
+/* 로딩/에러 메시지 */
+.waste-empty {
+  text-align: center;
+  color: #999999;
+  padding: 8px 0 4px;
   font-size: 14px;
-  letter-spacing: 0.2em;
 }
 
-/* 아래 내용 영역 */
-.waste-content {
-  background: #ffffff;
-  min-height: 320px;
-  padding: 24px 32px 32px;
+.waste-empty.waste-error {
+  color: #e74c3c;
 }
 
 /* 필터 영역 */
@@ -121,7 +84,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
+  gap: 12px;
 }
 
 .filter-group {
@@ -142,6 +105,13 @@ body {
   border: 1px solid #dddddd;
   padding: 0 10px;
   font-size: 14px;
+  background: #fff;
+}
+
+/* 우측 버튼 묶음 */
+.waste-toolbar-buttons {
+  display: flex;
+  gap: 8px;
 }
 
 .waste-reset-btn {
@@ -163,7 +133,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
-  margin-bottom: 24px;
+  margin-top: 4px;
 }
 
 .summary-card {
@@ -185,10 +155,19 @@ body {
   color: #f26d57;
 }
 
+/* 🔷 카드 2: 테이블 */
+.waste-list-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  padding: 24px 24px 28px;
+  box-sizing: border-box;
+}
+
 /* 테이블 영역 */
 .waste-table-wrapper {
   border-top: 1px solid #f0f0f0;
-  padding-top: 16px;
+  padding-top: 12px;
 }
 
 .waste-table {
@@ -217,40 +196,37 @@ body {
   background: #fff8f5;
 }
 
-.waste-empty {
-  text-align: center;
-  color: #999999;
-  padding: 16px 0;
-}
-
 /* 반응형 */
 @media (max-width: 900px) {
+  .waste-inner {
+    padding: 0 16px;
+  }
+
   .waste-summary {
     grid-template-columns: 1fr;
   }
+
+  .waste-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .waste-toolbar-buttons {
+    align-self: flex-end;
+  }
 }
 
-@media (max-width: 768px) {
-  .frame {
-    max-width: 100%;
+@media (max-width: 600px) {
+  .waste-page {
+    padding: 28px 0 40px;
   }
 
-  .topbar {
-    padding: 14px 18px;
+  .waste-inner {
+    padding: 0 12px;
   }
 
-  .topbar-logo {
-    font-size: 18px;
-    letter-spacing: 0.15em;
-  }
-
-
-  .waste-title {
-    font-size: 24px;
-    letter-spacing: 0.35em;
-  }
-
-  .waste-content {
-    padding: 20px 16px 28px;
+  .waste-top-card,
+  .waste-list-card {
+    padding: 20px 18px 24px;
   }
 }

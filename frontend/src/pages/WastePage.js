@@ -5,7 +5,10 @@ import "./WastePage.css";
 // 요약 계산 함수
 function calcSummary(data) {
   const totalItems = data.length;
-  const totalAmount = data.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+  const totalAmount = data.reduce(
+    (sum, item) => sum + (Number(item.amount) || 0),
+    0
+  );
 
   const categoryMap = data.reduce((map, item) => {
     const cat = item.category || "기타";
@@ -44,7 +47,7 @@ function WastePage() {
     try {
       const res = await fetch("/discard", {
         method: "GET",
-        headers: { "Accept": "application/json" },
+        headers: { Accept: "application/json" },
       });
 
       if (!res.ok) {
@@ -54,7 +57,11 @@ function WastePage() {
       const data = await res.json().catch(() => []);
 
       // 혹시 백엔드가 { data: [...] } 형태로 줄 수도 있어서 대응
-      const list = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
 
       // 필드명 표준화(백엔드 키가 달라도 최대한 안전하게)
       const normalized = list.map((item) => ({
@@ -94,19 +101,20 @@ function WastePage() {
   );
 
   return (
-    <div className="page">
-      <div className="frame">
-        {/* 아래 내용 영역 */}
-        <main className="waste-content">
+    <div className="waste-page">
+      <div className="waste-inner">
+        <section className="header-hero">
+          <h1>Waste list</h1>
+          <p>폐기 목록</p>
+        </section>
+
+        <section className="waste-top-card">
           {/* 로딩/에러 표시 */}
           {loading && (
             <div className="waste-empty">데이터 불러오는 중...</div>
           )}
-
           {!loading && error && (
-            <div className="waste-empty" style={{ color: "#e74c3c" }}>
-              {error}
-            </div>
+            <div className="waste-empty waste-error">{error}</div>
           )}
 
           {/* 필터 영역 */}
@@ -128,7 +136,7 @@ function WastePage() {
               </select>
             </div>
 
-            <div style={{ display: "flex", gap: "8px" }}>
+            <div className="waste-toolbar-buttons">
               <button
                 type="button"
                 className="waste-reset-btn"
@@ -163,8 +171,10 @@ function WastePage() {
               <div className="summary-value">{topCategory}</div>
             </div>
           </div>
+        </section>
 
-          {/* 폐기 목록 테이블 */}
+        {/* 🔷 카드 2: 폐기 목록 테이블 */}
+        <section className="waste-list-card">
           <div className="waste-table-wrapper">
             <table className="waste-table">
               <thead>
@@ -176,18 +186,20 @@ function WastePage() {
                 </tr>
               </thead>
               <tbody>
-                {!loading && !error && filteredData.map((item, idx) => (
-                  <tr key={`${item.name || "item"}-${idx}`}>
-                    <td>{item.name || "-"}</td>
-                    <td>{item.category || "-"}</td>
-                    <td>
-                      {item.disposeDate
-                        ? String(item.disposeDate).replace(/-/g, ".")
-                        : "-"}
-                    </td>
-                    <td>{item.amount ?? 0}</td>
-                  </tr>
-                ))}
+                {!loading &&
+                  !error &&
+                  filteredData.map((item, idx) => (
+                    <tr key={`${item.name || "item"}-${idx}`}>
+                      <td>{item.name || "-"}</td>
+                      <td>{item.category || "-"}</td>
+                      <td>
+                        {item.disposeDate
+                          ? String(item.disposeDate).replace(/-/g, ".")
+                          : "-"}
+                      </td>
+                      <td>{item.amount ?? 0}</td>
+                    </tr>
+                  ))}
 
                 {!loading && !error && filteredData.length === 0 && (
                   <tr>
@@ -199,7 +211,7 @@ function WastePage() {
               </tbody>
             </table>
           </div>
-        </main>
+        </section>
       </div>
     </div>
   );

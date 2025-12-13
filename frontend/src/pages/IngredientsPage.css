@@ -6,40 +6,69 @@
   --bg: #f3f3f3;
   --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.06);
 }
-
-/* 페이지 전체 – 다른 페이지와 비슷한 카드 위치 */
-.recipe-page {
-  min-height: 100vh;
-  width: 100%;
-  background: var(--bg);
-  justify-content: center;
-  align-items: flex-start;
-  padding: 32px 24px 60px;
-  box-sizing: border-box;
+/*타이틀 영역*/
+.header-hero {
+  text-align: center;
+  margin-bottom: 32px;
 }
 
-/* 중앙 큰 카드 */
-.recipe-card {
+.header-hero h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.header-hero p {
+  font-size: 14px;
+  color: #777;
+}
+/* 페이지 전체 – 다른 메뉴와 비슷한 그라디언트 + 가운데 정렬 */
+.recipe-page {
   width: 100%;
-  max-width: 1280px;
+  min-height: 100vh;
+  padding: 40px 0 80px;
+  box-sizing: border-box;
+  background: linear-gradient(
+    180deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 45%,
+    var(--bg-gradient-end) 100%
+  );
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* 가운데 폭 제한 */
+.recipe-inner {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 사진 업로드 + 입력 폼 */
+.recipe-top-card {
   background: #ffffff;
   border-radius: 12px;
   box-shadow: var(--shadow-soft);
-  padding: 28px 36px 40px;
+  padding: 28px 32px 32px;
   box-sizing: border-box;
-}
 
-/* 상단: 왼쪽 사진 업로드 + 오른쪽 입력 폼 */
-.recipe-card-top {
-  margin-top: 8px;
-  display: flex;          /* 2열 배치 */
+  display: flex;          /* 왼쪽/오른쪽 2열 배치 */
   align-items: flex-start;
-  gap: 40px;              /* 왼쪽/오른쪽 사이 간격 */
+  gap: 40px;
 }
 
 /* 왼쪽 사진 업로드 영역 */
 .photo-upload {
-  flex: 0 0 360px;        /* 너비 360px 고정 */
+  flex: 0 0 360px;        /* 너비 360px 고정 느낌 */
   max-width: 360px;
   display: flex;
   flex-direction: column;
@@ -143,7 +172,7 @@
   margin-top: 10px;
 }
 
-/* 버튼 기본 스타일 (필요시) */
+/* 버튼 기본 스타일 */
 .btn {
   border: none;
   cursor: pointer;
@@ -157,9 +186,18 @@
   color: #ffffff;
 }
 
-/* ===== 하단 등록된 식재료 목록 ===== */
+/* 🔷 카드 2: 하단 등록된 식재료 목록 */
+.recipe-list-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  padding: 24px 24px 28px;
+  box-sizing: border-box;
+}
+
+/* 테이블 래퍼 */
 .recipe-table-wrapper {
-  margin-top: 28px;
+  margin-top: 4px;
   font-size: 14px;
 }
 
@@ -186,18 +224,29 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
-/* 선택된 행 강조 (선택사항) */
+/* 선택된 행 강조 */
 .row-selected {
   background: #fff7f3;
 }
 
-/* D-day 공통 스타일 (색상은 다른 CSS에서 이미 있을 수도 있음) */
+/* D-day 공통 스타일 (색상은 리스트 페이지와 통일되게 써도 됨) */
 .dday {
   font-weight: 700;
 }
 
+/* 필요하면 위험/주의/안전 색상도 같이 정의 가능
+.dday-danger { color: #ff5b5b; }
+.dday-warning { color: #ff9800; }
+.dday-safe { color: #00b050; }
+*/
+
+/* 아이패드·모바일 대응 */
 @media (max-width: 900px) {
-  .recipe-card-top {
+  .recipe-inner {
+    padding: 0 16px;
+  }
+
+  .recipe-top-card {
     flex-direction: column;    /* 세로로 쌓기 */
     gap: 24px;
   }
@@ -209,7 +258,16 @@
 }
 
 @media (max-width: 600px) {
-  .recipe-card {
-    padding: 20px 18px 28px;
+  .recipe-page {
+    padding: 28px 0 40px;
+  }
+
+  .recipe-inner {
+    padding: 0 12px;
+  }
+
+  .recipe-top-card,
+  .recipe-list-card {
+    padding: 20px 18px 24px;
   }
 }

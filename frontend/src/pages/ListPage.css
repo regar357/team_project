@@ -1,4 +1,4 @@
-/* src/IngredientsListPage.css */
+/* src/ListPage.css (IngredientsListPage 스타일 통일 버전) */
 :root {
   --accent: #f26d57;
   --accent-soft: #ffe3d6;
@@ -8,74 +8,77 @@
   --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.06);
 }
 
-/* ===== 전체 배경 ===== */
+/* ===== 전체 배경 (다른 메뉴들과 통일: 그라디언트) ===== */
 .ingredients-list-page {
-  min-height: 100vh;
   width: 100%;
-  background: var(--bg);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 32px 24px 60px;
+  min-height: 100vh;
+  padding: 40px 0 80px;
   box-sizing: border-box;
+  background: linear-gradient(
+    180deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 45%,
+    var(--bg-gradient-end) 100%
+  );
 }
 
-/* ===== 내부 흰 프레임(이미지처럼 큰 카드 배경) ===== */
+/* ===== 가운데 정렬된 내부 컨테이너 ===== */
 .ingredients-list-frame {
   width: 100%;
-  max-width: 1280px;
-  background: #fff;
-  border-radius: 2px;
-  padding: 28px 36px 44px;
+  max-width: 1120px;   /* search-page, weekly-page와 비슷한 폭 */
+  margin: 0 auto;
+  padding: 0 40px;
   box-sizing: border-box;
   position: relative;
 }
 
-
-/* ===== 타이틀 영역 ===== */
-.list-hero {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  margin-bottom: 22px;
-}
-
-.hero-badge {
-  width: 34px;
-  height: 34px;
-  background: var(--accent);
+/* 상단 얇은 라인 (선택사항) */
+.topbar-line {
+  height: 2px;
+  width: 60px;
   border-radius: 999px;
-  margin-top: 6px;
+  background: #ffb8a0;
+  margin-bottom: 16px;
 }
 
-.hero-text .hero-title {
-  font-size: 26px;
-  font-weight: 800;
-  color: #121212;
-  line-height: 1.05;
+
+/*타이틀 영역*/
+.list-hero {
+  text-align: center;
+  margin-bottom: 32px;
 }
 
-.hero-text .hero-title.sub {
-  margin-top: 2px;
+.list-hero h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+  color: #333;
 }
 
-.hero-subtitle {
-  margin-top: 10px;
-  font-size: 12.5px;
-  color: #8f8f8f;
+.list-hero p {
+  font-size: 14px;
+  color: #777;
 }
 
-/* ===== 본문 2열 ===== */
+
+/* ===== 본문 2열 (왼쪽 카테고리 카드 + 오른쪽 리스트 카드) ===== */
 .list-body {
+  margin-top: 16px;
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 34px;
-  align-items: start;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2.2fr);
+  gap: 32px;
+  align-items: flex-start;
 }
 
-/* ===== 카테고리 패널 ===== */
+/* ===== 왼쪽 카테고리 카드 ===== */
 .category-panel {
-  padding-top: 8px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px 18px 18px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06),
+              0 4px 10px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
 }
 
 .panel-title {
@@ -85,21 +88,22 @@
   margin-bottom: 14px;
 }
 
+/* 카테고리 버튼 그리드 */
 .category-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px 18px;
-  margin-bottom: 18px;
+  margin-bottom: 6px;
 }
 
 .category-card {
   background: #fff;
   border: 1px solid #ededed;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 14px 10px 12px;
   box-shadow: 0 6px 14px rgba(0,0,0,0.06);
   cursor: pointer;
-  transition: 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .category-card:hover {
@@ -130,12 +134,21 @@
   width: 96px;
 }
 
-/* ===== 오른쪽 리스트 패널 ===== */
+/* ===== 오른쪽 리스트 패널 전체 ===== */
 .list-panel {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-
+/* 상단 정렬/검색 툴바 */
+.list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
 
 /* 정렬 토글 */
 .sort-group {
@@ -150,7 +163,7 @@
   color: #444;
   font-size: 13px;
   cursor: pointer;
-  padding: 2px 0;
+  padding: 4px 2px;
 }
 
 .sort-chip.active {
@@ -165,6 +178,7 @@
   gap: 12px;
 }
 
+/* 새 식재료 추가 버튼 */
 .add-btn {
   border: none;
   background: var(--accent);
@@ -185,6 +199,7 @@
   line-height: 1;
 }
 
+/* 검색 박스 */
 .search-box {
   position: relative;
   width: 190px;
@@ -193,33 +208,27 @@
 .search-box input {
   width: 100%;
   height: 34px;
-  padding: 0 34px 0 12px;
+  padding: 0 12px;
   border-radius: 999px;
   border: 1px solid #f2b8ae;
   font-size: 12px;
   outline: none;
+  background: #fff;
 }
 
 .search-box input:focus {
   border-color: var(--accent);
 }
 
-.search-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 14px;
-  color: var(--accent);
-}
-
-/* ===== 테이블 카드 ===== */
+/* ===== 오른쪽: 리스트 테이블 카드 ===== */
 .table-card {
-  background: #fff;
-  border-radius: 10px;
+  background: #ffffff;
+  border-radius: 18px;
   border: 1px solid #efefef;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06),
+              0 4px 10px rgba(0, 0, 0, 0.03);
   padding: 18px 18px 14px;
+  box-sizing: border-box;
 }
 
 .ingredients-table {
@@ -284,25 +293,27 @@
 /* ===== 반응형 ===== */
 @media (max-width: 1100px) {
   .ingredients-list-frame {
-    padding: 24px 20px 40px;
+    padding: 0 24px;
   }
 
   .list-body {
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+    gap: 24px;
   }
 }
 
 @media (max-width: 900px) {
+  .ingredients-list-frame {
+    padding: 0 16px;
+  }
+
   .list-body {
     grid-template-columns: 1fr;
   }
 
-  .category-grid {
-    grid-template-columns: repeat(4, minmax(80px, 1fr));
-  }
-
-  .category-etc {
-    width: auto;
+  .category-panel {
+    max-width: 420px;
+    margin: 0 auto;
   }
 
   .list-toolbar {
@@ -314,10 +325,24 @@
     width: 100%;
     justify-content: space-between;
   }
+
+  .category-grid {
+    grid-template-columns: repeat(4, minmax(80px, 1fr));
+  }
+
+  .category-etc {
+    width: auto;
+  }
 }
 
 @media (max-width: 600px) {
+  .ingredients-list-page {
+    padding: 28px 0 40px;
+  }
 
+  .ingredients-list-frame {
+    padding: 0 12px;
+  }
 
   .category-grid {
     grid-template-columns: repeat(2, minmax(80px, 1fr));
