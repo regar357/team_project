@@ -35,7 +35,7 @@ function getDdayClass(expiryStr) {
   return "dday";
 }
 
-// 계산용으로 정규화: "YYYY-MM-DD...", "YYYY.MM.DD" 등 → "YYYY-MM-DD"
+// 계산용
 function normalizeExpiryForCalc(expiry) {
   if (!expiry) return "";
   const s = String(expiry);
@@ -43,7 +43,7 @@ function normalizeExpiryForCalc(expiry) {
   return datePart.replace(/\./g, "-").replace(/\//g, "-");
 }
 
-// 화면 표시용: "YYYY-MM-DD..." → "YYYY.MM.DD"
+// 화면 표시용
 function formatExpiryDate(expiry) {
   if (!expiry) return "-";
   const s = String(expiry);
@@ -64,8 +64,11 @@ const categories = [
 ];
 
 export default function IngredientsListPage() {
+  // 실제 목록 상태 (API에서 받아온 데이터)
+  const [items, setItems] = useState([]);
+
   const [selectedCategory, setSelectedCategory] = useState("전체");
-  const [sortMode, setSortMode] = useState("임박순"); // 임박순 | 이름순 | 등록순
+  const [sortMode, setSortMode] = useState("임박순");
   const [search, setSearch] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -110,16 +113,16 @@ export default function IngredientsListPage() {
         : [];
 
       if (normalized.length === 0) {
-        console.warn("/food 응답이 비어 있어 initialIngredients 사용");
-        setItems(initialIngredients);
+        console.warn("/food 응답이 비어 있습니다.");
+        setItems([]);
       } else {
+        // 테이블에 들어갈 데이터 세팅
         setItems(normalized);
       }
     } catch (err) {
       console.error("GET /food 오류:", err);
       setFetchError(err?.message ?? "목록을 불러오는 중 오류가 발생했습니다.");
-      // 오류여도 최소한 더미 데이터는 보여주기
-      setItems(initialIngredients);
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -160,7 +163,7 @@ export default function IngredientsListPage() {
     return arr;
   }, [items, selectedCategory, sortMode, search]);
 
-  // 폐기 버튼 → DELETE /food/discard/:food_id
+  // 폐기 버튼 DELETE /food/discard/:food_id
   const handleDispose = async (id) => {
     const target = items.find((i) => i.id === id || i.food_id === id);
     if (!target) return;
@@ -199,7 +202,7 @@ export default function IngredientsListPage() {
     }
   };
 
-  // 새 식재료 추가 버튼(지금은 임시)
+  // 새 식재료 추가 버튼
   const handleAdd = () => {
     alert("새 식재료 추가 페이지로 이동 연결 예정!");
   };
@@ -238,7 +241,6 @@ export default function IngredientsListPage() {
 
           {/* 리스트 패널 */}
           <div className="list-panel">
-            {/* 상단 툴바 */}
             <div className="list-toolbar">
               <div className="sort-group">
                 {["임박순", "이름순", "등록순"].map((m) => (
@@ -275,7 +277,6 @@ export default function IngredientsListPage() {
 
             {/* 테이블 카드 */}
             <div className="table-card">
-              {/* 로딩/에러 메시지 (원하면 빼도 됨) */}
               {loading && (
                 <div className="empty-row" style={{ textAlign: "center" }}>
                   목록을 불러오는 중입니다...
