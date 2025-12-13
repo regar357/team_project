@@ -96,7 +96,8 @@ export async function fetchIngredients() {
     if (!response.ok) {
     throw new Error("식재료 목록 불러오기 실패");
   }
-    const rows = await response.json();
+    const apiResponse = await response.json();
+    const rows = apiResponse && Array.isArray(apiResponse.data) ? apiResponse.data : [];
     console.log("=== API 식재료 목록 응답 데이터 (GET /food/food_name) ===");
     console.log(rows);
 
