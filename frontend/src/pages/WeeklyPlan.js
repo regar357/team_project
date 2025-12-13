@@ -1,7 +1,8 @@
 // src/pages/WeeklyPlan.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import Button from "../components/common/Button";
+import { fetchIngredients } from "../utils/api/ingredients";
+// import { generateWeeklyPlan } from "../utils/api/weekly";
 import { fetchWeeklyRecipes } from "../utils/api/weekly";
 import "./WeeklyPlan.css";
 
@@ -12,21 +13,46 @@ export default function WeeklyPlan() {
 
   const [selectedDay, setSelectedDay] = useState("Mon");
   const [weeklyRecipes, setWeeklyRecipes] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       const weekly = await fetchWeeklyRecipes();
       setWeeklyRecipes(weekly);
+      setLoading(false);
     };
     load();
   }, []);
 
-  const recipes = weeklyRecipes[selectedDay] || [];
-  // const dateRangeLabel = "2024.12.01 ~ 12.07";
+  //   // 식재료 가져와서 AI 모델로 주간 식단 생성
+  // useEffect(() => {
+  //   const load = async () => {
+  //     try {
+  //       // 현재 보유 식재료 목록 가져오기
+  //       const ingredients = await fetchIngredients();
+  //       const ingredientNames = ingredients.map((i) => i.name);
 
-  // const handleReset = () => {
-  //   alert("RESET 기능은 추후 추천 로직과 연결될 예정입니다.");
-  // };
+  //       console.log("[WeeklyPlan] 가져온 식재료:", ingredientNames);
+
+  //       // AI 모델에 주간 식단 생성 요청
+  //       const weekly = await generateWeeklyPlan(ingredientNames);
+
+  //       console.log("[WeeklyPlan] AI 추천 결과:", weekly);
+
+  //       setWeeklyRecipes(weekly);
+  //     } catch (err) {
+  //       console.error("주간 식단 불러오기 실패:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   load();
+  // }, []);
+
+  const recipes = weeklyRecipes[selectedDay] || [];
+  const displayedRecipes = recipes.slice(0, 3);
+
 
   return (
     <div className="weekly-page">
@@ -53,29 +79,25 @@ export default function WeeklyPlan() {
             </button>
           ))}
         </div>
-      
-{/* 
-        <Button type="primary" onClick={handleReset}>
-          RESET
-        </Button> */}
-
       </div>
 
       {/* =====  카드 그리드 ===== */}
       <section className="weekly-main">
-
-        <div className="weekly-recipes-grid">
-          {recipes.length === 0 && (
+          {loading && ( <p className="weekly-loading">AI가 주간 식단을 생성 중입니다...</p> )}
+          
+          { !loading && displayedRecipes.length === 0 && (
             <p className="weekly-empty">
             아직 선택한 요일에 등록된 식단이 없습니다. 
             </p>
         )}
+        
+        <div className="weekly-recipes-grid">
 
-        {recipes.map((r) => (
+        {displayedRecipes.map((r) => (
           <div key={r.id}>
             <div
               className="weekly-recipe-card"
-              onClick={() => navigate(`/recipes/${r.id}`)}
+              onClick={() => navigate(`/recipes/${r.id}`,{ state: { recipeData: r }})}
             >
               <div className="weekly-recipe-image-wrap">
                 <img src={r.image_url} alt={r.title} />

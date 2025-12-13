@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import "./Home.css";
 
 const HOME_MENU_ITEMS = [
-  { id: "rec-find", label: "레시피 찾기", icon: "👩‍🍳", path: "/recipes/search" },
   { id: "ing-list", label: "식재료 목록", icon: "📋", path: "/list" },
   { id: "ing-add", label: "식재료 등록", icon: "📷", path: "/ingredients" },
+  { id: "rec-find", label: "레시피 찾기", icon: "👩‍🍳", path: "/recipes/search" },
   { id: "weekly", label: "주간 식단", icon: "📅", path: "/weekly-plan" },
   { id: "alerts", label: "유통기한 알림", icon: "🔔", path: "/alerts" },
   { id: "waste", label: "폐기물 정리", icon: "📊", path: "/waste" },

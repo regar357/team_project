@@ -5,12 +5,9 @@ export const RECIPES = [
   {
     id: 1,
     title: "토마토 파스타",
-    image_url: "/images/pasta.jpg",
-    category: "양식",
-    tags: ["파스타", "초간단"],
     description: "상큼한 토마토 향이 가득한 간단 파스타입니다.",
     servings: 2,
-    ingredients: ["토마토", "파스타면", "올리브유", "마늘", "소금", "후추"],
+ 
     steps: [
       "파스타 면을 삶습니다.",
       "올리브유에 마늘을 볶습니다.",
@@ -25,9 +22,6 @@ export const RECIPES = [
   {
     id: 2,
     title: "Egg scramble",
-    image_url: "/images/egg.png",
-    category: "양식",
-    tags: ["다이어트", "고단백"],
     description: "아침으로 먹기 좋은 부드러운 스크램블 에그입니다.",
     servings: 1,
     ingredients: ["계란", "버터", "우유", "소금"],
@@ -212,8 +206,6 @@ export async function fetchRecipeById(id) {
         title: rawRecipe.recipe_title,
         description: rawRecipe.recipe_description,
 
-        // priority_used_ingredients: safeJsonParseOrSplit(rawRecipe.priority_used_ingredients),
-        // other_ingredients:safeJsonParseOrSplit( rawRecipe.other_ingredients),
         priority_used_ingredients: Array.isArray(rawRecipe.priority_used_ingredients)
             ? rawRecipe.priority_used_ingredients
             : safeJsonParseOrSplit(rawRecipe.priority_used_ingredients),
@@ -228,7 +220,6 @@ export async function fetchRecipeById(id) {
         created_at: rawRecipe.created_at,
         image_url: rawRecipe.image_url ?? "/images/default_recipe.png",
 
-        // isSaved: getSavedRecipeIds().includes(rawRecipe.recipe_id),
       };
 
       return processedRecipe;
