@@ -231,8 +231,6 @@ function WastePage() {
                   <th>식재료명</th>
                   <th>카테고리</th>
                   <th>폐기일</th>
-                  <th>폐기량(개)</th>
-                  <th>기록 삭제</th>
                 </tr>
               </thead>
               <tbody>
