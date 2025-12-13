@@ -6,7 +6,8 @@
   --bg: #f3f3f3;
   --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.06);
 }
-/*타이틀 영역*/
+
+/* 타이틀 영역 */
 .header-hero {
   text-align: center;
   margin-bottom: 32px;
@@ -24,6 +25,7 @@
   font-size: 14px;
   color: #777;
 }
+
 /* 페이지 전체 – 다른 메뉴와 비슷한 그라디언트 + 가운데 정렬 */
 .recipe-page {
   width: 100%;
@@ -61,14 +63,14 @@
   padding: 28px 32px 32px;
   box-sizing: border-box;
 
-  display: flex;          /* 왼쪽/오른쪽 2열 배치 */
+  display: flex; /* 왼쪽/오른쪽 2열 배치 */
   align-items: flex-start;
   gap: 40px;
 }
 
 /* 왼쪽 사진 업로드 영역 */
 .photo-upload {
-  flex: 0 0 360px;        /* 너비 360px 고정 느낌 */
+  flex: 0 0 360px; /* 너비 360px 고정 느낌 */
   max-width: 360px;
   display: flex;
   flex-direction: column;
@@ -86,6 +88,24 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* 이미지를 가진 상태 */
+.photo-box.has-image {
+  border-style: solid;
+  border-color: #d5d5d5;
+  background: #000000;
+}
+
+/* 상자 안에서 꽉 차게 보이는 이미지 */
+.photo-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* 사진 업로드 버튼 */
@@ -100,6 +120,15 @@
   font-size: 14px;
   cursor: pointer;
   border: none;
+}
+
+/* 이미지가 있는 경우, 버튼을 하단에 겹치게 */
+.photo-button.photo-button-overlay {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  opacity: 0.9;
 }
 
 /* 사진 업로드 설명글 */
@@ -117,7 +146,7 @@
 
 /* 오른쪽 입력 폼 전체 */
 .recipe-form {
-  flex: 1;                      /* 남는 공간 전부 사용 */
+  flex: 1; /* 남는 공간 전부 사용 */
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -247,7 +276,7 @@
   }
 
   .recipe-top-card {
-    flex-direction: column;    /* 세로로 쌓기 */
+    flex-direction: column; /* 세로로 쌓기 */
     gap: 24px;
   }
 

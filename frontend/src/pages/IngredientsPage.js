@@ -41,9 +41,19 @@ function formatExpiryDate(expiry) {
   return datePart.replace(/-/g, ".");
 }
 
+// date input용: "YYYY-MM-DD...", "YYYY.MM.DD" 등 → "YYYY-MM-DD"
+function normalizeExpiryForInput(expiry) {
+  if (!expiry) return "";
+  const s = String(expiry);
+  const datePart = s.length >= 10 ? s.slice(0, 10) : s;
+  return datePart.replace(/\./g, "-").replace(/\//g, "-");
+}
+
 function IngredientsPage() {
+  // 아래 테이블에 표시할 식재료 목록
   const [ingredients, setIngredients] = useState([]);
 
+  // 우측 수정 폼
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -56,6 +66,9 @@ function IngredientsPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+
+  // 상자 안에 보여줄 이미지 URL (파일 로컬 미리보기용)
+  const [previewUrl, setPreviewUrl] = useState("");
 
   // 입력값 변경
   const handleChange = (e) => {
@@ -92,7 +105,19 @@ function IngredientsPage() {
     setUploadError("");
     setUploadedImageUrl("");
 
-    if (!file) return;
+    // 이전 미리보기 URL 정리 + 새 URL 생성
+    if (!file) {
+      setPreviewUrl((prevUrl) => {
+        if (prevUrl) URL.revokeObjectURL(prevUrl);
+        return "";
+      });
+      return;
+    }
+
+    setPreviewUrl((prevUrl) => {
+      if (prevUrl) URL.revokeObjectURL(prevUrl);
+      return URL.createObjectURL(file);
+    });
 
     try {
       setUploading(true);
@@ -107,20 +132,24 @@ function IngredientsPage() {
 
       // 결과 배열을 테이블용 데이터로 변환해서 바로 반영
       if (Array.isArray(data.results)) {
-        const normalized = data.results.map((item, idx) => ({
-          id: item.food_id ?? item.id ?? idx,
-          food_id: item.food_id ?? item.id ?? idx,
-          name: item.name ?? item.foodName ?? item.ingredientName ?? "",
-          category: item.category ?? item.type ?? "",
-          // 백엔드 응답에 맞춰 유통기한 필드 추론
-          expiry:
+        const normalized = data.results.map((item, idx) => {
+          const rawExpiry =
             item.expirationDate ??
             item.expiry ??
             item.expiryDate ??
             item.expiration_date ??
-            "",
-          imageUrl: item.imageUrl ?? "",
-        }));
+            "";
+
+          return {
+            id: item.food_id ?? item.id ?? idx,
+            food_id: item.food_id ?? item.id ?? idx,
+            name: item.name ?? item.foodName ?? item.ingredientName ?? "",
+            category: item.category ?? item.type ?? "",
+            // date input에 바로 쓸 수 있게 정규화
+            expiry: normalizeExpiryForInput(rawExpiry),
+            imageUrl: item.imageUrl ?? url ?? "",
+          };
+        });
 
         setIngredients(normalized);
       }
@@ -177,7 +206,7 @@ function IngredientsPage() {
     const payload = {
       name: form.name,
       category: form.category,
-      expiry: form.expiry,
+      expiry: form.expiry, // 이미 "YYYY-MM-DD" 형식
       // imageUrl: imageUrlToSend, // 백엔드에서 필요하면 주석 해제
     };
 
@@ -201,7 +230,7 @@ function IngredientsPage() {
       setForm({ name: "", category: "", expiry: "", imageFile: null });
       setUploadedImageUrl("");
       setUploadError("");
-
+      // 미리보기는 남겨도 되고, 비워도 됨. 여기서는 유지.
       alert("수정 완료!");
     } catch (err) {
       console.log("수정 오류:", err);
@@ -209,16 +238,18 @@ function IngredientsPage() {
     }
   };
 
-  // 행 클릭 시 폼에 불러오기
+  // 행 클릭 시 폼에 불러오기 (→ 수정 준비)
   const handleRowClick = (idx) => {
     const item = ingredients[idx];
     setForm({
       name: item.name,
       category: item.category,
-      expiry: item.expiry,
+      expiry: normalizeExpiryForInput(item.expiry),
       imageFile: null,
     });
 
+    // 행에 이미지 정보가 있다면 상자에서도 그 이미지 보여주기
+    setPreviewUrl("");
     setUploadedImageUrl(item.imageUrl || "");
     setUploadError("");
     setEditingIndex(idx);
@@ -236,24 +267,50 @@ function IngredientsPage() {
         <section className="recipe-top-card">
           {/* 왼쪽 사진 업로드 */}
           <div className="photo-upload">
-            <div className="photo-box">
-              <label className="photo-button">
-                <span>{uploading ? "업로드 중..." : "+ 사진 업로드"}</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  style={{ display: "none" }}
-                />
-              </label>
-              <p className="photo-help">냉장고 속 이미지를 등록하세요</p>
+            <div
+              className={`photo-box ${
+                previewUrl || uploadedImageUrl ? "has-image" : ""
+              }`}
+            >
+              {previewUrl || uploadedImageUrl ? (
+                <>
+                  <img
+                    src={previewUrl || uploadedImageUrl}
+                    alt="업로드된 식재료"
+                    className="photo-preview"
+                  />
+                  <label className="photo-button photo-button-overlay">
+                    <span>{uploading ? "업로드 중..." : "이미지 변경"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                  </label>
+                </>
+              ) : (
+                <>
+                  <label className="photo-button">
+                    <span>{uploading ? "업로드 중..." : "+ 사진 업로드"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                  </label>
+                  <p className="photo-help">냉장고 속 이미지를 등록하세요</p>
+                </>
+              )}
             </div>
 
+            {/* 파일 이름 / 업로드 상태 표시 (옵션) */}
             {form.imageFile && (
               <div className="photo-filename">{form.imageFile.name}</div>
             )}
 
-            {uploadedImageUrl && (
+            {uploadedImageUrl && !uploading && (
               <div className="photo-filename">업로드 완료</div>
             )}
 
