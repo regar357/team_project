@@ -83,80 +83,103 @@ exports.uploadFood = async (req, res) => {
 };
 
 exports.updateFood = async (req, res) => {
+  console.log("식재료 수정 수신 성공");
   const { food_id } = req.params;
   const { name, category, expiry } = req.body;
   console.log("food_id: " + food_id);
   console.log(req.body);
 
-  // try {
-  //   const [result] = await pool.query(
-  //     "UPDATE food SET food_name = ?, food_category = ?, food_Ex = ? WHERE id = ?",
-  //     [food_name, food_category, food_Ex, food_id]
-  //   );
+  try {
+    console.log("트라이 시작");
+    const [result] = await pool.query(
+      "UPDATE food SET food_name = ?, food_category = ?, food_Ex = ? WHERE food_id = ?",
+      [name, category, expiry, food_id]
+    );
 
-  //   if (result.affectedRows === 0) {
-  //     return res.status(404).json({ message: "존재하지 않는 식품 ID" });
-  //   }
+    console.log("수정 완료");
 
-  //   res.json({
-  //     message: "수정 완료",
-  //     food_id,
-  //     food_name,
-  //     food_category,
-  //     food_Ex,
-  //   });
-  // } catch (err) {
-  //   res.status(500).json({ error: err.message });
-  // }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "존재하지 않는 식품 ID" });
+    }
+
+    res.json({
+      message: "수정 완료",
+      food_id,
+      name,
+      category,
+      expiry,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 exports.getFoodList = async (req, res) => {
   console.log("수신 성공");
 
-  // const query = "SELECT * FROM food";
+  const query = "SELECT * FROM food";
 
-  // try {
-  //   const [rows] = await pool.query(query);
+  try {
+    const [rows] = await pool.query(query);
 
-  //   res.json({
-  //     message: "식재료 리스트 출력",
-  //     data: rows,
-  //   });
-  // } catch (err) {
-  //   res.status(500).json({
-  //     error: err.message,
-  //   });
-  // }
+    res.json({
+      message: "식재료 리스트 출력",
+      data: rows,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+};
+
+exports.getFoodNameList = async (req, res) => {
+  console.log("수신 성공");
+
+  const query = "SELECT food_name FROM food";
+
+  try {
+    const [rows] = await pool.query(query);
+
+    res.json({
+      message: "식재료 이름 리스트 출력",
+      data: rows,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
 };
 
 exports.discardFood = async (req, res) => {
   const { food_id } = req.params;
   console.log("수신 성공: " + food_id);
 
-  res.json({
-    message: "폐기 처분 성공",
-  });
+  // res.json({
+  //   message: "폐기 처분 성공",
+  // });
 
-  // try {
-  //   const [rows] = await pool.query("SELECT * FROM food WHERE food_id = ?", [
-  //     food_id,
-  //   ]);
+  try {
+    const [rows] = await pool.query("SELECT * FROM food WHERE food_id = ?", [
+      food_id,
+    ]);
 
-  //   if (rows.length === 0) {
-  //     return res.status(404).json({ message: "식품 정보를 찾을 수 없음" });
-  //   }
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "식품 정보를 찾을 수 없음" });
+    }
 
-  //   const food = rows[0];
+    const food = rows[0];
 
-  //   await pool.query(
-  //     "INSERT INTO discarded_food (food_id, food_name, food_category, food_Ex, discard_date) VALUES (?, ?, ?, ?, NOW())",
-  //     [food.food_id, food.food_name, food.food_category, food.food_Ex]
-  //   );
+    await pool.query(
+      "INSERT INTO discarded_food (food_id, food_name, food_category, food_Ex, discard_date) VALUES (?, ?, ?, ?, NOW())",
+      [food.food_id, food.food_name, food.food_category, food.food_Ex]
+    );
 
-  //   await pool.query("DELETE FROM food WHERE food_id = ?", [food_id]);
+    await pool.query("DELETE FROM food WHERE food_id = ?", [food_id]);
 
-  //   res.status(200).json({ message: "식품 폐기 완료" });
-  // } catch (err) {
-  //   res.status(500).json({ message: "DB 처리 중 오류 발생", error: err });
-  // }
+    res.status(200).json({ message: "식품 폐기 완료" });
+  } catch (err) {
+    res.status(500).json({ message: "DB 처리 중 오류 발생", error: err });
+  }
 };
