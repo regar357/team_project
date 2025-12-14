@@ -115,6 +115,7 @@ export default function RecipeSearch() {
                 priority_used_ingredients: recipe.priority_used_ingredients,
                 other_ingredients: recipe.other_ingredients,
                 title: recipe.recipe_title || recipe.title || '제목 없음', 
+                image_url: recipe.image_url ?? "/images/default_recipe.png",
                 tags: recipe.priority_used_ingredients.slice(0, 3)
               };
             }catch (e) {
