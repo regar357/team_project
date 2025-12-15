@@ -1,198 +1,91 @@
+/* src/pages/WeeklyPlan.css */
+
 .weekly-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   min-height: 100vh;
-  padding: 32px 100px;
+  padding: 60px 16px; 
   box-sizing: border-box;
-  background: linear-gradient(
-    180deg,
-    var(--bg-gradient-start) 0%,
-    var(--bg-gradient-mid) 45%,
-    var(--bg-gradient-end) 100%
-  );
-}
 
-/* 1줄째: 로고 + 날짜 */
-.weekly-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 16px;
 }
-
-.weekly-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.weekly-logo-circle {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #ee6049;
-}
-
-.weekly-logo-text {
-  display: flex;
-  flex-direction: column;
-  font-weight: 800;
-  font-size: 25px;
-  line-height: 1.1;
-}
-
-/* 2줄째: 요일 탭 + RESET */
-.weekly-top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 28px;
-  padding-right: 2px;
-}
-
-.weekly-tabs {
-  display: flex;
-  gap: 20px;
-   margin-left: 40px;
-  flex: 1;
-}
-
-.weekly-tab {
-  min-width: 100px;
-  padding: 10px 10px;
-  border-radius: 999px;
-  border: none;
-  background: #ddd;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: 700;
-  color: #555;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-}
-
-.weekly-tab.active {
-  background: #ee6049;
-  color: #fff;
+.weekly-content-wrap {
+    max-width: 1100px; 
+    width: 100%;
+    
 }
 
 
-.weekly-tab:hover {
-  transform: translateY(-1px);
+.weekly-block {
+  margin-bottom: 50px;
+}
+/* 요일 헤더  */
+
+.weekly-days {
+  display : grid;
+  margin-bottom : 20px; 
+  gap: 40px;
 }
 
-/* 카드 그리드 */
-
-
-
-.weekly-recipes-grid {
-  margin-top: 35px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(200px, 1fr));
-  gap: 36px 32px;
+.weekly-days-4 {
+  grid-template-columns: repeat(4, 1fr);
 }
 
-.weekly-empty {
-  grid-column: 1 / -1;
-  font-size: 15px;
-  color: var(--text-sub);
-}
-
-.weekly-recipe-card {
-  width: 100%;
-  min-height: 170px;
-  padding: 24px 22px 22px;
-  background: #ffffff;
-  border-radius: 10px;
-  /* border: 1px solid var(--glass-border); */
-  border-right: 1px solid #e5e7eb;
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: blur(18px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.weekly-recipe-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 26px 48px rgba(40, 90, 140, 0.3);
-}
-
-.weekly-recipe-card.selected {
-  box-shadow: 0 26px 55px rgba(77, 188, 233, 0.5);
-  outline: 2px solid var(--primary);
-}
-
-.weekly-recipe-image-wrap {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.18);
-  margin-bottom: 6px;
-}
-
-.weekly-recipe-image-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.weekly-recipe-title {
-  font-size: 25px;
-  font-weight: 700;
-  color: var(--text-main);
-  margin: 4px;
+.weekly-day {
   text-align: center;
+  font-weight: 700;
+  font-size: 25px; 
+  padding: 10px 0;
+  color: #555;
 }
 
-.weekly-recipe-tags {
+.day-tab {
+    background: #ee6049;
+    border: 1px solid #e0e0e0;
+    border-radius: 30px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    color: #ffffff 
+}
+
+
+/* =======================================
+ * 3. 테이블 및 카드 (글자 크기 확대)
+ * ======================================= */
+
+.weekly-table {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 3px;
+  flex-direction: column;
+  gap: 15px; /* 🚨 (수정) 행 간격 확대 */
 }
 
-.tag-badge {
-  display: inline-flex;
+.weekly-row {
+  display: grid;
+  gap: 40px; /* 🚨 (수정) 열 간격 확대 */
+}
+
+.weekly-row-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* 카드 */
+.weekly-card {
+  padding: 25px 15px; 
+  text-align: center;
+  font-size: 25px; 
+  font-weight: 500;
+  min-height: 80px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 7px 16px;
-  border-radius: 999px;
-  font-size: 15px;
-  font-weight: 400;
-  background-color: #2563eb;
-  color: #ffffff;
-  letter-spacing: 0.02em;
+  border: 1px solid #f0f0f0;
 }
-
-@media (max-width: 1200px) {
-  .weekly-layout {
-    grid-template-columns: 240px 1fr;
-    column-gap: 28px;
-  }
-}
-
-@media (max-width: 980px) {
-  .weekly-layout {
-    grid-template-columns: 1fr;
-    row-gap: 24px;
-  }
-
-  .weekly-recipes-grid {
-    grid-template-columns: repeat(2, minmax(180px, 1fr));
-  }
-
-  .weekly-page {
-    padding: 24px 16px 40px;
-  }
-}
-
-@media (max-width: 640px) {
-  .weekly-recipes-grid {
-    grid-template-columns: 1fr;
-  }
+.weekly-card.weekly-empty {
+  visibility: hidden; 
+  box-shadow: none;
+  border: none;
+  background: transparent;
 }

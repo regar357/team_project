@@ -4,6 +4,7 @@ const multer = require("multer");
 const path = require("path");
 const foodController = require("../controllers/foodController");
 
+//확장자 유지
 const storage = multer.diskStorage({
   destination: "uploads/",
   filename: (req, file, cb) => {
@@ -15,6 +16,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage }); // 이미지파일 저장 경로 설정
 //GET /food
 router.get("/", foodController.getFoodList);
+//GET /food/food_name
+router.get("/food_name", foodController.getFoodNameList);
 //POST /food/upload
 router.post("/upload", upload.single("image"), foodController.uploadFood);
 //PUT /food/update/:food_id

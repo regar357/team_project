@@ -4,6 +4,7 @@ const foodRoutes = require("./routes/food");
 const recipeRoutes = require("./routes/recipe");
 const discardRoutes = require("./routes/discard");
 const alertsRoutes = require("./routes/alerts");
+const weeklyRoutes = require("./routes/weekly");
 
 const app = express();
 const port = 3001;
@@ -16,6 +17,7 @@ app.use("/food", foodRoutes);
 app.use("/recipe", recipeRoutes);
 app.use("/discard", discardRoutes);
 app.use("/alerts", alertsRoutes);
+app.use("/weekly", weeklyRoutes);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/build/index.html"));

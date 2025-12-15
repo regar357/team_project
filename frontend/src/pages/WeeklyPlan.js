@@ -1,100 +1,120 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-// import Button from "../components/common/Button";
-import { fetchWeeklyRecipes } from "../utils/api/weekly";
+import React, { useState, useEffect } from "react";
+import Card from "../components/common/Card";
+import { fetchWeeklyPlan } from "../utils/api/weekly"; 
 import "./WeeklyPlan.css";
 
-const DAY_TABS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-export default function WeeklyPlan() {
-  const navigate = useNavigate();
+const DAYS = ["Mon", "Tue", "Wed", "Thu","Fri", "Sat", "Sun", "Empty"];
+const DAYS_TOP = DAYS.slice(0, 4); 
+const DAYS_BOTTOM = DAYS.slice(4, 8); 
 
-  const [selectedDay, setSelectedDay] = useState("Mon");
-  const [weeklyRecipes, setWeeklyRecipes] = useState({});
+export default function WeeklyPlan() {    
+    const [weeklyPlanData, setWeeklyPlanData] = useState({});
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      const weekly = await fetchWeeklyRecipes();
-      setWeeklyRecipes(weekly);
+    useEffect(() => {
+        const loadWeeklyPlan = async () => {
+            try {
+                setLoading(true);
+                const data = await fetchWeeklyPlan();
+                setWeeklyPlanData(data);
+            } catch (error) {
+                console.error("주간 식단 로딩 실패:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadWeeklyPlan();
+    }, []);
+
+    // API 데이터에서 메뉴를 가져오는 함수
+    const getMenu = (day, rowIndex) => {
+        const dailyMenus = weeklyPlanData[day];
+        return dailyMenus ? dailyMenus[rowIndex] : undefined;
     };
-    load();
-  }, []);
 
-  const recipes = weeklyRecipes[selectedDay] || [];
-  // const dateRangeLabel = "2024.12.01 ~ 12.07";
-
-  // const handleReset = () => {
-  //   alert("RESET 기능은 추후 추천 로직과 연결될 예정입니다.");
-  // };
+    if (loading) {
+        return (
+            <div className="weekly-page loading-state">
+                <div className="weekly-content-wrap">
+                    <p className="weekly-loading-text">주간 식단표를 불러오는 중입니다...</p>
+                </div>
+            </div>
+        );
+    }
 
   return (
-    <div className="weekly-page">
-      {/* 1줄째: 로고 + 날짜 범위 */}
-      <div className="weekly-top-row">
+  <div className="weekly-page">
 
-        <div className="weekly-logo">
-          <span className="weekly-logo-circle" />
-          <div className="weekly-logo-text">
-            <span>WEEKLY</span>
-            <span>PLAN</span>
-          </div>
-        </div>
-        
-        <div className="weekly-tabs">
-          {DAY_TABS.map((day) => (
-            <button
-              key={day}
-              type="button"
-              className={`weekly-tab ${selectedDay === day ? "active" : ""}`}
-              onClick={() => setSelectedDay(day)}
-            >
-              {day}
-            </button>
-          ))}
-        </div>
-      
-{/* 
-        <Button type="primary" onClick={handleReset}>
-          RESET
-        </Button> */}
+      <div className="weekly-content-wrap">
+          <section className="saved-hero">  
+            <h1>WEEKLY PLAN</h1>  <p>주간 식단</p>
+          </section>
 
-      </div>
+          <div className="weekly-block">
+            <div className="weekly-days weekly-days-4">
+              {DAYS_TOP.map((day) => (
+                <div 
+                    key={day} 
+                    className={`weekly-day ${day !== "Empty" ? "day-tab" : ""}`}
+                >
+                    {day !== "Empty" ? day : ""}
+                </div>
+              ))}
+            </div>
 
-      {/* =====  카드 그리드 ===== */}
-      <section className="weekly-main">
-
-        <div className="weekly-recipes-grid">
-          {recipes.length === 0 && (
-            <p className="weekly-empty">
-            아직 선택한 요일에 등록된 식단이 없습니다. 
-            </p>
-        )}
-
-        {recipes.map((r) => (
-          <div key={r.id}>
-            <div
-              className="weekly-recipe-card"
-              onClick={() => navigate(`/recipes/${r.id}`)}
-            >
-              <div className="weekly-recipe-image-wrap">
-                <img src={r.image_url} alt={r.title} />
-              </div>
-
-              <div className="weekly-recipe-info">
-                <div className="weekly-recipe-title">{r.title}</div>
-              </div>
-
-              <div className="weekly-recipe-tags">
-                { r.tags?.map((tag) => (
-                    <span key={tag} className="tag-badge"> {tag} </span>
-                  ))}
-              </div>
+            <div className="weekly-table">
+              {[0, 1].map((row) => (
+                <div key={row} className="weekly-row weekly-row-4">
+                  {DAYS_TOP.map((day) => {
+                    if (day === "Empty") {
+                      return <div key={`${day}-${row}`} className="weekly-card weekly-empty" />;
+                    }
+                    const menu = getMenu(day, row);
+                    return (
+                      <Card key={`${day}-${row}`} className="weekly-card">
+                        {menu ? menu.title : "-"}
+                      </Card>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-      </section>
 
-    </div>
-  );
+          {/* ===== 아랫줄: Fri~Sun (4칸 맞추기) ===== */}
+          <div className="weekly-block">
+            <div className="weekly-days weekly-days-4">
+              {DAYS_BOTTOM.map((day) => (
+                <div 
+                    key={day} 
+                    className={`weekly-day ${day !== "Empty" ? "day-tab" : ""}`}
+                >
+                  {day !== "Empty" ? day : ""}
+                </div>
+              ))}
+            </div>
+
+            <div className="weekly-table">
+              {[0, 1].map((row) => (
+                <div key={row} className="weekly-row weekly-row-4">
+                  {DAYS_BOTTOM.map((day) => {
+                    if (day === "Empty") {
+                      return <div key={`${day}-${row}`} className="weekly-card weekly-empty" />;
+                    }
+                    const menu = getMenu(day, row);
+                    return (
+                      <Card key={`${day}-${row}`} className="weekly-card">
+                        {menu ? menu.title : "-"}
+                      </Card>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+
+      </div>
+    </div>
+  );
 }
