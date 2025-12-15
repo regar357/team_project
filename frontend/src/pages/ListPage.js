@@ -228,10 +228,6 @@ export default function IngredientsListPage() {
     }
   };
 
-  const handleAdd = () => {
-    alert("새 식재료 추가 페이지로 이동 연결 예정!");
-  };
-
   return (
     <div className="ingredients-list-page">
       <div className="ingredients-list-frame">
@@ -284,15 +280,6 @@ export default function IngredientsListPage() {
               </div>
 
               <div className="toolbar-right">
-                <button
-                  type="button"
-                  className="add-btn"
-                  onClick={handleAdd}
-                >
-                  <span className="add-plus">＋</span>
-                  새 식재료 추가
-                </button>
-
                 <div className="search-box">
                   <input
                     placeholder="SEARCH"
